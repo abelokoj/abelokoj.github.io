@@ -1,3 +1,4 @@
+
 ---
 layout: course
 title: Introduction to Machine Learning
@@ -84,7 +85,6 @@ schedule:
       - name: Coding Lab
         url: https://github.com/
 ---
-
 ## Course Overview
 
 This introductory course on machine learning covers fundamental concepts and algorithms in the field. By the end of this course, students will be able to:
