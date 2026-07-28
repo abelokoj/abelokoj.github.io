@@ -11,8 +11,14 @@ email: abelokojunu@gmail.com # your email address
 #   logo: https://www.alberteinstein.com/wp-content/uploads/2024/03/cropped-favicon-192x192.png # can be png, svg, jpg
 #   title: Custom Social
 #   url: https://www.alberteinstein.com/
-linkedin_username: https://www.linkedin.com/in/abel-okojunu/
+linkedin_username: abel-okojunu/
 orcid_id: 0000-0002-5544-3402
-research_gate_profile: https://abelokoj.github.io/
+research_gate_profile: Abel-Okojunu
 github_username: abelokoj
 cv_pdf: /assets/pdf/example_pdf.pdf # path to your CV PDF file
+
+#  Adding a ratemy professor page.
+rate_my_professor: 
+  logo: https://www.ratemyprofessors.com
+  title: Rate My professor
+  url: https://www.ratemyprofessors.com/professor/2931172
