@@ -1,9 +1,9 @@
 # Professional Website
 
-<div align="center">
+<div>
 
 
-Head over to the website **[https://abelokoj.github.io](https://abelokoj.github.io)**
+Visit the website at:  **[https://abelokoj.github.io](https://abelokoj.github.io)**
 
 ---
 
