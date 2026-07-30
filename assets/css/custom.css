@@ -1,0 +1,19 @@
+/* Blue theme accent (overrides al-folio pink) */
+:root {
+  --global-theme-color: #1a6fc4 !important;
+  --global-hover-color: #155a9e !important;
+  --global-hover-text-color: #ffffff !important;
+  --global-code-bg-color: rgba(26, 111, 196, 0.05) !important;
+}
+html[data-theme="dark"] {
+  --global-theme-color: #4a9fe8 !important;
+  --global-hover-color: #7abef0 !important;
+}
+
+/* Colored contact icons — match live markup */
+.contact-icons a[href^="mailto"] i,
+.contact-icons a[title="Email"] i {
+  color: #EA4335 !important;
+}
+
+/* Dark mode: GitHub icon needs to stay visible */
