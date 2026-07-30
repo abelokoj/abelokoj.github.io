@@ -1,0 +1,183 @@
+/* ==========================================================
+   Online font sources
+   Serif: Source Serif 4
+   Sans: Source Sans 3
+   Mono: FiraCode Nerd Font
+   ========================================================== */
+
+/* Source Serif 4 + Source Sans 3 from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
+
+/* FiraCode Nerd Font from the Nerd Font Web Fonts CDN */
+@import url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css");
+
+:root {
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Source Sans 3", Arial, sans-serif;
+  --font-mono: "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
+}
+
+/* Sans — site interface, menus, labels, and normal prose */
+body,
+button,
+input,
+textarea,
+select,
+.navbar,
+.navbar-nav,
+.nav-link,
+.dropdown-menu,
+.table,
+.publications,
+.news,
+.post-meta {
+  font-family: var(--font-sans);
+}
+
+/* Serif — headings, page titles, post titles */
+h1, h2, h3, h4, h5, h6,
+.title,
+.post-title,
+article .title,
+.publications h2,
+.news h2,
+.cv .title {
+  font-family: var(--font-serif);
+}
+
+/* Mono — inline code, code blocks, syntax highlighting */
+code,
+pre,
+kbd,
+samp,
+.highlight,
+.highlight pre,
+.highlight code,
+figure.highlight,
+figure.highlight pre {
+  font-family: var(--font-mono);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Local font selection (NB: The code below has not been fully tested/verified to work) */
+
+/* @font-face {
+  font-family: "My Personal Serif";
+  src: url("/assets/fonts/MySerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "My Personal Serif";
+  src: url("/assets/fonts/MySerif-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "My Personal Sans";
+  src: url("/assets/fonts/MySans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "My Personal Sans";
+  src: url("/assets/fonts/MySans-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "My Personal Mono";
+  src: url("/assets/fonts/MyMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "My Personal Mono";
+  src: url("/assets/fonts/MyMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-serif: "My Personal Serif", Georgia, serif;
+  --font-sans: "My Personal Sans", Arial, sans-serif;
+  --font-mono: "My Personal Mono", "Courier New", monospace;
+}
+
+/* Default page copy and interface */
+/* body,
+button,
+input,
+textarea,
+select,
+.navbar,
+.navbar-nav,
+.nav-link {
+  font-family: var(--font-sans);
+} */
+
+/* Headings and editorial display text */
+/* h1, h2, h3, h4, h5, h6,
+.post-title,
+.title,
+article .title {
+  font-family: var(--font-serif);
+} */
+
+/* Code, preformatted text, highlighted snippets */
+/* code,
+pre,
+kbd,
+samp,
+.highlight,
+.highlight pre,
+.highlight code {
+  font-family: var(--font-mono);
+}  */
+
+/* */ 
