@@ -1,0 +1,38 @@
+/* Blue theme accent (overrides al-folio pink) */
+:root {
+  --global-theme-color: #1a6fc4 !important;
+  --global-hover-color: #155a9e !important;
+  --global-hover-text-color: #ffffff !important;
+  --global-code-bg-color: rgba(26, 111, 196, 0.05) !important;
+}
+html[data-theme="dark"] {
+  --global-theme-color: #4a9fe8 !important;
+  --global-hover-color: #7abef0 !important;
+}
+
+/* Colored contact icons — match live markup */
+.contact-icons a[href^="mailto"] i,
+.contact-icons a[title="Email"] i {
+  color: #EA4335 !important;
+}
+.contact-icons a[href*="linkedin.com"] i {
+  color: #0A66C2 !important;
+}
+.contact-icons a[href*="orcid.org"] i {
+  color: #A6CE39 !important;
+}
+.contact-icons a[href*="researchgate.net"] i {
+  color: #00CCBB !important;
+}
+.contact-icons a[href*="github.com"] i {
+  color: #333333 !important;
+}
+.contact-icons a[href*="/assets/pdf/"] i,
+.contact-icons a[title="Cv pdf"] i {
+  color: #1a6fc4 !important;
+}
+
+/* Dark mode: GitHub icon needs to stay visible */
+html[data-theme="dark"] .contact-icons a[href*="github.com"] i {
+  color: #e6e6e6 !important;
+}

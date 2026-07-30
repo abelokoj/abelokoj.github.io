@@ -7,7 +7,7 @@ FROM ruby:slim
 # ARG USERID=901
 # ARG USERNAME=jekyll
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 LABEL authors="Amir Pourmand,George Araújo" \
       description="Docker image for al-folio academic template" \
@@ -32,7 +32,7 @@ RUN apt-get update -y && \
         procps \
         python3-pip \
         zlib1g-dev && \
-    pip --no-cache-dir install --upgrade --break-system-packages nbconvert
+        pip --no-cache-dir install --upgrade --break-system-packages jupyter nbconvert
 
 # clean up
 RUN apt-get clean && \
