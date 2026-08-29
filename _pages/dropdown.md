@@ -2,12 +2,14 @@
 layout: page
 title: Submenus
 nav: true
-nav_order: 8
+nav_order: 7
 dropdown: true
 children:
-  - title: Bookshelf
-    permalink: /books/
+  - title: Resume
+    permalink: /resume/
+  - title: CV
+    permalink: /cv/
   - title: divider
-  - title: blog
+  - title: Blog posts
     permalink: /blog/
 ---

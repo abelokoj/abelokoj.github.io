@@ -15,10 +15,10 @@ linkedin_username: abel-okojunu/
 orcid_id: 0000-0002-5544-3402
 research_gate_profile: Abel-Okojunu
 github_username: abelokoj
-cv_pdf: /assets/pdf/example_pdf.pdf # path to your CV PDF file
+cv_pdf: /assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf  # /assets/pdf/example_pdf.pdf # path to your CV PDF file
 
 #  Adding a ratemy professor page.
-rate_my_professor: 
-  logo: https://www.ratemyprofessors.com
-  title: Rate My professor
+custom_social:
+  logo: /assets/img/icon_files/rmp_logo.png   #https://www.ratemyprofessors.com/favicon.ico
+  title: Rate My Professor
   url: https://www.ratemyprofessors.com/professor/2931172

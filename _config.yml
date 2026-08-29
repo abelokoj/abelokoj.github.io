@@ -7,9 +7,9 @@ first_name: Abel
 middle_name: 
 last_name: Okojunu
 contact_note: >
-  You can even add a little note about which of these is the best way to reach you.
+  Best way to reach me is by email at abelokojunu@gmail.com.
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+  Applied Mathematics, Scientific Computing, Machine Learning and AI.
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
@@ -19,7 +19,7 @@ lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: ⚛️ # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 
 url: https://abelokoj.github.io # the base hostname & protocol for your site
-baseurl:  # the subpath of your site, e.g. /blog/. Leave blank for root  ## previously was /al-folio
+baseurl: "" # the subpath of your site, e.g. /blog/. Leave blank for root  ## previously was /al-folio
 last_updated: false # set to true if you want to display last updated in the footer
 impressum_path: # set to path to include impressum link in the footer, use the same path as permalink in a page, helps to conform with EU GDPR
 back_to_top: true # set to false to disable the back to top button
@@ -29,8 +29,10 @@ back_to_top: true # set to false to disable the back to top button
 # -----------------------------------------------------------------------------
 
 # repo color theme
-repo_theme_light: default # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
-repo_theme_dark: dark # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
+# repo_theme_light: default # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
+# repo_theme_dark: dark # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
+repo_theme_light: shadow_blue # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
+repo_theme_dark: github_dark # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
 repo_trophies:
   enabled: true
   theme_light: flat # https://github.com/ryo-ma/github-profile-trophy
@@ -122,8 +124,8 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: al-folio # blog_name will be displayed in your blog page
-blog_description: a simple whitespace theme for academics
+blog_name: Abel Okojunu # blog_name will be displayed in your blog page
+blog_description: Notes on Applied Mathematics, Scientific Computing, Machine Learning & AI. 
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
 
@@ -133,17 +135,17 @@ pagination:
 
 related_blog_posts:
   enabled: true
-  max_related: 5
+  max_related: 4
 
 # Giscus comments (RECOMMENDED)
 # Follow instructions on https://giscus.app/ to setup for your repo to fill out the information below.
 giscus:
-  repo: # <your-github-user-name>/<your-github-repo-name>
-  repo_id: # leave empty or specify your repo_id (see https://giscus.app/)
-  category: Comments # name of the category under which discussions will be created
-  category_id: # leave empty or specify your category_id (see https://giscus.app/)
-  mapping: title # identify discussions by post title
-  strict: 1 # use strict identification mode
+  repo: abelokoj/abelokoj.github.io # abelokoj/abelokoj.github.io <your-github-user-name>/<your-github-repo-name>
+  repo_id: "R_kgDOTgiVew" # leave empty or specify your repo_id (see https://giscus.app/)
+  category: "Comments" # name of the category under which discussions will be created
+  category_id: "DIC_kwDOTgiVe84DCeqq" # leave empty or specify your category_id (see https://giscus.app/)
+  mapping: "title" # identify discussions by post title
+  strict: 0 # use strict identification mode
   reactions_enabled: 1 # enable (1) or disable (0) emoji reactions
   input_position: bottom # whether to display input form below (bottom) or above (top) the comments
   dark_theme: dark # name of the dark color scheme (preferred works well with al-folio dark mode)
@@ -152,24 +154,26 @@ giscus:
   lang: en
 
 # Disqus comments (DEPRECATED)
-disqus_shortname: al-folio # put your disqus shortname
+# disqus_shortname: al-folio # put your disqus shortname
 # https://help.disqus.com/en/articles/1717111-what-s-a-shortname
 
 # External sources.
 # If you have blog posts published on medium.com or other external sources,
 # you can display them in your blog by adding a link to the RSS feed.
 # Optional: Set default categories and tags for posts from each source.
+# ===========================================================================
+# I commented out the lines below.
 external_sources:
-  - name: medium.com
-    rss_url: https://medium.com/@al-folio/feed
-    categories: [external-posts]
-    tags: [medium]
-  - name: Google Blog
-    posts:
-      - url: https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/
-        published_date: 2024-05-14
-    categories: [external-posts]
-    tags: [google]
+  # - name: medium.com
+  #   rss_url: https://medium.com/@al-folio/feed
+  #   categories: [external-posts]
+  #   tags: [medium]
+  # - name: Google Blog
+  #   posts:
+  #     - url: https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/
+  #       published_date: 2024-05-14
+  #   categories: [external-posts]
+  #   tags: [google]
 
 # -----------------------------------------------------------------------------
 # Newsletter
@@ -261,6 +265,7 @@ plugins:
   - jekyll-paginate-v2
   - jekyll-regex-replace
   - jekyll/scholar
+  - jekyll-scholar
   - jekyll-sitemap
   - jekyll-socials
   - jekyll-tabs
@@ -333,13 +338,12 @@ jekyll-archives:
   books:
     enabled: [year, tags, categories] # enables year, tag and category archives (remove if you need to disable one of them).
 
-display_tags: ["formatting", "images", "links", "math", "code", "blockquotes"] # these tags will be displayed on the front page of your blog
-display_categories: ["external-services"] # these categories will be displayed on the front page of your blog
+display_tags: ["uncertainty-quantification", "statistics", "numerical-methods", "CFD", "Navier-Stokes", "scientific-computing", "scientific-ml", "pinns", "stability-analysis", "machine-learning", "deep-learning", "hpc", "parallel-computing"] # these tags will be displayed on the front page of your blog
+display_categories: ["AI-ML", "CFD", "HPC", "Scientific-Computing", "Research", "Teaching"] # these categories will be displayed on the front page of your blog
 
 # -----------------------------------------------------------------------------
 # Jekyll Scholar
 # -----------------------------------------------------------------------------
-
 scholar:
   last_name: [Einstein]
   first_name: [Albert, A.]
@@ -348,8 +352,11 @@ scholar:
   locale: en
 
   source: /_bibliography/
-  bibliography: papers.bib
-  bibliography_template: bib
+  # bibliography: papers.bib
+  # bibliography_template: bib
+  # source: ./_bibliography
+  bibliography: blog_references.bib
+  bibliography_template: "{{reference}}"
   # Note: if you have latex math in your bibtex, the latex filter
   # preprocessing may conflict with MathJAX if the latter is enabled.
   # See https://github.com/alshedivat/al-folio/issues/357.
@@ -362,8 +369,11 @@ scholar:
   details_link: Details
 
   query: "@*"
-  group_by: year
+  group_by: none  # year
   group_order: descending
+  order: ascending
+
+  
 
 # Display different badges withs stats for your publications
 # Customize badge behavior in _layouts/bib.liquid
