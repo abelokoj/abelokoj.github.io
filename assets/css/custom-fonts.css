@@ -1,23 +1,26 @@
 /* ==========================================================
    Online font sources
-   Serif: Source Serif 4
-   Sans: Source Sans 3
-   Mono: FiraCode Nerd Font
+   Sans (headings + body): Inter — loaded via <link> in _includes/head.liquid
+   Mono: Maple Mono, falling back to FiraCode Nerd Font
    ========================================================== */
 
-/* Source Serif 4 + Source Sans 3 from Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
+/* Maple Mono (primary code font) — Fontsource CDN build, latin subset.
+   Note: this is upstream Maple Mono, not the Nerd Font (NF) patched build;
+   no CDN-hosted NF webfont exists, it ships only as GitHub release ZIPs. The
+   FiraCode Nerd Font fallback below still supplies any NF icon glyph that
+   Maple Mono lacks, so the chain covers them without self-hosting. */
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.3.0/400.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource/maple-mono@5.3.0/700.css");
 
-/* FiraCode Nerd Font from the Nerd Font Web Fonts CDN */
+/* FiraCode Nerd Font — fallback, and the source of NF icon glyphs */
 @import url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css");
 
 :root {
-  --font-serif: "Source Serif 4", Georgia, serif;
-  --font-sans: "Source Sans 3", Arial, sans-serif;
-  --font-mono: "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
+  --font-sans: "Lora", Arial, sans-serif;
+  --font-mono: "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
 }
 
-/* Sans — site interface, menus, labels, and normal prose */
+/* Inter everywhere — interface, prose, and headings */
 body,
 button,
 input,
@@ -30,11 +33,7 @@ select,
 .table,
 .publications,
 .news,
-.post-meta {
-  font-family: var(--font-sans);
-}
-
-/* Serif — headings, page titles, post titles */
+.post-meta,
 h1, h2, h3, h4, h5, h6,
 .title,
 .post-title,
@@ -42,7 +41,17 @@ article .title,
 .publications h2,
 .news h2,
 .cv .title {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6,
+.title,
+.post-title,
+article .title,
+.publications h2,
+.news h2,
+.cv .title {
+  font-weight: 700;
 }
 
 /* Mono — inline code, code blocks, syntax highlighting */
@@ -58,126 +67,78 @@ figure.highlight pre {
   font-family: var(--font-mono);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Local font selection (NB: The code below has not been fully tested/verified to work) */
-
-/* @font-face {
-  font-family: "My Personal Serif";
-  src: url("/assets/fonts/MySerif-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "My Personal Serif";
-  src: url("/assets/fonts/MySerif-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "My Personal Sans";
-  src: url("/assets/fonts/MySans-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "My Personal Sans";
-  src: url("/assets/fonts/MySans-Semibold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "My Personal Mono";
-  src: url("/assets/fonts/MyMono-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "My Personal Mono";
-  src: url("/assets/fonts/MyMono-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-:root {
-  --font-serif: "My Personal Serif", Georgia, serif;
-  --font-sans: "My Personal Sans", Arial, sans-serif;
-  --font-mono: "My Personal Mono", "Courier New", monospace;
-}
-
-/* Default page copy and interface */
-/* body,
-button,
-input,
-textarea,
-select,
-.navbar,
-.navbar-nav,
-.nav-link {
-  font-family: var(--font-sans);
-} */
-
-/* Headings and editorial display text */
-/* h1, h2, h3, h4, h5, h6,
-.post-title,
-.title,
-article .title {
-  font-family: var(--font-serif);
-} */
-
-/* Code, preformatted text, highlighted snippets */
-/* code,
+/* Code sits slightly below the 16px body text. rem (not em) so code nested
+   inside sized containers can't compound. The `:not(pre) > code` selector
+   matches main.css's own inline-code rule so source order decides — a bare
+   `code` selector loses to it on specificity and is silently ignored.
+   Prose is deliberately left unset here so it keeps the theme's 16px. */
 pre,
-kbd,
-samp,
-.highlight,
 .highlight pre,
-.highlight code {
-  font-family: var(--font-mono);
-}  */
+figure.highlight pre,
+:not(pre) > code {
+  font-size: 0.90625rem; /* 14.5px at the 16px root */
+}
 
-/* */ 
+/* About page — justified prose. `hyphens: auto` is doing real work here: the
+   profile image floats right, so text wraps in a narrowed column where justify
+   alone would open large word gaps ("rivers"). Paragraphs only, so headings and
+   list items keep their natural ragged right. */
+.about-intro p {
+  text-align: left;
+  hyphens: auto;
+}
+
+/* Blog post list — tighter vertical rhythm.
+   The gem resets margin-bottom on .post-meta but not on .post-tags, which is
+   the last element in each <li>; with Tailwind preflight off it keeps its
+   UA-default ~1em bottom margin and stacks on top of the li's own padding,
+   leaving a large empty gap before the divider between posts. */
+.post-list li {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.post-list li p {
+  margin: 0;
+}
+
+/* Blog tag/category cloud — tighter vertical rhythm.
+   The bullet separators are bare <p> tags with no reset class, and Tailwind
+   preflight is off here, so the UA default ~1em p margin was stacking on
+   top of the padding below and inflating the gap between wrapped rows. */
+.tag-category-list ul li,
+.tag-category-list ul p {
+  padding: 0.15rem 0.2rem;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.02;
+}
+
+/* Contact/social icons — brand colors instead of monochrome.
+   The gem paints the glyph color on the i::before pseudo-element
+   (var(--global-text-color)), so overrides must target ::before too. */
+.contact-icons a[href^="mailto"] i::before {
+  color: #ea4335; /* Gmail red */
+}
+.contact-icons a[href*="linkedin.com"] i::before {
+  color: #0a66c2; /* LinkedIn blue */
+}
+.contact-icons a[href*="orcid.org"] i::before {
+  color: #a6ce39; /* ORCID green */
+}
+.contact-icons a[href*="researchgate.net"] i::before {
+  color: #00ccbb; /* ResearchGate teal */
+}
+.contact-icons a[href*="github.com"] i::before {
+  color: #333333; /* GitHub dark */
+}
+html[data-theme="dark"] .contact-icons a[href*="github.com"] i::before {
+  color: #e6e6e6; /* keep the GitHub mark visible on a dark background */
+}
+.contact-icons a[title="Cv pdf"] i::before {
+  color: var(--global-theme-color);
+}
+
+
+
+

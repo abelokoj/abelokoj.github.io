@@ -145,7 +145,7 @@ test("related posts are wrapped in a valid list", async ({ page }) => {
   await page.goto("/al-folio/blog/2023/tables/", { waitUntil: "networkidle" });
   await stabilizeVisuals(page);
 
-  const heading = page.getByRole("heading", { name: "Enjoy Reading This Article?" });
+  const heading = page.getByRole("heading", { name: "Enjoyed reading this article?" });
   await expect(heading).toBeVisible();
 
   const relatedList = heading.locator("xpath=following::ul[1]");

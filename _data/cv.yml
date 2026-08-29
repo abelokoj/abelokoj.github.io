@@ -1,189 +1,383 @@
 cv:
-  name: Albert Einstein
-  label: Scientist
-  email: einstein@example.com
-  location: Princeton, NJ
+  name: Abel Okojunu
+  label: Applied Mathematician
+  email: abelokojunu@gmail.com
+  location: Tallahassee, Florida
   image: ""
-  summary: A German-born theoretical physicist, widely ranked among the greatest and most influential scientists of all time
+  summary: An Applied & Computational Mathematician with interest in scientific computing, HPC, Machine Learning and AI.
 
   social_networks:
-    - network: X
-      username: AlbertEinstein
     - network: GitHub
-      username: example
+      username: abelokoj
     - network: LinkedIn
-      username: example
+      username: abel-okojunu
 
   address:
-    street: 2712 Broadway St
-    city: San Francisco
-    region: California
-    postalCode: CA 94115
+    street:
+    city: Tallahassee
+    region: Florida
+    postalCode: "32306"
     countryCode: US
 
   sections:
     Education:
-      - institution: University of Zurich
-        location: Zurich, Switzerland
-        url: https://www.uzh.ch/
-        area: Physics
+      - institution: Florida State University
+        location: Tallahassee, Florida, USA
+        url: ""
+        area: Applied & Computational Mathematics
         studyType: PhD
-        start_date: 1900
-        end_date: 1905
+        start_date: "" # not stated on the CV -- fill in your actual start year
+        end_date: 2026
         score: ""
-        courses: "Theory of Relativity"
+        courses: ""
         highlights:
-          - Description 1.
-          - Description 2.
+          - "Thesis: Linear Stability Analysis of Rotating Flow using a non-Matrix-forming approach"
+          - "Expected completion: Fall 2026"
 
-      - institution: Eidgenössische Technische Hochschule
-        location: Zurich, Switzerland
-        area: Physics
-        studyType: Federal teaching diploma
-        start_date: 1896
-        end_date: 1900
+      - institution: Florida State University
+        location: Tallahassee, Florida, USA
+        url: ""
+        area: Mathematics
+        studyType: M.Sc.
+        start_date: "" # not stated on the CV -- fill in your actual start year
+        end_date: 2023
+        score: ""
+        courses: ""
+        highlights: []
+
+      - institution: Federal University of Petroleum Resources
+        location: Effurun, Delta State, Nigeria
+        url: ""
+        area: Mathematics
+        studyType: B.Sc.
+        start_date: 2013
+        end_date: 2018
+        score: "First Class Honours (4.95/5.0) -- the highest recorded CGPA for any student since the university's inception; Class Rank 1"
+        courses: ""
         highlights:
-          - Description 1.
-          - Description 2.
+          - "B.Sc. Thesis: Higher Order Compact Finite Difference Schemes for Linear 2-point Boundary Value Problems"
 
     Experience:
-      - company: Institute for Advanced Study, Princeton University
-        position: Professor of Theoretical Physics
-        location: Princeton University, NJ
-        start_date: 1933
-        end_date: 1955
-        summary: Teaching at Palmer Physical Laboratory (now 302 Frist Campus Center). While not a professor at Princeton, I associated with the physics professors and continued to give lectures on campus.
+      - company: Florida State University, Department of Mathematics
+        position: Graduate Teaching Assistant (Instructor of Record)
+        location: Tallahassee, Florida, USA
+        start_date: "2023-07-01"
+        end_date: "present"
+        summary: "Responsible for instruction, student mentoring, course content design, grading, and providing feedback on 50+ original problems for approximately 30 students each semester."
         highlights:
-          - Relativity
-          - Description 2.
+          - "Calculus 3 (Spring & Fall 2025): multivariate calculus, vector analysis, optimization"
+          - "Applied Linear Algebra I (Summer 2025): matrix algebra, eigenvalue analysis, least-squares optimization, numerical methods (LU, QR, SVD)"
+          - "Calculus 1 (Spring & Fall 2024): differential & integral calculus, optimization, limit theory"
+          - "Pre-Calculus (Summer & Fall 2023): function analysis, logarithmic/exponential modeling, algebraic geometry"
 
-      - company: California Institute of Technology
-        position: Visiting Professor
-        location: Pasadena, California, US
-        start_date: 1933
-        end_date: 1933
+      - company: Lawrence Livermore National Laboratory (LLNL)
+        position: Graduate Research Intern
+        location: Livermore, California, USA
+        start_date: "2024-06-01"
+        end_date: "2024-08-31"
+        summary: "Summer graduate internship in computational methods for aerospace/aviation applications."
         highlights:
-          - Description 1.
-          - Description 2.
+          - "Developed an accelerated ODE technique using the Sherman-Morrison formula for sustainable aviation fuel (SAF) modeling"
+          - "Applied HPC techniques to computational methods for dynamical systems in an aerospace engineering context"
+          - "Collaborated with interdisciplinary technical teams on algorithm development"
 
-      - company: Kaiser Wilhelm Institute for Physics
-        position: Director
-        location: Berlin, Germany
-        start_date: 1917
-        end_date: 1933
+      - company: Florida State University, Department of Mathematics # institution assumed -- not explicitly named for this entry on the CV; please confirm
+        position: Graduate Research Assistant
+        location: Tallahassee, Florida, USA
+        start_date: "2022-04-01"
+        end_date: "2023-04-01"
+        summary: ""
+        highlights:
+          - "Jet noise reduction, compressible flow, and gas dynamics research"
 
-      - company: Karl-Ferdinand University
-        position: Professor of Theoretical Physics
-        location: Prague, Czechoslovakia
-        start_date: 1911
-        end_date: 1917
+      - company: Florida State University, Department of Mathematics
+        position: Graduate Teaching Assistant (Lab & Recitations)
+        location: Tallahassee, Florida, USA
+        start_date: "2021-01-01"
+        end_date: "2022-04-01"
+        summary: "Organized recitations, graded coursework, and provided feedback to improve students' overall learning experience."
+        highlights:
+          - "Courses: Pre-Calculus, Business Calculus III"
 
-      - company: University of Zurich
-        position: Associate Professor of Theoretical Physics
-        location: Zurich, Switzerland
-        start_date: 1909
-        end_date: 1911
+      - company: Independent National Electoral Commission (INEC)
+        position: "Assistant Presiding Officer (APO 1)"
+        location: "Ward 4, Unit 11, Ndi Etiti Nkporo, Ohafia L.G.A., Abia State, Nigeria"
+        start_date: "2019-02-01"
+        end_date: "2019-03-01"
+        summary: "Election duty officer for the 2019 Nigerian presidential election."
+        highlights: []
+
+      - company: Private Tutoring
+        position: "Private Tutor (Mathematics), Part-time"
+        location: Nigeria
+        start_date: "2019-07-01"
+        end_date: "2019-08-31"
+        summary: ""
+        highlights:
+          - "Tutored an undergraduate Computer Engineering student in college algebra"
+          - "Customized problems to address the student's conceptual gaps"
+
+      - company: Peniel Intellectual Academy
+        position: Mathematics Tutor (National Youth Service Corps)
+        location: Ohafia, Abia State, Nigeria
+        start_date: "2018-07-01"
+        end_date: "2019-06-01"
+        summary: ""
+        highlights: []
+
+      - company: Faith Academy
+        position: Mathematics Tutor
+        location: Nigeria
+        start_date: "2012-10-01"
+        end_date: "2014-03-01"
+        summary: "Instructor of record for primary school mathematics students."
+        highlights: []
 
     Volunteer:
-      - company: People's Climate March
-        position: Lead Organizer
-        location: Zurich, Switzerland
-        start_date: 2014-04-01
-        end_date: 2015-07-01
-        summary: Lead organizer for the New York City branch of the People's Climate March, the largest climate march in history.
-        highlights:
-          - "Awarded 'Climate Hero' award by Greenpeace for my efforts organizing the march."
-          - "Men of the year 2014 by Time magazine"
+      - company: "National Youth Service Corps -- Federal Road Safety Club, Ohafia (FRSC)"
+        position: Community Development Service (CDS) Member
+        location: Ohafia, Abia State, Nigeria
+        start_date: "2018-07-01"
+        end_date: "2019-06-01"
+        summary: "Community development service component of Nigeria's mandatory National Youth Service Corps program."
+        highlights: []
 
     Awards:
-      - title: Nobel Prize in Physics
+      - title: Dwight B. Goodner Mathematics Fellowship
         authors:
-          - "Royal Swedish Academy of Sciences"
-        date: 1921-11-01
-        awarder: Royal Swedish Academy of Sciences
-        url: https://www.nobelprize.org/prizes/physics/1921/einstein/biographical/
-        summary: The Nobel Prizes are five separate prizes that, according to Alfred Nobel's will of 1895, are awarded to 'those who, during the preceding year, have conferred the greatest benefit to humankind.'
+          - Florida State University, Department of Mathematics
+        date: "2026-04-01"
+        awarder: Florida State University, Department of Mathematics
+        url: ""
+        summary: "Senior award for outstanding teaching in the field of mathematics."
 
-      - title: Max Planck Medal
+      - title: Distinguished Teaching Assistant Award
         authors:
-          - "German Physical Society"
-        date: 2029
-        awarder: German Physical Society
-        summary: Awarded for outstanding scientific achievement
+          - Florida State University, Department of Mathematics
+        date: "2025-04-01"
+        awarder: Florida State University, Department of Mathematics
+        url: ""
+        summary: ""
+
+      - title: Certificate of Recognition
+        authors:
+          - EducationUSA Abuja
+        date: "2020-12-01"
+        awarder: EducationUSA Abuja
+        url: ""
+        summary: "Special recognition for supporting EducationUSA Abuja (2019/2020 cohort)."
+
+      - title: Tam Family Fellowship
+        authors:
+          - Tam Family Foundation
+        date: "2020-04-01"
+        awarder: Tam Family Foundation (FSU)
+        url: ""
+        summary: ""
+
+      - title: Vice-Chancellor's Prize -- Overall Best Graduating Student
+        authors:
+          - Federal University of Petroleum Resources
+        date: "2019-04-01"
+        awarder: Federal University of Petroleum Resources
+        url: ""
+        summary: "For the 2016/2017 academic session."
+
+      - title: Dean's Prize (College of Science) -- Best Graduating Student
+        authors:
+          - Federal University of Petroleum Resources, College of Science
+        date: "2019-04-01"
+        awarder: Federal University of Petroleum Resources, College of Science
+        url: ""
+        summary: "For the 2016/2017 academic session."
+
+      - title: Opportunity Fund Scholarship (OFP)
+        authors:
+          - EducationUSA
+        date: "2019-07-01"
+        awarder: EducationUSA (Abuja, Nigeria)
+        url: ""
+        summary: ""
+
+      - title: Prince Ned Nwoko's Foundation Award
+        authors:
+          - Prince Ned Nwoko's Foundation
+        date: "2019-05-01"
+        awarder: Prince Ned Nwoko's Foundation
+        url: ""
+        summary: "Cash award to first-class graduates."
+
+      - title: Gold Medal -- National Mathematics Competition for University Students (NAMCUS)
+        authors:
+          - NAMCUS
+        date: "2017-04-01"
+        awarder: NAMCUS
+        url: ""
+        summary: "Awarded at the 400 level."
+
+      - title: Most Outstanding Student, Department of Mathematics & Computer Science
+        authors:
+          - "NAMCOSS Merit Awards, Federal University of Petroleum Resources"
+        date: "2017-04-01"
+        awarder: "NAMCOSS Merit Awards (FUPRE)"
+        url: ""
+        summary: ""
+
+      - title: Best College of Science Student
+        authors:
+          - "NADESTU Awards, Federal University of Petroleum Resources"
+        date: "2017-06-01"
+        awarder: "NADESTU Awards (FUPRE)"
+        url: ""
+        summary: ""
+
+      - title: Silver Medal -- National Mathematics Competition for University Students (NAMCUS)
+        authors:
+          - NAMCUS
+        date: "2016-04-01"
+        awarder: NAMCUS
+        url: ""
+        summary: "Awarded at the 300 level, competing against seniors in the 400 level."
+
+      - title: MTN Foundation Scholarship
+        authors:
+          - MTN Foundation
+        date: "2015-11-01"
+        awarder: MTN Foundation
+        url: ""
+        summary: "Science & Technology Scholarship for undergraduate studies."
 
     Publications:
-      - title: Zur Elektrodynamik bewegter Körper
+      - title: Higher-Order Compact Finite Difference Scheme for Linear Two-point Boundary Value Problems
         authors:
-          - Albert Einstein
-        publisher: Annalen der Physik
-        releaseDate: 1905-06-30
-        url: https://en.wikisource.org/wiki/Translation:On_the_Electrodynamics_of_Moving_Bodies
-        summary: It concerned an interpretation of the Michelson–Morley experiment and the properties of light and time. Special relativity incorporates the principle that the speed of light is the same for all inertial observers regardless of the state of motion of the source.
+          - Abel Okojunu
+          - A. Waheed
+          - A. M. Okedoye
+        publisher: SSRN
+        releaseDate: "2022-01-01"
+        url: https://doi.org/10.2139/ssrn.4720897
+        summary: ""
 
-      - title: Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt
+      - title: Algorithms for solution of fixed point and equilibrium problems in a Banach space
         authors:
-          - Albert Einstein
-        publisher: Annalen der Physik
-        releaseDate: 1905-03-18
-        url: https://de.wikisource.org/wiki/Über_einen_die_Erzeugung_und_Verwandlung_des_Lichtes_betreffenden_heuristischen_Gesichtspunkt
-        summary: In the second paper, he applied the quantum theory to light to explain the photoelectric effect. In particular, he used the idea of light quanta (photons) to explain experimental results, but stressed the importance of the experimental results. The importance of his work on the photoelectric effect earned him the Nobel Prize in Physics in 1921.
-
-      - title: Die Grundlage der allgemeinen Relativitätstheorie
-        authors:
-          - Albert Einstein
-        publisher: Annalen der Physik
-        releaseDate: 1916-03-20
-        url: https://de.wikisource.org/wiki/Die_Grundlage_der_allgemeinen_Relativitätstheorie
-        summary: The publication of the theory of general relativity made him internationally famous. He was professor of physics at the universities of Zurich (1909–1911) and Prague (1911–1912), before he returned to ETH Zurich (1912–1914).
+          - Ekuma Okereke
+          - Abel Okojunu
+        publisher: Tropical Journal of Science and Technology
+        releaseDate: "2019-01-01"
+        url: https://credence-publishing.com
+        summary: "Vol. 1, issue 1, pp. 105-123."
 
     Skills:
-      - name: Physics
-        level: Master
-        icon: fa-solid fa-hashtag
-        keywords: "Quantum Mechanics, Quantum Computing, Quantum Information, Quantum Cryptography, Quantum Communication, Quantum Teleportation"
+      - name: Scientific Computing & Programming
+        level: "" # bar lengths in the PDF suggest differing proficiency per tool -- fill in if you want an overall level shown
+        icon: fa-solid fa-code
+        keywords: "MATLAB, Python, R, Julia, C++, FORTRAN"
+
+      - name: Symbolic & Optimization Software
+        level: ""
+        icon: fa-solid fa-square-root-variable
+        keywords: "Maple, Mathematica, GAMS, GAP"
+
+      - name: Machine Learning # inferred from your blog's ML-toolkit posts (scikit-learn, XGBoost, Keras/TensorFlow, PyTorch) -- please confirm/adjust
+        level: ""
+        icon: fa-solid fa-brain
+        keywords: "scikit-learn, XGBoost, PyTorch, TensorFlow/Keras"
+
+      - name: Typesetting & Environments
+        level: ""
+        icon: fa-solid fa-file-lines
+        keywords: "LaTeX, Typst, Windows, Linux"
 
     Languages:
-      - name: German
-        summary: "Native speaker"
-
       - name: English
         summary: "Fluent"
 
     Interests:
-      - name: Physics
-        icon: fa-solid fa-tag
-        keywords: "Quantum Mechanics, Quantum Computing, Quantum Information, Quantum Cryptography, Quantum Communication, Quantum Teleportation"
+      - name: Scientific Computing & Numerical Methods
+        icon: fa-solid fa-diagram-project
+        keywords: "High-Performance Computing, Uncertainty Quantification, Stiff ODE Solvers, Domain Decomposition"
+
+      - name: Machine Learning & AI
+        icon: fa-solid fa-robot
+        keywords: "Physics-Informed Neural Networks, Bayesian Inference, Surrogate Modeling"
 
     Certificates:
-      - name: Machine Learning
-        date: 2018-01-01
-        issuer: Stanford University
-        icon: fa-solid fa-location-dot
+      - name: Applied Data Science with Python Specialization (5 courses)
+        date: "" # no date given on the CV
+        issuer: "Coursera -- University of Michigan"
+        icon: fa-solid fa-laptop-code
 
-      - name: Quantum Computing
-        date: 2018-01-01
-        issuer: Stanford University
-        icon: fa-solid fa-tag
+      - name: Statistics with R Specialization (5 courses)
+        date: ""
+        issuer: "Coursera -- Duke University"
+        icon: fa-solid fa-chart-simple
 
-      - name: Quantum Information
-        date: 2018-01-01
-        issuer: Stanford University
-        icon: fa-solid fa-envelope
+      - name: Julia Scientific Computing
+        date: ""
+        issuer: "Coursera -- University of Cape Town"
+        icon: fa-solid fa-square-root-variable
 
-    Projects:
-      - name: Quantum Computing
-        summary: Quantum computing is the use of quantum-mechanical phenomena such as superposition and entanglement to perform computation. Computers that perform quantum computations are known as quantum computers.
+      - name: Introduction to Programming in MATLAB
+        date: ""
+        issuer: "Coursera -- Vanderbilt University"
+        icon: fa-solid fa-code
+
+      - name: Analyzing and Visualizing Data with Power BI
+        date: ""
+        issuer: "edX -- Microsoft"
+        icon: fa-solid fa-chart-line
+
+      - name: Data Science Ethics
+        date: ""
+        issuer: "Coursera -- University of Michigan"
+        icon: fa-solid fa-scale-balanced
+
+    Projects: # populated from your blog posts -- trim/expand/add links as you prefer
+      - name: Sherman-Morrison-Accelerated ODE Solvers for Sustainable Aviation Modeling
+        summary: "Applied the Sherman-Morrison formula to avoid re-factorizing a system matrix at every implicit-Euler time step in a rank-one, time-varying ODE system motivated by aircraft fuel-burn dynamics."
         highlights:
-          - Quantum Teleportation
-          - Quantum Cryptography
-        start_date: 2018-01-01
-        end_date: 2018-01-01
+          - "Reduced per-step cost from O(n^3) to O(n^2)"
+          - "Validated against a naive refactor-every-step baseline"
+        start_date: 2026
+        end_date: 2026
 
-    References:
-      - name: Professor John Doe
-        icon: fa-solid fa-laptop
-        reference: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam condimentum, diam quis convallis euismod, arcu mi ullamcorper lorem, a vestibulum nunc magna at sem. Sed in risus ac felis varius blandit.
+      - name: Stiff ODE Solvers and Stability Analysis
+        summary: "Analyzed why explicit Runge-Kutta methods fail on stiff systems (Van der Pol oscillator) and benchmarked explicit vs. implicit (Radau) solver cost across a range of stiffness parameters."
+        highlights:
+          - "Derived absolute-stability regions for forward/backward Euler from the Dahlquist test equation"
+        start_date: 2026
+        end_date: 2026
 
-      - name: Professor Jane Smith
-        icon: fa-solid fa-thumbtack
-        reference: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam condimentum, diam quis convallis euismod, arcu mi ullamcorper lorem, a vestibulum nunc magna at sem. Sed in risus ac felis varius blandit.
+      - name: Uncertainty Quantification via Polynomial Chaos Expansion
+        summary: "Built a Legendre polynomial-chaos surrogate model and compared its spectral convergence against standard Monte Carlo sampling."
+        highlights:
+          - "Matched machine-precision accuracy in ~15-20 evaluations vs. tens of thousands for Monte Carlo"
+        start_date: 2026
+        end_date: 2026
+
+      - name: "Physics-Informed Neural Networks vs. Classical Solvers"
+        summary: "A quantitative, from-scratch comparison of a PINN against a classical adaptive ODE solver on a problem with a known closed-form solution."
+        highlights:
+          - "Benchmarked accuracy and wall-clock cost against ground truth, not just against each other"
+        start_date: 2026
+        end_date: 2026
+
+      - name: HPC Domain Decomposition for Wave Propagation
+        summary: "Implemented 1D domain decomposition with halo exchange for a 2D wave equation and verified bit-for-bit equivalence with a monolithic solve."
+        highlights:
+          - "Analyzed scaling behavior via Amdahl's Law and a weak-scaling communication-overhead model"
+        start_date: 2026
+        end_date: 2026
+
+    References: # see the note below about publishing reference contact info publicly
+      - name: "Dr. Mark Sussman (PhD Supervisor)"
+        icon: fa-solid fa-chalkboard-user
+        reference: "Department of Mathematics, Florida State University"
+
+      - name: "Elizabeth Scott (Sr. Graduate Coordinator)"
+        icon: fa-solid fa-user-tie
+        reference: "Department of Mathematics, Florida State University"
+
+      - name: "Dr. Courtney Simmons (G.T.A. Coordinator)"
+        icon: fa-solid fa-user-tie
+        reference: "Department of Mathematics, Florida State University"
