@@ -6,6 +6,35 @@
    right-floated content column, so it works on any screen size.
    ========================================================== */
 
+/* resume.css is loaded only for the Resume layout, so its sans-serif
+   typography can cover the complete page without affecting other routes. */
+body,
+button,
+input,
+textarea,
+select,
+.navbar,
+.navbar-nav,
+.nav-link,
+.dropdown-menu,
+.table,
+.publications,
+.news,
+.post-meta,
+h1,
+h2,
+h3,
+h4,
+h6,
+.title,
+.post-title,
+article .title,
+.publications h2,
+.news h2,
+.cv .title {
+  font-family: "Open Sans", Arial, sans-serif;
+}
+
 .resume-page {
   max-width: 800px;
   margin: 0 auto;
