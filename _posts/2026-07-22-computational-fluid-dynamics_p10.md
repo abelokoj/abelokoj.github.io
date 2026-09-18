@@ -2,6 +2,7 @@
 layout: post
 title: "Computational Fluid Dynamics"
 subtitle: "Foundations, Methods, and a Verified Solver"
+code_theme: codex
 date: 2026-06-22
 description: A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.
 tags: [CFD, Navier-Stokes, numerical-PDE, Python, applied-mathematics, scientific-computing]
