@@ -44,6 +44,15 @@ article .title,
   font-family: var(--font-serif);
 }
 
+.post-header .post-subtitle {
+  margin: 0.35rem 0 0.7rem;
+  color: var(--global-text-color-light);
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 h1, h2, h3, h4, h6,
 .title,
 .post-title,
