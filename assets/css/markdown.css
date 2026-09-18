@@ -39,6 +39,37 @@ html[data-theme="dark"] :is(.markdown-body, #markdown-content) {
   --md-color-quote-bar: #4a4a4a;
 }
 
+/* High-contrast Rouge syntax palette, based on GitHub's light and dark
+   code colors. These tokens intentionally follow markdown.css so they
+   override the theme's light-only Pygments stylesheet in dark mode. */
+:is(.markdown-body, #markdown-content) {
+  --code-text: #24292f;
+  --code-comment: #6e7781;
+  --code-keyword: #cf222e;
+  --code-string: #0a3069;
+  --code-number: #0550ae;
+  --code-function: #8250df;
+  --code-class: #953800;
+  --code-variable: #116329;
+  --code-decorator: #8250df;
+  --code-error: #cf222e;
+  --code-error-bg: #ffebe9;
+}
+
+html[data-theme="dark"] :is(.markdown-body, #markdown-content) {
+  --code-text: #e6edf3;
+  --code-comment: #8b949e;
+  --code-keyword: #ff7b72;
+  --code-string: #a5d6ff;
+  --code-number: #79c0ff;
+  --code-function: #d2a8ff;
+  --code-class: #ffa657;
+  --code-variable: #7ee787;
+  --code-decorator: #d2a8ff;
+  --code-error: #ff7b72;
+  --code-error-bg: #490202;
+}
+
 :is(.markdown-body, #markdown-content) > :first-child {
   margin-top: 0 !important;
 }
@@ -299,6 +330,58 @@ html[data-theme="dark"] :is(.markdown-body, #markdown-content) a.absent {
   font-size: inherit;
   white-space: inherit;
   overflow-wrap: inherit;
+}
+
+/* Rouge/Pygments token classes. Grouping related tokens keeps Python code
+   legible without assigning a different color to every minor token type. */
+:is(.markdown-body, #markdown-content) .highlight,
+:is(.markdown-body, #markdown-content) .highlight pre,
+:is(.markdown-body, #markdown-content) .highlight code {
+  color: var(--code-text);
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.c, .cm, .cp, .c1, .cs) {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.k, .kc, .kd, .kn, .kp, .kr, .kt, .ow) {
+  color: var(--code-keyword);
+  font-weight: 600;
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.s, .sa, .sb, .sc, .dl, .sd, .s1, .s2, .se, .sh, .si, .sr, .ss, .sx) {
+  color: var(--code-string);
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.m, .mb, .mf, .mh, .mi, .il, .mo) {
+  color: var(--code-number);
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.nf, .fm) {
+  color: var(--code-function);
+  font-weight: 600;
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.nc, .ne) {
+  color: var(--code-class);
+  font-weight: 600;
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.nb, .bp, .no, .nv, .vc, .vg, .vi) {
+  color: var(--code-variable);
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.na, .nd, .ni, .nl) {
+  color: var(--code-decorator);
+}
+
+:is(.markdown-body, #markdown-content) .highlight :is(.err, .gr, .gt) {
+  color: var(--code-error);
+}
+
+:is(.markdown-body, #markdown-content) .highlight .err {
+  background-color: var(--code-error-bg);
 }
 
 :is(.markdown-body, #markdown-content) .contains-task-list {
