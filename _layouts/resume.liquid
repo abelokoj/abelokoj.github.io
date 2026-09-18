@@ -1,0 +1,143 @@
+---
+layout: default
+---
+
+{% assign cv = site.data.cv.cv %}
+
+<div class="resume-page">
+  <header class="resume-header">
+    <h1>{{ cv.name }}</h1>
+    <p class="resume-label">{{ cv.label }}</p>
+    {% if cv.summary %}<p class="resume-summary">{{ cv.summary }}</p>{% endif %}
+    <div class="contact-icons resume-contact-icons">{% social_links %}</div>
+  </header>
+
+  <div class="resume-content">
+    {% if cv.sections.Interests %}
+      <section class="resume-section">
+        <h2>Research Interests</h2>
+        <ul>
+          {% for item in cv.sections.Interests %}
+            <li>
+              <strong>{{ item.name }}</strong>
+              {% if item.keywords %} &mdash; {{ item.keywords }}{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Experience %}
+      <section class="resume-section">
+        <h2>Experience</h2>
+        {% for item in cv.sections.Experience %}
+          <div class="resume-entry">
+            <h3>{{ item.position }}, {{ item.company }}</h3>
+            <p class="resume-meta">{{ item.location }} &middot; {{ item.start_date }} &ndash; {{ item.end_date }}</p>
+            {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
+            {% if item.highlights.size > 0 %}
+              <ul>
+                {% for highlight in item.highlights %}
+                  <li>{{ highlight }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Education %}
+      <section class="resume-section">
+        <h2>Education</h2>
+        {% for item in cv.sections.Education %}
+          <div class="resume-entry">
+            <h3>{{ item.institution }}</h3>
+            <p class="resume-meta">
+              {{ item.studyType }}, {{ item.area }} &middot; {{ item.location }} &middot;
+              {% if item.start_date and item.start_date != "" %}{{ item.start_date }} &ndash; {% endif %}{{ item.end_date }}
+            </p>
+            {% if item.score and item.score != "" %}<p>{{ item.score }}</p>{% endif %}
+            {% if item.highlights.size > 0 %}
+              <ul>
+                {% for highlight in item.highlights %}
+                  <li>{{ highlight }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Skills %}
+      <section class="resume-section">
+        <h2>Skills</h2>
+        <ul>
+          {% for item in cv.sections.Skills %}
+            <li><strong>{{ item.name }}:</strong> {{ item.keywords }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Awards %}
+      <section class="resume-section">
+        <h2>Awards &amp; Honors</h2>
+        <ul>
+          {% for item in cv.sections.Awards %}
+            <li>
+              <strong>{{ item.title }}</strong>
+              {% if item.awarder %} &mdash; {{ item.awarder }}{% endif %}{% if item.date %} ({{ item.date }}){% endif %}
+              {% if item.summary and item.summary != "" %} {{ item.summary }}{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Publications %}
+      <section class="resume-section">
+        <h2>Publications</h2>
+        <ul>
+          {% for item in cv.sections.Publications %}
+            <li>
+              {{ item.authors | join: ", " }}.
+              {% if item.url and item.url != "" %}
+                <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>.
+              {% else %}
+                {{ item.title }}.
+              {% endif %}
+              {{ item.publisher }}{% if item.releaseDate %}, {{ item.releaseDate }}{% endif %}.
+              {% if item.summary %}{{ item.summary }}{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Volunteer %}
+      <section class="resume-section">
+        <h2>Volunteer Experience</h2>
+        {% for item in cv.sections.Volunteer %}
+          <div class="resume-entry">
+            <h3>{{ item.position }}, {{ item.company }}</h3>
+            <p class="resume-meta">{{ item.location }} &middot; {{ item.start_date }} &ndash; {{ item.end_date }}</p>
+            {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    {% if cv.sections.Certificates %}
+      <section class="resume-section">
+        <h2>Certificates</h2>
+        <ul>
+          {% for item in cv.sections.Certificates %}
+            <li>{{ item.name }} &mdash; {{ item.issuer }}{% if item.date and item.date != "" %} ({{ item.date }}){% endif %}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  </div>
+</div>

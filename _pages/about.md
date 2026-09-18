@@ -2,7 +2,7 @@
 layout: about
 title: About
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Florida State University, 303 Love Building, 1017 Academic  Way Tallahassee, FL 32306. | 
+subtitle: <a href='#'>Affiliations</a>. Florida State University | 303 Love Building, 1017 Academic  Way Tallahassee, FL 32306.| 
 
 profile:
   align: center
