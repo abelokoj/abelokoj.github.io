@@ -1,7 +1,7 @@
 /* ==========================================================
    Online font sources
-   Sans (headings + body): Inter — loaded via <link> in _includes/head.liquid
-   Mono: Maple Mono, falling back to FiraCode Nerd Font
+   Serif (headings + body): Lora — loaded via <link> in _includes/head.liquid
+   Mono: Maple Mono NF, falling back to Maple Mono and FiraCode Nerd Font
    ========================================================== */
 
 /* Maple Mono (primary code font) — Fontsource CDN build, latin subset.
@@ -16,11 +16,11 @@
 @import url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css");
 
 :root {
-  --font-sans: "Lora", Arial, sans-serif;
-  --font-mono: "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
+  --font-serif: "Lora", Georgia, "Times New Roman", serif;
+  --font-mono: "Maple Mono NF", "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
 }
 
-/* Inter everywhere — interface, prose, and headings */
+/* Lora everywhere except the separately styled Resume page. */
 body,
 button,
 input,
@@ -41,7 +41,7 @@ article .title,
 .publications h2,
 .news h2,
 .cv .title {
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
 }
 
 h1, h2, h3, h4, h5, h6,
