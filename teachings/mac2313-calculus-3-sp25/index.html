@@ -1,0 +1,319 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> MAC 2313 : Calculus with Analytic Geometry III | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="website"> <meta property="og:title" content="Abel Okojunu | MAC 2313 : Calculus with Analytic Geometry III"> <meta property="og:url" content="https://abelokoj.github.io/teachings/mac2313-calculus-3-sp25/"> <meta property="og:description" content="Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus."> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="MAC 2313 : Calculus with Analytic Geometry III"> <meta name="twitter:description" content="Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus."> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=" lora rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=11721491485ea314a5dd52fc325ebb8b"> <link rel="canonical" href="https://abelokoj.github.io/teachings/mac2313-calculus-3-sp25/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">MAC 2313 : Calculus with Analytic Geometry III</h1> <p class="post-description">Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.</p> </header> <article> <div class="course"> <div class="course-info"> <p><strong>Instructor:</strong> Abel Okojunu</p> <p><strong>Term:</strong> Spring 2025</p> </div> <h2 id="role">Role</h2> <p>Instructor of record, <strong>Spring 2025</strong> — classroom instruction, student mentoring, and assessment feedback. A coordinated multi-section course following a common departmental syllabus and shared assessments.</p> <h2 id="course-overview">Course Overview</h2> <p>A five-credit course in multivariable calculus and the third in the calculus sequence. It extends single-variable calculus to functions of several variables and to vector fields, closing with the classical integral theorems that connect differentiation and integration in higher dimensions.</p> <h2 id="topics">Topics</h2> <ul> <li>Functions of several variables and their graphical representations</li> <li>Vectors and alternative coordinate systems</li> <li>Partial derivatives, gradients, and local linearization</li> <li>Optimization, including constrained optimization</li> <li>Multiple integration in polar, cylindrical, and spherical coordinates</li> <li>Parameterized curves and vector fields</li> <li>Line integrals, flux integrals, and divergence</li> <li>Curl, Stokes’ theorem, and the divergence theorem</li> </ul> <h2 id="prerequisites">Prerequisites</h2> <p>Calculus II (MAC 2312) with a grade of C− or better.</p> <h2 id="grading">Grading</h2> <table> <thead> <tr> <th>Component</th> <th>Weight</th> </tr> </thead> <tbody> <tr> <td>Midterm Exams</td> <td>50%</td> </tr> <tr> <td>Final Exam</td> <td>25%</td> </tr> <tr> <td>Homework</td> <td>20%</td> </tr> <tr> <td>Quizzes</td> <td>5%</td> </tr> </tbody> </table> <h2 id="course-materials">Course Materials</h2> <p>Hughes-Hallett, D., Gleason, A. M., &amp; McCallum, W. G. (2021). <em>Calculus: Single and multivariable</em> (8th ed.). Wiley.</p> <h2>Schedule</h2> <table class="table table-sm table-responsive"> <thead> <tr> <th>Week</th> <th>Date</th> <th>Topic</th> <th>Materials</th> </tr> </thead> <tbody> <tr> <td>1–2</td> <td>Jan 13 – Jan 21</td> <td> <strong>Functions of Several Variables</strong> <div class="schedule-description"> <p>Sections 12.1, 12.2, 12.3, 12.4, 12.5, 12.6</p> </div> </td> <td> </td> </tr> <tr> <td>3–4</td> <td>Jan 29 – Feb 5</td> <td> <strong>Vectors</strong> <div class="schedule-description"> <p>Sections 13.1, 13.2, 13.3, 13.4</p> </div> </td> <td> </td> </tr> <tr> <td>5–6</td> <td>Feb 10 – Feb 20</td> <td> <strong>Differentiating Functions of Several Variables</strong> <div class="schedule-description"> <p>Sections 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7</p> </div> </td> <td> </td> </tr> <tr> <td>7</td> <td>Feb 26 – Feb 27</td> <td> <strong>Differentiating Functions of Several Variables; Optimization</strong> <div class="schedule-description"> <p>Sections 14.8, 15.1</p> </div> </td> <td> </td> </tr> <tr> <td>8</td> <td>Mar 4 – Mar 6</td> <td> <strong>Optimization; Integrating Functions of Several Variables</strong> <div class="schedule-description"> <p>Sections 15.2, 16.1</p> </div> </td> <td> </td> </tr> <tr> <td>9</td> <td>Mar 17</td> <td> <strong>Integrating Functions of Several Variables</strong> <div class="schedule-description"> <p>Sections 16.2, 16.3, 16.4</p> </div> </td> <td> </td> </tr> <tr> <td>10</td> <td>Mar 18 – Mar 20</td> <td> <strong>Optimization; Integrating Functions of Several Variables</strong> <div class="schedule-description"> <p>Sections 15.3, 16.5</p> </div> </td> <td> </td> </tr> <tr> <td>11–12</td> <td>Mar 26 – Apr 7</td> <td> <strong>Parameterization and Vector Fields; Line Integrals</strong> <div class="schedule-description"> <p>Sections 17.1, 17.2, 17.3, 17.4, 18.1, 18.2, 18.3</p> </div> </td> <td> </td> </tr> <tr> <td>13</td> <td>Apr 8 – Apr 14</td> <td> <strong>Line Integrals</strong> <div class="schedule-description"> <p>Sections 18.4</p> </div> </td> <td> </td> </tr> <tr> <td>14</td> <td>Apr 15</td> <td> <strong>Flux Integrals and Divergence</strong> <div class="schedule-description"> <p>Sections 19.1</p> </div> </td> <td> </td> </tr> <tr> <td>15</td> <td>Apr 22 – Apr 28</td> <td> <strong>Flux Integrals and Divergence; Curl and Stokes’ Theorem; Coordinates and Parameterized Surfaces</strong> <div class="schedule-description"> <p>Sections 19.2, 19.3, 19.4, 20.1, 20.2, 20.3, 21.1, 21.2, 21.3</p> </div> </td> <td> </td> </tr> <tr> <td>16</td> <td>Apr 30</td> <td> <strong>Final Exam</strong> <div class="schedule-description"> <p>Assessment</p> </div> </td> <td> </td> </tr> </tbody> </table> </div> </article> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum Vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics-foundations-methods-and-a-verified-solver",
+        
+          title: "Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-and-inverse-problems-from-first-principles-to-clinical-data",
+        
+          title: "Bayesian Inference and Inverse Problems: From First Principles to Clinical Data",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-parallel-computing-for-scientific-simulation-domain-decomposition-amdahl-39-s-law-and-exascale-computing",
+        
+          title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl&#39;s Law, and Exascale Computing",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-an-applied-introduction-to-modern-machine-learning-libraries-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-real-world-data",
+        
+          title: "An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-classical-numerical-methods-a-comparative-assessment-of-accuracy-and-computational-cost",
+        
+          title: "Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-an-introduction-to-uncertainty-quantification-using-surrogate-modeling",
+        
+          title: "An Introduction to Uncertainty Quantification Using Surrogate Modeling",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiff-odes-and-solver-stability-why-explicit-methods-sometimes-fail-in-dynamical-systems",
+        
+          title: "Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

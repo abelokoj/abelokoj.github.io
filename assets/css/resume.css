@@ -1,0 +1,140 @@
+/* ==========================================================
+   Resume page — visual style adapted from a Free CSS Templates
+   design (https://debog.github.io/resume.html), released under a
+   Creative Commons Attribution 2.5 License. Layout rebuilt as a
+   fluid single column instead of the original's fixed 1000px,
+   right-floated content column, so it works on any screen size.
+   ========================================================== */
+
+.resume-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+  font-family: "Open Sans", Arial, sans-serif;
+  color: var(--global-text-color);
+  text-align: left;
+}
+
+.resume-header {
+  text-align: center;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.resume-header h1 {
+  margin: 0;
+  font-size: 2.4em;
+  font-weight: 400;
+  letter-spacing: -1px;
+  font-family: inherit;
+}
+
+.resume-label {
+  margin: 0.4rem 0 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9em;
+  color: var(--global-text-color-light);
+}
+
+.resume-summary {
+  max-width: 34rem;
+  margin: 1rem auto 0;
+  line-height: 150%;
+}
+
+.resume-contact-icons {
+  margin-top: 1rem;
+  font-size: 1.4rem;
+}
+
+.resume-contact-icons a {
+  margin: 0 0.5rem;
+  color: var(--global-text-color);
+}
+
+/* The gem sizes custom-logo icons (e.g. Rate My Professor) with a fixed
+   3.2rem width/height, independent of the smaller font-size used for the
+   font-icon glyphs here, so it renders much bigger than the rest. */
+.resume-contact-icons a img {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.resume-section {
+  margin-bottom: 2rem;
+}
+
+.resume-section h2 {
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.375rem;
+  font-size: 1.1em;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  font-family: inherit;
+  border-bottom: 0.75pt solid var(--global-text-color);
+}
+
+.resume-entry {
+  margin-bottom: 1rem;
+}
+
+.resume-entry:last-child {
+  margin-bottom: 0;
+}
+
+.resume-entry h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1em;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.resume-entry .resume-meta {
+  margin: 0 0 0.5rem;
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--global-text-color-light);
+}
+
+.resume-entry p {
+  margin: 0 0 0.5rem;
+  line-height: 150%;
+}
+
+.resume-page ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.resume-entry ul {
+  list-style-type: disc;
+}
+
+.resume-page li {
+  margin-bottom: 0.35rem;
+  line-height: 150%;
+}
+
+.resume-page a {
+  color: #374ee7;
+  text-decoration: none;
+}
+
+.resume-page a:hover {
+  text-decoration: underline;
+}
+
+html[data-theme="dark"] .resume-page a {
+  color: #7c93ff;
+}
+
+@media (max-width: 576px) {
+  .resume-header h1 {
+    font-size: 1.8em;
+  }
+}

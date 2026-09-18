@@ -1,0 +1,423 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Bayesian Inference and Inverse Problems: From First Principles to Clinical Data | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="article"> <meta property="og:title" content="Abel Okojunu | Bayesian Inference and Inverse Problems: From First Principles to Clinical Data"> <meta property="og:url" content="https://abelokoj.github.io/blog/2026/bayesian-inference-inverse-problems_p8/"> <meta property="og:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="Bayesian Inference and Inverse Problems: From First Principles to Clinical Data"> <meta name="twitter:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=" lora rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=11721491485ea314a5dd52fc325ebb8b"> <link rel="canonical" href="https://abelokoj.github.io/blog/2026/bayesian-inference-inverse-problems_p8/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Bayesian Inference and Inverse Problems: From First Principles to Clinical Data</h1> <p class="post-meta"> Created on May 30, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/bayesian-inference"> <i class="fa-solid fa-hashtag fa-sm"></i> bayesian-inference</a>   <a href="/blog/tag/mcmc"> <i class="fa-solid fa-hashtag fa-sm"></i> mcmc</a>   <a href="/blog/tag/inverse-problems"> <i class="fa-solid fa-hashtag fa-sm"></i> inverse-problems</a>   <a href="/blog/tag/uncertainty-quantification"> <i class="fa-solid fa-hashtag fa-sm"></i> uncertainty-quantification</a>   <a href="/blog/tag/statistics"> <i class="fa-solid fa-hashtag fa-sm"></i> statistics</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h2 id="motivation-the-other-half-of-uncertainty-quantification">Motivation: the other half of uncertainty quantification</h2> <p>The <a href="/blog/2026/uncertainty-quantification-surrogate-modeling_p3/">earlier post in this series on uncertainty quantification</a> covered the <strong>forward</strong> direction: determining the resulting distribution over a simulation’s output, given a known probability distribution over an input. This post treats the mirror-image problem, which is arguably the more common one in practice: given noisy, real-world <strong>observations</strong>, what can be inferred about an unknown parameter that produced them, and, critically, <strong>with what degree of confidence</strong>.</p> <p>That inversion is the mathematical core of an enormous range of applied problems: inferring a patient’s underlying disease risk from noisy clinical measurements, inferring the unknown properties of a material from a small number of experimental tests, or, as this post returns to at the end, inferring the seafloor displacement that triggered a tsunami from a sparse network of ocean pressure sensors, in time to issue a warning before the wave arrives. In each case the same question recurs: given data that constrain the answer only partially and noisily, which values of the unknown parameter are consistent with what was observed, and with what degree of certainty.</p> <h2 id="two-ways-to-answer-that-question">Two ways to answer that question</h2> <p>Classical statistics answers this with a <strong>point estimate</strong> plus a confidence interval. Ordinary least squares, for example, yields a single best-fit coefficient together with a standard error describing how much that estimate would vary were the experiment repeated many times. The claim concerns the long-run behavior of the <em>procedure</em>.</p> <p><strong>Bayesian inference</strong> addresses a different and arguably more directly useful question: the full <strong>probability distribution</strong> over the unknown parameter, given the data actually observed rather than hypothetical repetitions of the experiment. The answer is a distribution rather than a single number, termed the <strong>posterior distribution</strong>, and it incorporates uncertainty quantification in the most literal sense.</p> <h3 id="bayes-theorem-as-a-mathematical-object-not-just-a-formula-to-memorize">Bayes’ theorem as a mathematical object, not just a formula to memorize</h3> <p>Everything in this post follows from one identity, due originally to <a class="citation" href="#bayes1763essay">(Bayes &amp; Price, 1763)</a>. For an unknown parameter $\theta$ and observed data $D$,</p> \[p(\theta \mid D) = \frac{p(D \mid \theta)\, p(\theta)}{p(D)} \;\propto\; \underbrace{p(D \mid \theta)}_{\text{likelihood}} \cdot \underbrace{p(\theta)}_{\text{prior}}.\] <p>Each term is doing a specific, interpretable job:</p> <ul> <li> <strong>$p(\theta)$, the prior</strong>, encodes what was believed about $\theta$ <em>before</em> observing this data: physical bounds, results from previous studies, or, as in the examples below, deliberately weak and close to agnostic beliefs where prior assumptions should not dominate.</li> <li> <strong>$p(D \mid \theta)$, the likelihood</strong>, is the probability of seeing <em>this specific data</em> were $\theta$ the true value. At this point a physical or statistical model of the measurement process enters.</li> <li> <strong>$p(\theta \mid D)$, the posterior</strong>, is the answer: the full distribution of plausible $\theta$ values <em>given</em> what was actually observed, obtained by weighting the prior by how well each candidate $\theta$ explains the data.</li> <li> <strong>$p(D)$, the evidence</strong>, is a normalizing constant (the probability of the data, integrated over all possible $\theta$), and it is precisely the term that makes computing the posterior <em>directly</em> intractable for all but the simplest models, since it requires integrating over every possible parameter value. That intractability is the practical obstacle the remainder of this post addresses.</li> </ul> <h3 id="a-bridge-from-familiar-ground-map-estimation-as-regularized-regression">A bridge from familiar ground: MAP estimation as regularized regression</h3> <p>Before any computational method is introduced, one connection deserves statement. The <strong>maximum a posteriori (MAP)</strong> estimate, the single most probable value of $\theta$ under the posterior, connects directly to a result from the optimization post in this series. Taking the log of Bayes’ theorem (dropping the constant $p(D)$, which does not affect where the maximum is),</p> \[\hat{\theta}_{\text{MAP}} = \arg\max_\theta \Big[ \log p(D \mid \theta) + \log p(\theta) \Big].\] <p>If the likelihood is Gaussian and the prior on $\theta$ is also Gaussian with mean zero, this becomes <em>exactly</em> ridge-regularized least squares: the log-likelihood term is (up to constants) the familiar sum of squared residuals, and the log-prior term is exactly an $L_2$ penalty on $\theta$. Concretely, with $D = (X, y)$, $y \mid \theta \sim \mathcal{N}(X\theta, \sigma^2 I)$, and $\theta \sim \mathcal{N}(0, \tau^2 I)$,</p> \[\hat{\theta}_{\text{MAP}} = \arg\min_\theta \left[ \frac{1}{2\sigma^2}\lVert y - X\theta \rVert_2^2 + \frac{1}{2\tau^2}\lVert \theta \rVert_2^2 \right] = \arg\min_\theta \left[ \lVert y - X\theta \rVert_2^2 + \lambda \lVert \theta \rVert_2^2 \right], \quad \lambda = \frac{\sigma^2}{\tau^2},\] <p>which is precisely ridge regression with regularization strength $\lambda = \sigma^2/\tau^2$. <strong>Regularization, viewed through a Bayesian lens, is an informative prior</strong>. The equivalence is useful, since it implies that every regularization technique from classical statistics and machine learning admits a direct Bayesian interpretation, and conversely.</p> <h2 id="why-the-posterior-usually-cannot-be-computed-directly">Why the posterior usually cannot be computed directly</h2> <p>For anything beyond a small number of textbook “conjugate prior” cases, the posterior distribution has no closed form. The normalizing constant $p(D)$ requires integrating the likelihood multiplied by the prior over every possible parameter value, which is analytically intractable outside a small number of special cases. The standard practical solution is to <strong>sample</strong> from the posterior instead of computing it in closed form, using <strong>Markov Chain Monte Carlo (MCMC)</strong>.</p> <h3 id="the-metropolis-hastings-algorithm-from-scratch">The Metropolis-Hastings algorithm, from scratch</h3> <p>The idea, due to Metropolis and colleagues in 1953 <a class="citation" href="#metropolis1953equation">(Metropolis et al., 1953)</a> and generalized by Hastings in 1970 <a class="citation" href="#hastings1970monte">(Hastings, 1970)</a>, is elegant: construct a random walk through parameter space that, if run sufficiently long, visits each region of the posterior with a frequency exactly proportional to its posterior probability, without ever computing the intractable normalizing constant.</p> <p>The algorithm, at each step, given a current position $\theta$:</p> <ol> <li>Propose a new candidate $\theta’ = \theta + \epsilon$, where $\epsilon$ is drawn from a simple symmetric distribution (e.g. a Gaussian centered at zero).</li> <li>Compute the acceptance ratio $r = \dfrac{p(D \mid \theta’)\, p(\theta’)}{p(D \mid \theta)\, p(\theta)}$ The intractable constant $p(D)$ cancels exactly, since it appears in both numerator and denominator. <strong>This cancellation is what makes the algorithm viable</strong>: it never requires the overall normalization of the posterior, only the <em>relative</em> posterior density at two points.</li> <li>Accept the proposal with probability $\min(1, r)$; otherwise stay at $\theta$.</li> </ol> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">metropolis_hastings</span><span class="p">(</span><span class="n">log_post_fn</span><span class="p">,</span> <span class="n">theta0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">step_sizes</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">theta0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">current_lp</span> <span class="o">=</span> <span class="nf">log_post_fn</span><span class="p">(</span><span class="o">*</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="nf">len</span><span class="p">(</span><span class="n">theta</span><span class="p">)))</span>
+    <span class="n">n_accept</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+        <span class="n">proposal</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">rng</span><span class="p">.</span><span class="nf">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_sizes</span><span class="p">)</span>
+        <span class="n">proposal_lp</span> <span class="o">=</span> <span class="nf">log_post_fn</span><span class="p">(</span><span class="o">*</span><span class="n">proposal</span><span class="p">)</span>
+        <span class="n">log_accept_ratio</span> <span class="o">=</span> <span class="n">proposal_lp</span> <span class="o">-</span> <span class="n">current_lp</span>   <span class="c1"># working in log-space
+</span>                                                        <span class="c1"># for numerical stability
+</span>        <span class="k">if</span> <span class="n">np</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="n">rng</span><span class="p">.</span><span class="nf">uniform</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">log_accept_ratio</span><span class="p">:</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">proposal</span>
+            <span class="n">current_lp</span> <span class="o">=</span> <span class="n">proposal_lp</span>
+            <span class="n">n_accept</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">theta</span>
+    <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">n_accept</span> <span class="o">/</span> <span class="n">n_samples</span>
+</code></pre></div></div> <p>Working entirely in <strong>log-space</strong> (log-posterior, log-acceptance-ratio) rather than raw probabilities is standard practice and important in practice, not just stylistic: posterior densities routinely involve products of many small probabilities, which underflow to exactly zero in floating-point arithmetic if computed directly; sums of log-probabilities do not have this problem.</p> <h2 id="part-a-inferring-a-wave-source-from-noisy-sensor-data">Part A: Inferring a wave source from noisy sensor data</h2> <p>A physically motivated example makes this concrete, and connects directly to the <a href="/blog/2026/hpc-domain-decomposition_p7/">HPC post in this series</a> and its wave-propagation simulation. Consider a simplified inverse problem: a wave pulse of unknown amplitude $A$ originates at an unknown location $x_0$, and a network of sensors at known positions records the peak amplitude and arrival time of the pulse as it passes. The task is to infer $A$ and $x_0$ <strong>from the noisy sensor readings alone</strong>.</p> <p>The setup is a deliberately simplified version of the inverse problem underlying real tsunami early-warning systems: infer an unknown source from sparse, noisy sensor observations, fast enough to matter.</p> <h3 id="the-forward-model">The forward model</h3> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SENSOR_POSITIONS</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">8.5</span><span class="p">])</span>
+<span class="n">WAVE_SPEED</span> <span class="o">=</span> <span class="mf">2.0</span>
+
+<span class="k">def</span> <span class="nf">forward_model</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">abs</span><span class="p">(</span><span class="n">SENSOR_POSITIONS</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="n">peak_amp</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">dist</span><span class="p">)</span>      <span class="c1"># geometric spreading/damping
+</span>    <span class="n">arrival_time</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">/</span> <span class="n">WAVE_SPEED</span>
+    <span class="k">return</span> <span class="n">peak_amp</span><span class="p">,</span> <span class="n">arrival_time</span>
+</code></pre></div></div> <p>Synthetic “observed” data is generated from a known true source ($A=3.0$, $x_0=0.2$), corrupted with realistic Gaussian sensor noise. Recovering known parameters from synthetic data is the standard means of validating an inverse-problem pipeline: because the ground truth is known by construction, whether the inference procedure recovers it can be checked directly.</p> <h3 id="likelihood-and-prior">Likelihood and prior</h3> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">log_likelihood</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+    <span class="n">pred_amp</span><span class="p">,</span> <span class="n">pred_time</span> <span class="o">=</span> <span class="nf">forward_model</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="n">ll_amp</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(((</span><span class="n">obs_amp</span> <span class="o">-</span> <span class="n">pred_amp</span><span class="p">)</span> <span class="o">/</span> <span class="n">NOISE_STD_AMP</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ll_time</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(((</span><span class="n">obs_time</span> <span class="o">-</span> <span class="n">pred_time</span><span class="p">)</span> <span class="o">/</span> <span class="n">NOISE_STD_TIME</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ll_amp</span> <span class="o">+</span> <span class="n">ll_time</span>
+
+<span class="k">def</span> <span class="nf">log_prior</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mf">0.0</span> <span class="o">&lt;</span> <span class="n">amplitude</span> <span class="o">&lt;</span> <span class="mf">10.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">inf</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">&lt;</span> <span class="n">x0</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">inf</span>
+    <span class="k">return</span> <span class="mf">0.0</span>   <span class="c1"># flat (uniform) prior within physically reasonable bounds
+</span></code></pre></div></div> <p>The Gaussian log-likelihood here is not an arbitrary modeling choice. It follows directly from assuming independent, normally distributed measurement noise on each sensor reading, which is the standard and usually well-justified assumption for instrument noise, by the Central Limit Theorem, where the noise is the sum of many small independent error sources.</p> <h3 id="running-the-sampler">Running the sampler</h3> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">samples</span><span class="p">,</span> <span class="n">accept_rate</span> <span class="o">=</span> <span class="nf">metropolis_hastings</span><span class="p">(</span>
+    <span class="n">log_posterior</span><span class="p">,</span> <span class="n">theta0</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">60000</span><span class="p">,</span>
+    <span class="n">step_sizes</span><span class="o">=</span><span class="p">[</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span>
+<span class="p">)</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MCMC acceptance rate: 0.446
+Posterior amplitude: mean=2.948, 95% CI=[2.692, 3.213]  (true=3.0)
+Posterior x0:        mean=0.224, 95% CI=[0.085, 0.362]  (true=0.2)
+</code></pre></div></div> <p>Both true parameter values fall comfortably within their respective 95% credible intervals, and the posterior means are close to the ground truth. A correctly implemented inference pipeline should produce exactly this, and it constitutes a validation of the method rather than a demonstration alone.</p> <p align="center"> <img src="/assets/img/posts/mcmc_wave_source_p8.svg" alt="MCMC trace plots, posterior histograms, joint posterior, and posterior predictive check for the wave source inference problem" style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: Top row, trace plots for both parameters, showing the position of the chain at every iteration with the true value overlaid, together with the joint posterior sample cloud. Bottom row, marginal posterior histograms and a posterior predictive check: sensor readings forward-simulated from 200 random posterior draws (gray) against the actual noisy observations (red) and the true noiseless signal (green). The gray envelope contains the observations, which is the relevant qualitative check; failure to do so would indicate that the model itself, rather than only the inferred parameters, is misspecified.</em></p> <h3 id="reading-the-diagnostics-like-a-practitioner-not-just-a-code-runner">Reading the diagnostics like a practitioner, not just a code-runner</h3> <p>A few things worth understanding, since they are the actual daily practice of doing this correctly rather than superstition:</p> <ul> <li> <strong>Acceptance rate $\approx 0.446$</strong> sits in a reasonable range. If the proposal step size is too large, almost every proposal falls in a low-probability region and is rejected, so the acceptance rate collapses toward zero and the chain barely moves. If it is too small, <em>almost every</em> proposal is accepted, but each step covers so little ground that the chain explores the posterior very slowly. A commonly cited heuristic for random-walk Metropolis targets roughly 20–50% acceptance <a class="citation" href="#roberts1997weak">(Roberts et al., 1997)</a>, although the appropriate value depends on the dimensionality and shape of the posterior. The figure is a diagnostic to be checked rather than a target to be optimized.</li> <li> <strong>Burn-in</strong> (discarding the first 10,000 of 60,000 samples above) exists because the chain starts at an arbitrary initial point rather than at a sample from the posterior, so the early samples still reflect that starting point. The trace plots in Figure 1 make this directly visible at the point where the chain settles into stable, noisy variation about a fixed level rather than trending toward it.</li> <li> <strong>The joint posterior scatter</strong> (top-right panel) shows genuine correlation structure between $A$ and $x_0$, information that a point estimate alone would discard entirely but that carries physical significance: it identifies which <em>combinations</em> of source parameters are difficult to distinguish given the geometry of this sensor network, which is directly actionable in designing an improved sensor layout.</li> </ul> <h2 id="part-b-bayesian-linear-regression-on-real-patient-data">Part B: Bayesian linear regression on real patient data</h2> <p>To ground this in a genuinely real-world dataset rather than only a synthetic inverse problem, this section turns to the <strong>scikit-learn diabetes dataset</strong>: 442 real patients, 10 standardized clinical measurements (age, sex, BMI, blood pressure, six blood serum measurements), and a target variable measuring disease progression one year after baseline.</p> <h3 id="classical-ols-baseline">Classical OLS baseline</h3> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ols</span> <span class="o">=</span> <span class="nc">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">).</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_c</span><span class="p">)</span>
+<span class="n">resid</span> <span class="o">=</span> <span class="n">y_c</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">ols</span><span class="p">.</span><span class="n">coef_</span>
+<span class="n">sigma2_hat</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">resid</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span>
+<span class="n">ols_se</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sqrt</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">diag</span><span class="p">(</span><span class="n">sigma2_hat</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">inv</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">)))</span>
+</code></pre></div></div> <h3 id="the-bayesian-version">The Bayesian version</h3> <p>An independent, zero-mean Gaussian prior is placed on each (standardized) regression coefficient, a direct implementation of the equivalence between MAP estimation and ridge regression derived above. The procedure again uses Metropolis-Hastings, sampling here in the full 10-dimensional coefficient space at once:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">TAU2</span> <span class="o">=</span> <span class="mf">4.0</span>       <span class="c1"># prior variance on each coefficient
+</span><span class="n">NOISE_STD</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="k">def</span> <span class="nf">log_posterior_reg</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="p">.</span><span class="nf">any</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">abs</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">inf</span>
+    <span class="n">resid</span> <span class="o">=</span> <span class="n">y_c</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">beta</span>
+    <span class="n">log_lik</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">resid</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">NOISE_STD</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">log_prior_beta</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">beta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">TAU2</span>
+    <span class="k">return</span> <span class="n">log_lik</span> <span class="o">+</span> <span class="n">log_prior_beta</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Regression MCMC acceptance rate: 0.362
+
+Feature       OLS coef [95% CI]              Bayes posterior mean [95% credible interval]
+age       -0.006 [-0.078, +0.066]      -0.008 [-0.114, +0.099]
+sex       -0.148 [-0.222, -0.074]      -0.147 [-0.257, -0.037]
+bmi       +0.321 [+0.241, +0.402]      +0.320 [+0.203, +0.436]
+bp        +0.200 [+0.121, +0.279]      +0.205 [+0.087, +0.325]
+s1        -0.489 [-0.993, +0.015]      -0.487 [-0.918, +0.105]
+s2        +0.294 [-0.116, +0.704]      +0.294 [-0.179, +0.658]
+s3        +0.062 [-0.195, +0.319]      +0.060 [-0.271, +0.342]
+s4        +0.109 [-0.086, +0.305]      +0.107 [-0.161, +0.411]
+s5        +0.464 [+0.256, +0.672]      +0.461 [+0.213, +0.673]
+s6        +0.042 [-0.038, +0.122]      +0.043 [-0.068, +0.161]
+</code></pre></div></div> <p align="center"> <img src="/assets/img/posts/bayes_vs_ols_diabetes_p8.svg" alt="Comparison of OLS confidence intervals and Bayesian credible intervals for diabetes regression coefficients" style="width: 100%; max-width: 800px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 2: OLS point estimates with 95% confidence intervals (blue) versus Bayesian posterior means with 95% credible intervals (orange), for all 10 standardized clinical features. <code class="language-plaintext highlighter-rouge">bmi</code>, <code class="language-plaintext highlighter-rouge">bp</code> (blood pressure), and <code class="language-plaintext highlighter-rouge">s5</code> have intervals that exclude zero under both approaches, and are the features most robustly associated with disease progression in this cohort.</em></p> <h3 id="why-the-estimates-agree-closely-here-and-when-they-would-not">Why the estimates agree closely here, and when they would not</h3> <p>The OLS and Bayesian estimates land nearly on top of each other in this example, and that is not a coincidence worth glossing over: with a weak (large-variance, $\tau^2=4$) Gaussian prior and a reasonably large sample size ($n=442$), the likelihood dominates the posterior, and the Bayesian credible interval converges toward the classical confidence interval. This is a general asymptotic result, a Bayesian analogue of the Bernstein-von Mises theorem, rather than a feature specific to this dataset <a class="citation" href="#efron2016computer">(Efron &amp; Hastie, 2016)</a>.</p> <p>The Bayesian approach is advantageous in the regimes where this does not hold: <strong>small sample sizes</strong> (where the prior genuinely constrains an otherwise poorly determined estimate), <strong>informative priors</strong> built from real external knowledge (a previous clinical study’s results feeding directly into this one, rather than starting from scratch), and whenever a <strong>full posterior over a downstream, nonlinear quantity</strong> is required. A Bayesian analysis yields the exact distribution of any function of the samples at negligible additional cost, by applying the function to every posterior draw, whereas a classical approach would require a separate and often approximate argument, such as the delta method, to propagate uncertainty through a nonlinear transformation. A classical, non-Bayesian alternative that provides a useful point of contrast is the bootstrap, which constructs confidence intervals by resampling the data rather than by specifying a prior <a class="citation" href="#efron1979bootstrap">(Efron, 1979)</a>.</p> <h2 id="connecting-back-a-recent-breakthrough-in-real-time-bayesian-inversion">Connecting back: a recent breakthrough in real-time Bayesian inversion</h2> <p>The <a href="/blog/2026/hpc-domain-decomposition_p7/">HPC post earlier in this series</a> described the 2025 Gordon Bell Prize-winning tsunami early-warning system built at LLNL, running on the El Capitan exascale supercomputer <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a>. The toy wave-source inference problem in Part A above is a deliberately simplified version of exactly the computational core of that system: given real-time seafloor pressure sensor readings, rapidly infer the unknown source displacement that best explains them, and use that inferred source to forecast the resulting wave. The operational system follows precisely the forward-model-plus-Bayesian-inversion structure developed step by step in this post, at a substantially larger and more time-critical scale, where rapid inference means seconds rather than the hours a full re-simulation would require.</p> <p>The substantive engineering problem that the operational system solves, and that this simplified example avoids, is the following: <strong>Metropolis-Hastings, as implemented above, is far too slow for a real-time, life-safety application.</strong> Sixty thousand samples of a two-parameter posterior require a fraction of a second on a laptop, whereas a full-physics tsunami source inversion at the resolution needed for an actionable warning cannot be run tens of thousands of times sequentially within the seconds available before a wave arrives. The operational system therefore precomputes a large library of full-physics forward simulations <em>offline</em>, using the exascale throughput of El Capitan and the domain-decomposed PDE solvers of the previous post in this series, and then performs the real-time inference step as a fast lookup and interpolation against that precomputed library rather than as a live MCMC run. The Bayesian inverse-problem mathematics is the same as that developed here, but the expensive forward-model evaluation is moved entirely offline so that the online inference step runs at the speed an emergency response requires <a class="citation" href="#tarantola2005inverse">(Tarantola, 2005)</a>.</p> <h2 id="summary-notes-and-highlights">Summary Notes and Highlights</h2> <ul> <li> <strong>Bayesian inference reframes the question</strong>, replacing a single answer with the full distribution of plausible answers given what was actually observed. That question differs genuinely from, and is often more useful than, a classical point estimate accompanied by a confidence interval.</li> <li> <strong>MAP estimation is regularized regression in another form</strong>: an explicit prior is mathematically equivalent to an explicit regularization penalty, which provides a useful bridge for readers approaching the subject from optimization rather than statistics.</li> <li> <strong>Metropolis-Hastings sidesteps the intractable normalizing constant</strong> by working entirely with <em>ratios</em> of posterior densities, which is the single mathematical trick that makes MCMC computationally feasible at all.</li> <li> <strong>Acceptance rate, trace plots, and burn-in are diagnostics to be checked rather than boilerplate.</strong> A poorly tuned sampler can silently produce a plausible-looking but incorrect posterior, and these are the tools for detecting that outcome.</li> <li> <strong>Posterior predictive checks</strong>, which simulate data from posterior draws and compare it against what was actually observed, are among the most underused and most valuable checks in applied Bayesian work.</li> <li> <strong>Bayesian and classical estimates converge given sufficient data and a weak prior.</strong> The advantage of the Bayesian approach appears in small samples, with genuinely informative priors, and when propagating uncertainty through nonlinear downstream quantities.</li> </ul> <h2 id="references">References</h2> <p>The foundational identity underlying this entire post is due to <a class="citation" href="#bayes1763essay">(Bayes &amp; Price, 1763)</a>. The Metropolis-Hastings algorithm follows <a class="citation" href="#metropolis1953equation">(Metropolis et al., 1953)</a> and its generalization by <a class="citation" href="#hastings1970monte">(Hastings, 1970)</a>, with practical acceptance-rate targets justified theoretically in <a class="citation" href="#roberts1997weak">(Roberts et al., 1997)</a>. <a class="citation" href="#gelman2013bayesian">(Gelman et al., 2013)</a> is the standard modern reference for Bayesian modeling, MCMC diagnostics, and posterior predictive checks, and <a class="citation" href="#tarantola2005inverse">(Tarantola, 2005)</a> is the classical reference connecting Bayesian inference to physical inverse problems specifically. <a class="citation" href="#efron2016computer">(Efron &amp; Hastie, 2016)</a> gives an especially clear, modern treatment of the Bayesian/frequentist correspondence discussed above, and <a class="citation" href="#efron1979bootstrap">(Efron, 1979)</a> introduces the bootstrap as a classical non-Bayesian point of contrast. The Gordon Bell Prize-winning tsunami-forecasting system referenced throughout is documented in <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a>.</p> <ol class="bibliography"> <li><span id="bayes1763essay">Bayes, T., &amp; Price, R. (1763). An Essay Towards Solving a Problem in the Doctrine of Chances. <i>Philosophical Transactions of the Royal Society of London</i>, <i>53</i>, 370–418.</span></li> <li><span id="metropolis1953equation">Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H., &amp; Teller, E. (1953). Equation of State Calculations by Fast Computing Machines. <i>Journal of Chemical Physics</i>, <i>21</i>(6), 1087–1092.</span></li> <li><span id="hastings1970monte">Hastings, W. K. (1970). Monte Carlo Sampling Methods Using Markov Chains and Their Applications. <i>Biometrika</i>, <i>57</i>(1), 97–109.</span></li> <li><span id="roberts1997weak">Roberts, G. O., Gelman, A., &amp; Gilks, W. R. (1997). Weak Convergence and Optimal Scaling of Random Walk Metropolis Algorithms. <i>Annals of Applied Probability</i>, <i>7</i>(1), 110–120.</span></li> <li><span id="efron2016computer">Efron, B., &amp; Hastie, T. (2016). <i>Computer Age Statistical Inference</i>. Cambridge University Press.</span></li> <li><span id="efron1979bootstrap">Efron, B. (1979). Bootstrap Methods: Another Look at the Jackknife. <i>Annals of Statistics</i>, <i>7</i>(1), 1–26.</span></li> <li><span id="llnl2025gordonbell">Lawrence Livermore National Laboratory. (2025). <i>LLNL, UT &amp; UCSD Win Gordon Bell Prize with Exascale Tsunami Forecasting</i>. https://www.llnl.gov/article/53636</span></li> <li><span id="tarantola2005inverse">Tarantola, A. (2005). <i>Inverse Problem Theory and Methods for Model Parameter Estimation</i>. SIAM.</span></li> <li><span id="gelman2013bayesian">Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., &amp; Rubin, D. B. (2013). <i>Bayesian Data Analysis</i> (3rd ed.). CRC Press.</span></li> </ol> <hr> <p><em>Full, executed code for both the wave-source inversion and the diabetes regression comparison is available in <a href="/assets/code/bayesian_inference_p8.py"><code class="language-plaintext highlighter-rouge">bayesian_inference_p8.py</code></a>.</em></p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoyed reading this article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/compact_finite_difference_kdv_p11/">Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/computational-fluid-dynamics_p10/">Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/hpc-domain-decomposition_p7/">Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-deep-dive_p6/">An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and PyTorch on Real-World Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/pinn-vs-classical-methods_p4/">Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and Computational Cost</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/uncertainty-quantification-surrogate-modeling_p3/">An Introduction to Uncertainty Quantification Using Surrogate Modeling</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/stiff-odes-solver-stability_p2/">Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/sherman-morrison-ode_p1/">Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling</a> </li> </ul> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
+    (function setupGiscus() {
+      function determineGiscusTheme() {
+        var theme = localStorage.getItem("theme") || document.documentElement.getAttribute("data-theme") || "system";
+if (theme === "dark") return "dark";
+if (theme === "light") return "light";
+var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+return prefersDark ? "dark" : "light";
+
+      }
+
+      var giscusTheme = determineGiscusTheme();
+      var attrs = {
+        src: "https://giscus.app/client.js",
+        "data-repo": "abelokoj/abelokoj.github.io",
+        "data-repo-id": "R_kgDOTgiVew",
+        "data-category": "Comments",
+        "data-category-id": "DIC_kwDOTgiVe84DCeqq",
+        "data-mapping": "title",
+        "data-strict": "0",
+        "data-reactions-enabled": "1",
+        "data-emit-metadata": "0",
+        "data-input-position": "bottom",
+        "data-theme": giscusTheme,
+        "data-lang": "en",
+        crossorigin: "anonymous",
+        async: true
+      };
+
+      var giscusScript = document.createElement("script");
+      Object.entries(attrs).forEach(function(entry) { giscusScript.setAttribute(entry[0], entry[1]); });
+      var host = document.getElementById("giscus_thread");
+      if (host) host.appendChild(giscusScript);
+    })();
+  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum Vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics-foundations-methods-and-a-verified-solver",
+        
+          title: "Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-and-inverse-problems-from-first-principles-to-clinical-data",
+        
+          title: "Bayesian Inference and Inverse Problems: From First Principles to Clinical Data",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-parallel-computing-for-scientific-simulation-domain-decomposition-amdahl-39-s-law-and-exascale-computing",
+        
+          title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl&#39;s Law, and Exascale Computing",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-an-applied-introduction-to-modern-machine-learning-libraries-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-real-world-data",
+        
+          title: "An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-classical-numerical-methods-a-comparative-assessment-of-accuracy-and-computational-cost",
+        
+          title: "Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-an-introduction-to-uncertainty-quantification-using-surrogate-modeling",
+        
+          title: "An Introduction to Uncertainty Quantification Using Surrogate Modeling",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiff-odes-and-solver-stability-why-explicit-methods-sometimes-fail-in-dynamical-systems",
+        
+          title: "Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
