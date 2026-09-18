@@ -44,12 +44,16 @@ article .title,
   font-family: var(--font-serif);
 }
 
+.post-header .post-title {
+  font-size: 2rem; /* 20% smaller than Bootstrap's 2.5rem h1 default. */
+}
+
 .post-header .post-subtitle {
   margin: 0.35rem 0 0.7rem;
-  color: var(--global-text-color-light);
+  color: var(--global-text-color);
   font-family: var(--font-serif);
-  font-size: 1.35rem;
-  font-weight: 500;
+  font-size: 1.62rem; /* 20% larger than the previous 1.35rem. */
+  font-weight: 700;
   line-height: 1.35;
 }
 
