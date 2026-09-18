@@ -435,11 +435,11 @@ h1,
 h2,
 h3,
 h4,
-h5,
 h6,
 pre,
 code,
 form,
+legend,
 input,
 button,
 textarea,
@@ -547,6 +547,18 @@ hr {
   z-index: 10;
 }
 
+#clusters > a {
+  color: #ef5c00;
+  text-decoration: underline;
+  cursor: auto;
+}
+
+#clusters > a:hover {
+  color: #126dce;
+  text-decoration: underline;
+  cursor: auto;
+}
+
 mark,
 .mark {
   background-color: #ffffff;
@@ -585,8 +597,7 @@ input.raw_input {
   box-shadow: none;
 }
 
-audio,
-video {
+audio {
   display: inline;
   vertical-align: middle;
   align-content: center;

@@ -1,0 +1,399 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="article"> <meta property="og:title" content="Abel Okojunu | Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling"> <meta property="og:url" content="https://abelokoj.github.io/blog/2026/sherman-morrison-ode_p1/"> <meta property="og:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling"> <meta name="twitter:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=" lora rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=11721491485ea314a5dd52fc325ebb8b"> <link rel="canonical" href="https://abelokoj.github.io/blog/2026/sherman-morrison-ode_p1/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling</h1> <p class="post-meta"> Created on February 01, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/numerical-methods"> <i class="fa-solid fa-hashtag fa-sm"></i> numerical-methods</a>   <a href="/blog/tag/linear-algebra"> <i class="fa-solid fa-hashtag fa-sm"></i> linear-algebra</a>   <a href="/blog/tag/dynamical-systems"> <i class="fa-solid fa-hashtag fa-sm"></i> dynamical-systems</a>   <a href="/blog/tag/aerospace"> <i class="fa-solid fa-hashtag fa-sm"></i> aerospace</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h2 id="motivation">Motivation</h2> <p>Sustainable Aviation Fuel (SAF) blending studies, fuel-burn optimization, and mission-performance models share a common computational bottleneck: each entails integrating a system of ordinary differential equations (ODEs) describing the aircraft’s state (mass, velocity, altitude, and various internal dynamic modes) over the course of a flight. Because aircraft mass decreases continuously as fuel burns, the matrix governing this dynamics is not fixed; it drifts over time.</p> <p>For <em>stiff</em> or tightly coupled formulations, <strong>implicit</strong> time-stepping schemes are the standard choice, since explicit schemes would demand impractically small time steps for stability (a topic treated in more depth in <a href="/blog/2026/stiff-odes-solver-stability_p2/">the next post in this series</a>). Implicit schemes, however, require solving a linear system at every time step. Implemented directly, this means refactoring an $n \times n$ matrix from scratch at each step: an $O(n^3)$ operation repeated hundreds or thousands of times over a full flight-mission simulation.</p> <p>This post examines a case in which the cost is avoidable. When the time-varying part of the system matrix is <strong>low rank</strong>, as occurs when a single scalar quantity, such as remaining fuel mass, couples inside the dynamics, the <strong>Sherman-Morrison formula</strong> permits the system matrix to be factorized once and that factorization to be reused for the entire simulation, reducing the per-step cost from $O(n^3)$ to $O(n^2)$.</p> <p>This post presents a generalized reconstruction of a numerical approach used during a graduate research internship at Lawrence Livermore National Laboratory, in which the technique accelerated an ODE solver for a sustainable aviation modeling application. The system, data, and code below constitute a self-contained synthetic reconstruction prepared for this post; none of the material reproduces proprietary code or data.</p> <h2 id="setting-up-the-problem">Setting up the problem</h2> <p>Consider a linear time-varying ODE system:</p> \[\frac{dy}{dt} = A(t), y + b, \qquad A(t) = A_0 + c(t), u v^\top .\] <p>Here $y(t) \in \mathbb{R}^n$ is the state vector (velocity perturbations, structural modes, and thermal states, depending on the quantities the model tracks), $A_0$ is a fixed baseline dynamics matrix, and $c(t)uv^\top$ is a rank-one correction whose direction ($u, v \in \mathbb{R}^n$) remains fixed while its strength $c(t)$ evolves smoothly over the flight. Physically, $c(t)$ acts as a fuel-mass-dependent coupling value: as fuel is consumed, the aircraft’s mass distribution moves, and that shift enters the dynamics matrix along a fixed structural direction, scaled by a coefficient that decays over the flight horizon.</p> <p>Discretizing with <strong>backward (implicit) Euler</strong> at step size $h$,</p> \[y_{k+1} = y_k + h\left(A(t_{k+1}), y_{k+1} + b\right) \quad\Longrightarrow\quad \big(I - hA_{k+1}\big), y_{k+1} = y_k + hb,\] <p>and substituting $A_{k+1} = A_0 + c_{k+1}, uv^\top$ with the <strong>fixed</strong> matrix $B_0 := I - hA_0$, gives</p> \[M_{k+1}y_{k+1} = y_k + hb, \qquad M_{k+1} = B_0 - hc_{k+1}uv^\top.\] <p>The key structural observation is that $M_{k+1}$ is always a rank-one perturbation of the same fixed matrix $B_0$: the perturbation strength changes at every step, whereas $B_0$ does not.</p> <h2 id="the-sherman-morrison-formula">The Sherman-Morrison formula</h2> <p>For an invertible matrix $B \in \mathbb{R}^{n\times n}$ and vectors $u, v \in \mathbb{R}^n$ such that $B + \alpha uv^\top$ remains invertible, the Sherman-Morrison formula gives the inverse of the rank-one update directly, without a fresh factorization:</p> \[\left(B + \alpha, uv^\top\right)^{-1} = B^{-1} - \frac{\alpha, B^{-1}u, v^\top B^{-1}}{1 + \alpha, v^\top B^{-1}u}.\] <p><strong>Derivation sketch.</strong> Write $B^{-1}u = p$ and $v^\top B^{-1} = q^\top$, and let $\sigma = 1 + \alpha v^\top B^{-1}u = 1 + \alpha q^\top u$. Multiplying the right-hand side above by $\left(B + \alpha uv^\top\right)$ and expanding term by term,</p> \[\left(B^{-1} - \frac{\alpha, p q^\top}{\sigma}\right)\left(B + \alpha uv^\top\right) = I + \alpha B^{-1} u v^\top - \frac{\alpha}{\sigma}, p q^\top B * \frac{\alpha^2}{\sigma}, p q^\top u v^\top .\] <p>Using $q^\top B = v^\top$ and $q^\top u = v^\top B^{-1}u = (\sigma - 1)/\alpha$, the last two terms combine to $-\dfrac{\alpha}{\sigma}pv^\top!\left(1 + \alpha \dfrac{\sigma-1}{\alpha}\right) = -\alpha pv^\top$, which exactly cancels the second term $\alpha B^{-1}uv^\top = \alpha pv^\top$. What remains is the identity matrix, confirming the formula.</p> <p><strong>Why this computationally important.</strong> Once $B_0^{-1}$ has been computed, at a cost of one $O(n^3)$ factorization, applying the formula for a new value of $\alpha = -hc_{k+1}$ costs only</p> <ul> <li>two matrix-vector products, $B_0^{-1}u$ and $v^\top B_0^{-1}$: $O(n^2)$;</li> <li>one rank-one outer-product update: $O(n^2)$.</li> </ul> <p>No refactorization is required. The $O(n^3)$ cost is paid exactly once, at the start of the simulation, rather than at every one of the $T$ time steps. For a simulation with $T$ steps, this reduces an $O(Tn^3)$ algorithm to an $O(n^3 + Tn^2)$ one, a substantial saving whenever $T$ is large relative to $n$.</p> <h2 id="implementation">Implementation</h2> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="k">def</span> <span class="nf">solve_naive</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Refactor the system matrix from scratch at every step: O(n^3) per step.</span><span class="sh">"""</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="n">y0</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y0</span><span class="p">.</span><span class="nf">copy</span><span class="p">()</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span><span class="p">.</span><span class="nf">copy</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">h</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nf">fuel_burn_coeff</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">Ak</span> <span class="o">=</span> <span class="n">A0</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">outer</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="n">h</span> <span class="o">*</span> <span class="n">Ak</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">traj</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="nf">copy</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">solve_sherman_morrison</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Factor B0 once; apply a rank-1 Sherman-Morrison update every step: O(n^2) per step.</span><span class="sh">"""</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="n">y0</span><span class="p">)</span>
+    <span class="n">B0</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="n">h</span> <span class="o">*</span> <span class="n">A0</span>
+    <span class="n">B0_inv</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">inv</span><span class="p">(</span><span class="n">B0</span><span class="p">)</span>            <span class="c1"># ONE O(n^3) factorization
+</span>    <span class="n">y</span> <span class="o">=</span> <span class="n">y0</span><span class="p">.</span><span class="nf">copy</span><span class="p">()</span>
+    <span class="n">traj</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span><span class="p">.</span><span class="nf">copy</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">h</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nf">fuel_burn_coeff</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="o">-</span><span class="n">h</span> <span class="o">*</span> <span class="n">c</span>
+        <span class="n">Binv_u</span> <span class="o">=</span> <span class="n">B0_inv</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">v_Binv</span> <span class="o">=</span> <span class="n">v</span> <span class="o">@</span> <span class="n">B0_inv</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">@</span> <span class="n">Binv_u</span><span class="p">)</span>
+        <span class="n">M_inv</span> <span class="o">=</span> <span class="n">B0_inv</span> <span class="o">-</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">outer</span><span class="p">(</span><span class="n">Binv_u</span><span class="p">,</span> <span class="n">v_Binv</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">M_inv</span> <span class="o">@</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>           <span class="c1"># O(n^2) per step
+</span>        <span class="n">traj</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="nf">copy</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+</code></pre></div></div> <p>The <code class="language-plaintext highlighter-rouge">fuel_burn_coeff</code> function models the decaying bond strength as fuel is consumed over the flight horizon $T$:</p> \[c(t) = c_0\left(1 - \frac{t}{T}\right), \qquad c_0 = 2.\] <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">fuel_burn_coeff</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">c0</span><span class="o">=</span><span class="mf">2.0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">c0</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">t</span> <span class="o">/</span> <span class="n">T</span><span class="p">)</span>
+</code></pre></div></div> <h2 id="correctness-check">Correctness check</h2> <p>Before the speedup can be relied upon, both methods must be confirmed to produce the same trajectory up to floating-point round-off. Running both solvers on an identical $30$-dimensional system over $400$ steps gives a maximum absolute deviation between the two trajectories of $2.277 \times 10^{-11}$, a magnitude consistent with floating-point round-off rather than with a numerical discrepancy. The two methods are algebraically equivalent, as expected, since Sherman-Morrison is an exact identity rather than an approximation.</p> <p align="center"> <img src="/assets/img/posts/trajectory_p1.svg" alt="Implicit Euler trajectory using the Sherman-Morrison solver" style="width: 90%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p>Figure 1: Trajectories of the first three state components under the Sherman-Morrison-accelerated implicit Euler scheme.</p> <h2 id="benchmark-measured-performance">Benchmark: measured performance</h2> <p>Wall-clock time for both approaches was measured across system sizes $n \in {20, 40, 80, 160, 320}$, running $150$ implicit Euler steps for each:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>n=  20  naive=0.0041s  sherman-morrison=0.0021s  speedup=1.97x
+n=  40  naive=0.0070s  sherman-morrison=0.0027s  speedup=2.64x
+n=  80  naive=0.0158s  sherman-morrison=0.0052s  speedup=3.05x
+n= 160  naive=0.0621s  sherman-morrison=0.0121s  speedup=5.12x
+n= 320  naive=0.3402s  sherman-morrison=0.0752s  speedup=4.52x
+</code></pre></div></div> <p align="center"> <img src="/assets/img/posts/timing_p1.svg" alt="Runtime comparison: naive refactoring vs Sherman-Morrison" style="width: 90%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p>Figure 2: Wall-clock time for 150 implicit Euler steps, naive re-solve vs. Sherman-Morrison rank-one update, across system dimension $n$.</p> <p>The measured speedup increases with $n$, consistent with the $O(n^3)$ against $O(n^2)$ per-step scaling. The exact multiplier depends on implementation details, including the BLAS backend, cache behavior, and the number of steps run; at small $n$, the fixed overhead of Python-level bookkeeping partially masks the asymptotic advantage. Larger gains appear either at greater $n$ or over longer time horizons, where the one-time $O(n^3)$ factorization is amortized over more steps.</p> <h2 id="conditions-for-applicability">Conditions for applicability</h2> <p>The Sherman-Morrison structure is common in practice, but it is not universal. It applies cleanly when:</p> <ul> <li>The time-varying part of the system matrix is genuinely <strong>low rank</strong> (rank one, or rank $k$ via the generalized Woodbury identity below), and</li> <li>The <strong>direction</strong> of the perturbation is fixed, with only its <strong>magnitude</strong> changing over time, as with a single scalar physical quantity, such as fuel mass or temperature-dependent stiffness, or a single damaged structural element.</li> </ul> <p>The formula offers no advantage if the entire matrix changes at every step with no shared low-rank structure. In that regime, the available options are per-step refactorization or the exploitation of a different structure entirely, such as sparsity, banded matrices, or iterative Krylov methods.</p> <h2 id="asymptotic-complexity">Asymptotic complexity</h2> <p>The asymptotic comparison is set out explicitly below, since the argument for this technique rests on it: for each step, the naive approach requires a fresh $O(n^3)$ factorization, while the Sherman-Morrison approach uses one initial $O(n^3)$ factorization and then $O(n^2)$ work per step.</p> <table> <thead> <tr> <th>Operation</th> <th>Naive re-solve</th> <th>Sherman-Morrison</th> </tr> </thead> <tbody> <tr> <td>One-time setup</td> <td>-</td> <td>$O(n^3)$ (factor $B_0$)</td> </tr> <tr> <td>Cost per time step</td> <td>$O(n^3)$ (refactor $M_k$)</td> <td>$O(n^2)$ (rank-one update)</td> </tr> <tr> <td>Total over $T$ steps</td> <td>$O(Tn^3)$</td> <td>$O(n^3 + Tn^2)$</td> </tr> <tr> <td>Break-even point</td> <td>-</td> <td>favorable once $T \gtrsim n$</td> </tr> </tbody> </table> <p>The break-even condition follows directly: the one-time $O(n^3)$ factorization is worth paying only if it is amortized over a sufficient number of steps. For a small number of time steps on a large system, the naive approach stays competitive; for the long time horizons typical of flight-mission simulations, which involve thousands of steps, the Sherman-Morrison approach is decisively faster.</p> <h2 id="a-note-on-the-computational-stability">A note on the computational stability.</h2> <p>The Sherman-Morrison formula has a denominator, $\sigma := 1 + \alpha, v^\top B^{-1} u$, and, as with any expression of this form, it loses accuracy when that term approaches zero. This happens mostly when the rank-one update pushes the perturbed matrix toward singularity: the classical matrix-determinant lemma gives $\det!\left(B + \alpha uv^\top\right) = \sigma \det(B)$, so $\sigma \to 0$ is equivalent to the perturbed system becoming singular. Physically, this corresponds to the fuel-mass-driven coupling term growing large enough to push part of the system toward an unstable or degenerate configuration.</p> <p>This condition is worth guarding against explicitly:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">denom</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">@</span> <span class="n">Binv_u</span><span class="p">)</span>
+<span class="k">if</span> <span class="nf">abs</span><span class="p">(</span><span class="n">denom</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span><span class="p">:</span>
+    <span class="c1"># Fall back to a direct solve for this step, or flag for inspection --
+</span>    <span class="c1"># the rank-1 update is close to singular here.
+</span>    <span class="bp">...</span>
+</code></pre></div></div> <p>For well-behaved physical systems in which the interaction coefficient stays bounded well away from the singular states of the matrix, as holds for the smoothly decaying fuel-burning coefficient used here, the condition rarely arises in practice. It is nonetheless an edge case that is inexpensive to test for and costly to diagnose if left unguarded.</p> <h2 id="extending-to-rank-k-updates-the-woodbury-identity">Extending to rank-$k$ updates: the Woodbury identity</h2> <p>Real systems sometimes involve more than one time-varying scalar coupling within the dynamics: for instance, both a fuel-mass term and a temperature-dependent stiffness term, each having its own direction. The Sherman-Morrison formula generalizes directly to this case via the <strong>Woodbury matrix identity</strong>:</p> \[\left(B + UCV^\top\right)^{-1} = B^{-1} - B^{-1}U\left(C^{-1} + V^\top B^{-1} U\right)^{-1} V^\top B^{-1},\] <p>where $U, V \in \mathbb{R}^{n\times k}$ collect one column per rank-one term and $C \in \mathbb{R}^{k \times k}$ is a small coefficient matrix. As long as $k \ll n$, the same core argument holds: the expensive $n \times n$ factorization is still required only once, and the per-step update cost is dominated by inverting the small $k \times k$ matrix $C^{-1} + V^\top B^{-1}U$, which is inexpensive whenever the number of independently changing coupling terms remains small relative to the size of the full system.</p> <h2 id="summary-notes-and-highlights">Summary Notes and Highlights</h2> <ul> <li>Implicit ODE solvers incur a per-step linear-algebra cost; identifying low-rank structure in the evolution of the system matrix allows that cost to be paid once rather than at every step.</li> <li>The Sherman-Morrison formula, together with its rank-$k$ generalization in the Woodbury identity, applies whenever a simulation involves a fixed baseline matrix with a small time-varying correction. The same pattern occurs well beyond aviation: recursive least squares, Kalman filtering, and quasi-Newton optimization all rely on this identity <a class="citation" href="#hager1989updating">(Hager, 1989)</a>.</li> <li>Performance optimization should always be validated against a naive reference implementation before relying on the speed-up, since a result obtained quickly but incorrectly is of less value than a correct result obtained slowly.</li> </ul> <p>In the <a href="/blog/2026/stiff-odes-solver-stability_p2/">next post</a>, I turn to the obstacle that implicit solvers exist to address in the first place: numerical stiffness, and the reasons explicit methods break down outright on certain dynamical systems regardless of how much rank structure is available for exploitation.</p> <h2 id="references">References</h2> <p>The rank-one and rank-$k$ inverse-update identities used throughout this post trace back to <a class="citation" href="#sherman1950adjustment">(Sherman &amp; Morrison, 1950)</a> and <a class="citation" href="#woodbury1950inverting">(Woodbury, 1950)</a>; <a class="citation" href="#hager1989updating">(Hager, 1989)</a> surveys the wider family of matrix-inverse update formulas and their use in optimization, while <a class="citation" href="#golub2013matrix">(Golub &amp; Van Loan, 2013)</a> and <a class="citation" href="#datta2010numerical">(Datta, 2010)</a> give standard treatments of rank-one updates in the context of numerical linear algebra for time-stepping schemes.</p> <ol class="bibliography"> <li><span id="hager1989updating">Hager, W. W. (1989). Updating the Inverse of a Matrix. <i>SIAM Review</i>, <i>31</i>(2), 221–239.</span></li> <li><span id="sherman1950adjustment">Sherman, J., &amp; Morrison, W. J. (1950). Adjustment of an Inverse Matrix Corresponding to a Change in One Element of a Given Matrix. <i>Annals of Mathematical Statistics</i>, <i>21</i>(1), 124–127.</span></li> <li><span id="woodbury1950inverting">Woodbury, M. A. (1950). <i>Inverting Modified Matrices</i> (No. Memorandum Report 42; Issue Memorandum Report 42). Statistical Research Group, Princeton University.</span></li> <li><span id="golub2013matrix">Golub, G. H., &amp; Van Loan, C. F. (2013). <i>Matrix Computations</i> (4th ed.). Johns Hopkins University Press.</span></li> <li><span id="datta2010numerical">Datta, B. N. (2010). <i>Numerical Linear Algebra and Applications</i> (2nd ed.). SIAM.</span></li> </ol> <hr> <p><em>Full code for this post is available in <a href="/assets/code/sherman_morrison_demo_p1.py"><code class="language-plaintext highlighter-rouge">sherman_morrison_demo_p1.py</code></a>.</em></p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoyed reading this article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/compact_finite_difference_kdv_p11/">Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/computational-fluid-dynamics_p10/">Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/bayesian-inference-inverse-problems_p8/">Bayesian Inference and Inverse Problems: From First Principles to Clinical Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/hpc-domain-decomposition_p7/">Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-deep-dive_p6/">An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and PyTorch on Real-World Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/pinn-vs-classical-methods_p4/">Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and Computational Cost</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/uncertainty-quantification-surrogate-modeling_p3/">An Introduction to Uncertainty Quantification Using Surrogate Modeling</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/stiff-odes-solver-stability_p2/">Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems</a> </li> </ul> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
+    (function setupGiscus() {
+      function determineGiscusTheme() {
+        var theme = localStorage.getItem("theme") || document.documentElement.getAttribute("data-theme") || "system";
+if (theme === "dark") return "dark";
+if (theme === "light") return "light";
+var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+return prefersDark ? "dark" : "light";
+
+      }
+
+      var giscusTheme = determineGiscusTheme();
+      var attrs = {
+        src: "https://giscus.app/client.js",
+        "data-repo": "abelokoj/abelokoj.github.io",
+        "data-repo-id": "R_kgDOTgiVew",
+        "data-category": "Comments",
+        "data-category-id": "DIC_kwDOTgiVe84DCeqq",
+        "data-mapping": "title",
+        "data-strict": "0",
+        "data-reactions-enabled": "1",
+        "data-emit-metadata": "0",
+        "data-input-position": "bottom",
+        "data-theme": giscusTheme,
+        "data-lang": "en",
+        crossorigin: "anonymous",
+        async: true
+      };
+
+      var giscusScript = document.createElement("script");
+      Object.entries(attrs).forEach(function(entry) { giscusScript.setAttribute(entry[0], entry[1]); });
+      var host = document.getElementById("giscus_thread");
+      if (host) host.appendChild(giscusScript);
+    })();
+  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum Vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics-foundations-methods-and-a-verified-solver",
+        
+          title: "Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-and-inverse-problems-from-first-principles-to-clinical-data",
+        
+          title: "Bayesian Inference and Inverse Problems: From First Principles to Clinical Data",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-parallel-computing-for-scientific-simulation-domain-decomposition-amdahl-39-s-law-and-exascale-computing",
+        
+          title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl&#39;s Law, and Exascale Computing",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-an-applied-introduction-to-modern-machine-learning-libraries-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-real-world-data",
+        
+          title: "An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-classical-numerical-methods-a-comparative-assessment-of-accuracy-and-computational-cost",
+        
+          title: "Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-an-introduction-to-uncertainty-quantification-using-surrogate-modeling",
+        
+          title: "An Introduction to Uncertainty Quantification Using Surrogate Modeling",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiff-odes-and-solver-stability-why-explicit-methods-sometimes-fail-in-dynamical-systems",
+        
+          title: "Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

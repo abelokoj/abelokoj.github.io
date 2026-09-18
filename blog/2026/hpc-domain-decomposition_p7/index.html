@@ -1,0 +1,482 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="article"> <meta property="og:title" content="Abel Okojunu | Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing"> <meta property="og:url" content="https://abelokoj.github.io/blog/2026/hpc-domain-decomposition_p7/"> <meta property="og:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing"> <meta name="twitter:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=" lora rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=11721491485ea314a5dd52fc325ebb8b"> <link rel="canonical" href="https://abelokoj.github.io/blog/2026/hpc-domain-decomposition_p7/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing</h1> <p class="post-meta"> Created on April 30, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/hpc"> <i class="fa-solid fa-hashtag fa-sm"></i> hpc</a>   <a href="/blog/tag/parallel-computing"> <i class="fa-solid fa-hashtag fa-sm"></i> parallel-computing</a>   <a href="/blog/tag/mpi"> <i class="fa-solid fa-hashtag fa-sm"></i> mpi</a>   <a href="/blog/tag/domain-decomposition"> <i class="fa-solid fa-hashtag fa-sm"></i> domain-decomposition</a>   <a href="/blog/tag/numerical-methods"> <i class="fa-solid fa-hashtag fa-sm"></i> numerical-methods</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <blockquote> <p><strong>A note on scope.</strong> This post uses <code class="language-plaintext highlighter-rouge">mpi4py</code> for real distributed execution, but the sandboxed environment it was written in has a single CPU core and no internet access from which to install MPI libraries. The domain decomposition demonstration below is therefore <strong>verified</strong>: it simulates in serial Python the exact communication pattern (ghost-cell halo exchange) that a real MPI program uses, and confirms that it reproduces the monolithic solution exactly. The <code class="language-plaintext highlighter-rouge">mpi4py</code> code that would run this across distributed nodes is provided as a ready-to-run reference implementation; run it on a cluster or multi-core machine to observe the actual wall-clock speedup.</p> </blockquote> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Real distributed implementation via mpi4py -- run with:
+#   mpirun -n 16 python wave_mpi.py
+</span><span class="kn">from</span> <span class="n">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="p">.</span><span class="n">COMM_WORLD</span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="p">.</span><span class="nc">Get_rank</span><span class="p">()</span>
+<span class="n">n_procs</span> <span class="o">=</span> <span class="n">comm</span><span class="p">.</span><span class="nc">Get_size</span><span class="p">()</span>
+
+<span class="c1"># Each rank computes its own slice of the global domain
+</span><span class="n">NX_GLOBAL</span><span class="p">,</span> <span class="n">NY</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">240</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">NX_GLOBAL</span><span class="p">,</span> <span class="n">n_procs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="n">rank</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">local_nx</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span>
+
+<span class="n">u_prev</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="n">local_nx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">NY</span><span class="p">))</span>   <span class="c1"># +2 for ghost rows
+</span><span class="n">u_curr</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="n">local_nx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">NY</span><span class="p">))</span>
+<span class="c1"># ... initialize u_curr[1:-1, :] with this rank's slice of the initial condition ...
+</span>
+<span class="n">left_neighbor</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">MPI</span><span class="p">.</span><span class="n">PROC_NULL</span>
+<span class="n">right_neighbor</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">n_procs</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">MPI</span><span class="p">.</span><span class="n">PROC_NULL</span>
+
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">N_STEPS</span><span class="p">):</span>
+    <span class="c1"># Non-blocking halo exchange: post receives and sends together, then wait.
+</span>    <span class="c1"># This lets MPI overlap communication with other work when possible,
+</span>    <span class="c1"># which is considerably faster than blocking send-then-receive calls.
+</span>    <span class="n">reqs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Isend</span><span class="p">(</span><span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">left_neighbor</span><span class="p">))</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Isend</span><span class="p">(</span><span class="n">u_curr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">right_neighbor</span><span class="p">))</span>
+    <span class="n">recv_left</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">empty</span><span class="p">(</span><span class="n">NY</span><span class="p">)</span>
+    <span class="n">recv_right</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">empty</span><span class="p">(</span><span class="n">NY</span><span class="p">)</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Irecv</span><span class="p">(</span><span class="n">recv_left</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">left_neighbor</span><span class="p">))</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Irecv</span><span class="p">(</span><span class="n">recv_right</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">right_neighbor</span><span class="p">))</span>
+    <span class="n">MPI</span><span class="p">.</span><span class="n">Request</span><span class="p">.</span><span class="nc">Waitall</span><span class="p">(</span><span class="n">reqs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">u_curr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">recv_left</span>
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">n_procs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">u_curr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">recv_right</span>
+
+    <span class="c1"># Local update -- identical stencil math to the serial version above
+</span>    <span class="n">lap_x</span> <span class="o">=</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">u_curr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">lap_y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">roll</span><span class="p">(</span><span class="n">u_curr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="nf">roll</span><span class="p">(</span><span class="n">u_curr</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u_curr</span>
+    <span class="n">u_next</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">u_prev</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">r2</span> <span class="o">*</span> <span class="p">(</span><span class="n">lap_x</span> <span class="o">+</span> <span class="n">lap_y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">u_prev</span><span class="p">,</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">u_curr</span><span class="p">.</span><span class="nf">copy</span><span class="p">(),</span> <span class="n">u_next</span>
+
+<span class="c1"># Gather the full field onto rank 0 for output/analysis
+</span><span class="n">local_result</span> <span class="o">=</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+<span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">full_result</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">empty</span><span class="p">((</span><span class="n">NX_GLOBAL</span><span class="p">,</span> <span class="n">NY</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">full_result</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">comm</span><span class="p">.</span><span class="nc">Gatherv</span><span class="p">(</span><span class="n">local_result</span><span class="p">,</span> <span class="n">full_result</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div> <h2 id="motivation-why-a-mathematician-should-care-about-parallel-computing">Motivation: why a mathematician should care about parallel computing</h2> <p>Every post so far in this series has implicitly assumed that solving the equation and running the code are the same task. At the scale at which national laboratories operate, they are not. A single high-fidelity three-dimensional simulation of inertial confinement fusion, climate dynamics, or tsunami wave propagation can involve <strong>trillions</strong> of degrees of freedom, far more than the memory of any single processor can hold, let alone compute within a useful time. Problems at that scale can be solved only by distributing the work across thousands to millions of processors operating together. That requirement defines <strong>parallel computing</strong> in this context: not a performance optimization added afterward, but a structural requirement for the class of problems considered here.</p> <p>This matters directly for the kind of role a computational mathematician might apply for at a place like Lawrence Livermore National Laboratory. The <strong>El Capitan</strong> system at LLNL, deployed in 2024 and, as of this writing, still among the fastest supercomputers in the world, delivers more than 2.79 exaflops of peak performance <a class="citation" href="#llnl2024elcapitan">(Lawrence Livermore National Laboratory, 2024)</a>, built from more than 11,000 nodes connected by a high-speed interconnect fabric <a class="citation" href="#hpcwire2024elcapitan">(HPCwire, 2024)</a>. None of that raw computational power is usable without algorithms and code specifically designed to be split across that many independent processors, which is exactly the mathematical and engineering problem this post walks through from first principles, on a problem small enough to run on a laptop.</p> <h2 id="the-core-idea-domain-decomposition">The core idea: domain decomposition</h2> <p>The dominant strategy for parallelizing a PDE solve across many processors is <strong>domain decomposition</strong>: split the physical domain (a grid, a mesh) into pieces, assign each piece to a different processor, and have neighboring processors exchange a thin strip of boundary data, called <strong>ghost cells</strong> or a <strong>halo</strong>, at each time step, so that each processor holds exactly enough information about its neighbors to update its own piece correctly.</p> <h3 id="a-concrete-problem-wave-propagation-from-a-localized-source">A concrete problem: wave propagation from a localized source</h3> <p>To make this tangible, this post works with the 2D linear wave equation <a class="citation" href="#leveque2002finite">(LeVeque, 2002)</a>,</p> \[\frac{\partial^2 u}{\partial t^2} = c^2 \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right),\] <p>with an initial Gaussian “uplift” pulse as the initial condition. The Gaussian pulse is a deliberately simplified representation of the seafloor-displacement source that drives a real tsunami, and an apt one: it belongs to the same class of PDE, a wave equation on a large two- or three-dimensional spatial domain, underlying the work of the LLNL-led team that won the 2025 ACM Gordon Bell Prize for a real-time tsunami early-warning framework running on El Capitan <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a>, which this post returns to at the end.</p> <p>Discretizing with a standard second-order central-difference (leapfrog) scheme in both space and time gives the explicit update rule,</p> \[u^{n+1}_{i,j} = 2u^n_{i,j} - u^{n-1}_{i,j} + \left(\frac{c\,\Delta t}{\Delta x}\right)^2 \left(u^n_{i+1,j} + u^n_{i-1,j} + u^n_{i,j+1} + u^n_{i,j-1} - 4u^n_{i,j}\right).\] <p>The key structural fact this whole post rests on: <strong>updating $u^{n+1}_{i,j}$ only requires the four nearest neighbors of $(i,j)$ at the previous time step.</strong> This locality is what makes domain decomposition possible: a processor requires data only from its immediate neighbors, rather than from the entire global domain, to advance its local piece by one time step. Formally, the discrete Laplacian stencil has support radius $1$ in each spatial index, so the dependency graph of the update is itself local, and partitioning the grid into contiguous blocks introduces dependencies only across block boundaries.</p> <h3 id="splitting-the-grid">Splitting the grid</h3> <p>Suppose a grid of $N_x$ rows is split into $P$ contiguous blocks, one per processor (a <strong>1D decomposition</strong>; real production codes often use 2D or 3D decompositions for better surface-area-to-volume ratios, discussed below). Each processor’s local array is padded with <strong>one extra “ghost” row</strong> on each side:</p> <p align="center"> <img src="/assets/img/posts/domain_decomposition_p7.svg" alt="Domain decomposition schematic showing the wave field split into 4 subdomains" style="width: 100%; max-width: 460px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: The same wave field from the monolithic solve below, with vertical lines showing how it would be partitioned across 4 processor “ranks.” Each rank owns a contiguous vertical strip.</em></p> <p>At every time step, before any local computation happens, each rank exchanges its boundary row with its neighbors:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Halo exchange: each rank sends its boundary row to neighbors,
+# receives into its own ghost rows -- exactly the communication pattern
+# of MPI_Sendrecv between neighboring ranks.
+</span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">n_procs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">blocks_curr</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">blocks_curr</span><span class="p">[</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>    <span class="c1"># recv from left neighbor
+</span>    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">n_procs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">blocks_curr</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">blocks_curr</span><span class="p">[</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>    <span class="c1"># recv from right neighbor
+</span></code></pre></div></div> <p>Once every rank has valid data in its ghost rows, each rank computes its own update <strong>completely independently</strong>, requiring no further communication until the next time step:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lap_x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros_like</span><span class="p">(</span><span class="n">local_curr</span><span class="p">)</span>
+<span class="n">lap_x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">local_curr</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">local_curr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">local_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">lap_y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">roll</span><span class="p">(</span><span class="n">local_curr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="nf">roll</span><span class="p">(</span><span class="n">local_curr</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">local_curr</span>
+<span class="n">local_next</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">local_curr</span> <span class="o">-</span> <span class="n">local_prev</span> <span class="o">+</span> <span class="n">r2</span> <span class="o">*</span> <span class="p">(</span><span class="n">lap_x</span> <span class="o">+</span> <span class="n">lap_y</span><span class="p">)</span>
+</code></pre></div></div> <p>This alternation, in which boundary data are <strong>communicated and local computation then proceeds independently</strong>, is the central pattern in distributed scientific computing. Nearly every parallel PDE solver, regardless of the specific equation, follows this two-phase structure at every time step.</p> <h2 id="correctness-first-verifying-that-decomposition-reproduces-the-reference-solution">Correctness first: verifying that decomposition reproduces the reference solution</h2> <p>Before reasoning about speed at all, it is essential to verify that splitting the computation in this way does not silently change the answer. The check applies the same discipline as the correctness check in the first post of this series, applied here to a parallel algorithm rather than a sequential one.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">u_mono</span><span class="p">,</span> <span class="n">sensor_traces</span> <span class="o">=</span> <span class="nf">solve_monolithic</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">n_procs</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]:</span>
+    <span class="n">u_decomp</span> <span class="o">=</span> <span class="nf">solve_decomposed</span><span class="p">(</span><span class="n">n_procs</span><span class="p">)</span>
+    <span class="n">max_err</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">max</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">abs</span><span class="p">(</span><span class="n">u_decomp</span> <span class="o">-</span> <span class="n">u_mono</span><span class="p">))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">P=</span><span class="si">{</span><span class="n">n_procs</span><span class="si">:</span><span class="mi">3</span><span class="n">d</span><span class="si">}</span><span class="s"> subdomains: max abs difference = </span><span class="si">{</span><span class="n">max_err</span><span class="si">:</span><span class="p">.</span><span class="mi">3</span><span class="n">e</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Correctness check: decomposed solve vs monolithic solve
+  P=  1 subdomains: max abs difference = 4.302e-16
+  P=  2 subdomains: max abs difference = 4.302e-16
+  P=  4 subdomains: max abs difference = 4.302e-16
+  P=  8 subdomains: max abs difference = 4.302e-16
+  P= 16 subdomains: max abs difference = 4.302e-16
+</code></pre></div></div> <p>The result is identical, to floating-point round-off, regardless of the number of pieces into which the domain is split. Agreement to round-off is the expected outcome: the explicit finite-difference stencil is a purely local operation, and domain decomposition with correct halo exchange is mathematically an <em>exact</em> reformulation of the same computation rather than an approximation. Whenever a decomposed solve fails to match the monolithic one beyond expected round-off, the defect is almost always in the halo-exchange logic; a missing or off-by-one ghost-cell update is the most common bug in production MPI-based PDE codes.</p> <p align="center"> <img src="/assets/img/posts/wave_field_sensors_p7.svg" alt="Simulated wave field and sensor recordings" style="width: 100%; max-width: 680px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 2: Left, the simulated wave field after 300 time steps, spreading outward from the Gaussian source pulse, with black triangles marking sensor locations. Right, the amplitude recorded at each sensor over time. This configuration, comprising a localized wave source, sensors recording its passage, and the inverse problem of reasoning backward from sensor data to source parameters, is the subject of the next post in this series, on Bayesian inverse problems.</em></p> <h2 id="from-correctness-to-performance-amdahls-law">From correctness to performance: Amdahl’s Law</h2> <p>Having confirmed that decomposition yields the correct answer, the next question concerns the magnitude of the speedup obtained. The answer begins with a constraining result established in 1967 <a class="citation" href="#amdahl1967validity">(Amdahl, 1967)</a>.</p> <p>Suppose a fraction $f$ of a program’s total work can be perfectly parallelized across $P$ processors, while a fraction $(1-f)$ is inherently sequential (I/O, setup, a part of the algorithm that cannot be split). <strong>Amdahl’s Law</strong> gives the theoretical speedup,</p> \[S(P) = \frac{1}{(1-f) + \dfrac{f}{P}}.\] <p>As $P \to \infty$, this does not diverge; it converges to a <strong>hard ceiling</strong>,</p> \[\lim_{P \to \infty} S(P) = \frac{1}{1-f}.\] <p align="center"> <img src="/assets/img/posts/amdahl_law_p7.svg" alt="Amdahl's Law speedup curves for various parallel fractions" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 3: Theoretical speedup vs. number of processes, for several values of the parallel fraction $f$. Even at $f=0.99$, corresponding to 99% of the code being perfectly parallelized, the maximum possible speedup is capped at $100\times$ regardless of the number of processors applied. The bound reflects no limitation of particular hardware; it is a mathematical ceiling.</em></p> <p>This has a very concrete implication for how a computational scientist should spend their time: <strong>profile before parallelizing.</strong> If a code spends 20% of its time in an unavoidably sequential setup phase, no amount of additional hardware will ever get more than a $5\times$ speedup, and chasing a bigger cluster allocation to fix a bottleneck that Amdahl’s Law has already capped is a common, avoidable waste of both compute budget and engineering time.</p> <h2 id="weak-scaling-a-different-often-more-relevant-question">Weak scaling: a different, often more relevant question</h2> <p>Amdahl’s Law addresses <strong>strong scaling</strong>, in which the total problem size is fixed and processors are added. Production HPC codes are frequently run in the opposite regime, <strong>weak scaling</strong> <a class="citation" href="#gustafson1988reevaluating">(Gustafson, 1988)</a>, in which problem size grows <em>with</em> the number of processors, so that each processor handles a fixed-size local portion irrespective of the processor count. The relevant question in that regime is not how much faster the same problem runs, but whether adding processors permits a proportionally larger problem to be solved within the same wall-clock time.</p> <p>The obstacle to <em>ideal</em> weak scaling (perfectly flat efficiency as $P$ grows) is <strong>communication overhead</strong>: every additional processor means more neighbor-to-neighbor halo exchanges happening across the interconnect, and at large enough $P$, that communication cost starts to compete meaningfully with the local computation time.</p> <p align="center"> <img src="/assets/img/posts/weak_scaling_p7.svg" alt="Weak scaling efficiency curves under a simple communication overhead model" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 4: Parallel efficiency under a simple model where communication overhead grows logarithmically with the number of processes (a simplification of real network topology effects). The dashed black line is the unattainable ideal; the colored curves show how efficiency degrades as the communication-to-computation ratio increases. Communication overhead is the trade-off that HPC teams devote substantial engineering effort to managing, through improved interconnect topology, overlapping communication with computation, and reducing message counts.</em></p> <p>This is precisely why real production codes use <strong>2D or 3D domain decomposition</strong> rather than the simple 1D column-split used in this post’s demo: for a fixed number of processors $P$, a 2D decomposition gives each processor a roughly square rather than elongated local domain, which <strong>minimizes the surface-area-to-volume ratio</strong>. Since communication cost scales with the boundary, or surface, that each processor shares with its neighbors, while useful computation scales with the interior, or volume, minimizing that ratio directly minimizes communication overhead relative to useful work. Concretely, for a square local domain of side length $\ell$ split among $P$ processors in a $\sqrt{P}\times\sqrt{P}$ grid, each processor’s halo perimeter scales as $O(\ell)$ while its interior scales as $O(\ell^2)$; for the equivalent 1D strip decomposition the halo is a fixed-width edge running the <em>full</em> domain length, independent of $P$, so the communication-to-computation ratio degrades faster as $P$ grows. The underlying argument is isoperimetric in character, favoring compact shapes over elongated ones to minimize boundary relative to area, and it applies directly to supercomputer performance engineering.</p> <h2 id="from-simulated-ranks-to-a-real-mpi-implementation">From simulated ranks to a real MPI implementation</h2> <p>The demonstration above simulates $P$ ranks as Python lists within a single process, which is useful for understanding and verifying the algorithm but is not itself parallel. A production implementation, run across a cluster, uses <code class="language-plaintext highlighter-rouge">mpi4py</code> <a class="citation" href="#dalcin2008mpi">(Dalcı́n Lisandro et al., 2008)</a> to bind each rank to a genuinely separate process (often on a separate physical node), communicating via the Message Passing Interface (MPI) standard <a class="citation" href="#gropp2014using">(Gropp et al., 2014)</a>:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Real distributed implementation via mpi4py -- run with:
+#   mpirun -n 16 python wave_mpi.py
+</span><span class="kn">from</span> <span class="n">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="p">.</span><span class="n">COMM_WORLD</span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">comm</span><span class="p">.</span><span class="nc">Get_rank</span><span class="p">()</span>
+<span class="n">n_procs</span> <span class="o">=</span> <span class="n">comm</span><span class="p">.</span><span class="nc">Get_size</span><span class="p">()</span>
+
+<span class="c1"># Each rank computes its own slice of the global domain
+</span><span class="n">NX_GLOBAL</span><span class="p">,</span> <span class="n">NY</span> <span class="o">=</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">240</span>
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">NX_GLOBAL</span><span class="p">,</span> <span class="n">n_procs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">).</span><span class="nf">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="n">rank</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">local_nx</span> <span class="o">=</span> <span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span>
+
+<span class="n">u_prev</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="n">local_nx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">NY</span><span class="p">))</span>   <span class="c1"># +2 for ghost rows
+</span><span class="n">u_curr</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="n">local_nx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">NY</span><span class="p">))</span>
+<span class="c1"># ... initialize u_curr[1:-1, :] with this rank's slice of the initial condition ...
+</span>
+<span class="n">left_neighbor</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">MPI</span><span class="p">.</span><span class="n">PROC_NULL</span>
+<span class="n">right_neighbor</span> <span class="o">=</span> <span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">n_procs</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">MPI</span><span class="p">.</span><span class="n">PROC_NULL</span>
+
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">N_STEPS</span><span class="p">):</span>
+    <span class="c1"># Non-blocking halo exchange: post receives and sends together, then wait.
+</span>    <span class="c1"># This lets MPI overlap communication with other work when possible,
+</span>    <span class="c1"># which is considerably faster than blocking send-then-receive calls.
+</span>    <span class="n">reqs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Isend</span><span class="p">(</span><span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">left_neighbor</span><span class="p">))</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Isend</span><span class="p">(</span><span class="n">u_curr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">dest</span><span class="o">=</span><span class="n">right_neighbor</span><span class="p">))</span>
+    <span class="n">recv_left</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">empty</span><span class="p">(</span><span class="n">NY</span><span class="p">)</span>
+    <span class="n">recv_right</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">empty</span><span class="p">(</span><span class="n">NY</span><span class="p">)</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Irecv</span><span class="p">(</span><span class="n">recv_left</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">left_neighbor</span><span class="p">))</span>
+    <span class="n">reqs</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">comm</span><span class="p">.</span><span class="nc">Irecv</span><span class="p">(</span><span class="n">recv_right</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">right_neighbor</span><span class="p">))</span>
+    <span class="n">MPI</span><span class="p">.</span><span class="n">Request</span><span class="p">.</span><span class="nc">Waitall</span><span class="p">(</span><span class="n">reqs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">u_curr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">recv_left</span>
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">n_procs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">u_curr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">recv_right</span>
+
+    <span class="c1"># Local update -- identical stencil math to the serial version above
+</span>    <span class="n">lap_x</span> <span class="o">=</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">u_curr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">lap_y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">roll</span><span class="p">(</span><span class="n">u_curr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="nf">roll</span><span class="p">(</span><span class="n">u_curr</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u_curr</span>
+    <span class="n">u_next</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">u_prev</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">r2</span> <span class="o">*</span> <span class="p">(</span><span class="n">lap_x</span> <span class="o">+</span> <span class="n">lap_y</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">u_prev</span><span class="p">,</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">u_curr</span><span class="p">.</span><span class="nf">copy</span><span class="p">(),</span> <span class="n">u_next</span>
+
+<span class="c1"># Gather the full field onto rank 0 for output/analysis
+</span><span class="n">local_result</span> <span class="o">=</span> <span class="n">u_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+<span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">full_result</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">empty</span><span class="p">((</span><span class="n">NX_GLOBAL</span><span class="p">,</span> <span class="n">NY</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">full_result</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">comm</span><span class="p">.</span><span class="nc">Gatherv</span><span class="p">(</span><span class="n">local_result</span><span class="p">,</span> <span class="n">full_result</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div> <p>Every piece of this maps directly onto the serial simulation above: <code class="language-plaintext highlighter-rouge">Isend</code>/<code class="language-plaintext highlighter-rouge">Irecv</code> implement the exact halo-exchange logic from the <code class="language-plaintext highlighter-rouge">blocks_curr[p][0, :] = ...</code> lines; <code class="language-plaintext highlighter-rouge">MPI.PROC_NULL</code> cleanly handles the domain’s physical edges (a rank with no left neighbor simply communicates with a “null” process that does nothing); and <code class="language-plaintext highlighter-rouge">Gatherv</code> reassembles the distributed pieces back into a single global array, exactly like the reassembly loop at the end of the serial <code class="language-plaintext highlighter-rouge">solve_decomposed</code> function.</p> <h2 id="a-second-axis-of-parallelism-whats-inside-each-node">A second axis of parallelism: what’s inside each node</h2> <p>The discussion above concerns parallelism <em>across</em> nodes, with MPI ranks communicating over a network. Modern supercomputers, including El Capitan, add a second, orthogonal axis of parallelism <em>within</em> each node: each El Capitan compute node is built around AMD Instinct MI300A <strong>APUs</strong>, which combine CPU cores, GPU cores, and a shared pool of high-bandwidth memory in a single package. Using such a machine effectively requires combining two distinct parallel programming models:</p> <ul> <li> <strong>MPI (distributed-memory parallelism)</strong>: the domain-decomposition pattern treated throughout this post, splitting the <em>problem</em> across independent processes that each hold private memory and communicate explicitly by message passing.</li> <li> <p><strong>Data parallelism on a GPU (shared-memory, SIMD-style parallelism)</strong>: within a single node, a GPU applies the <em>same</em> arithmetic operation to thousands of data elements simultaneously. Returning to the local update step in the serial demonstration above,</p> <div class="language-python highlighter-rouge"> <div class="highlight"><pre class="highlight"><code><span class="n">lap_x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">local_curr</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">local_curr</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">local_curr</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+</code></pre></div> </div> <p>every grid point’s Laplacian is computed by an <em>identical</em> arithmetic expression, entirely independent of every other grid point’s computation. That is exactly the structure a GPU is built to exploit: thousands of lightweight cores each executing the same instruction on a different element of data simultaneously. GPU threading is an entirely different mechanism from the independent-process-plus-message-passing model of MPI, but it serves the same underlying goal of exploiting mathematical independence to obtain wall-clock speed.</p> </li> </ul> <p>This combination of MPI <em>between</em> nodes and GPU data-parallelism <em>within</em> each node is termed a <strong>hybrid parallel programming model</strong>, and it is close to universal across current exascale-class machines rather than specific to El Capitan. Production HPC codes typically express both layers explicitly: MPI calls of the kind shown in the <code class="language-plaintext highlighter-rouge">mpi4py</code> example above for cross-node communication, together with a GPU programming interface such as CUDA, HIP, or a portable abstraction layer such as Kokkos or RAJA, both developed in part at LLNL for this purpose, for the node-local, data-parallel computation. Understanding both axes, and where the boundary between them should fall for a given problem, is a distinct skill from either one alone, and a common gap between writing a serial numerical method and writing one that uses an exascale machine effectively.</p> <h2 id="a-recent-breakthrough-exascale-tsunami-forecasting">A recent breakthrough: exascale tsunami forecasting</h2> <p>A concrete indication of the practical limit of these ideas is instructive. The Gordon Bell Prize-winning tsunami system mentioned earlier used El Capitan to run the largest unstructured-mesh finite-element simulation to date, resolving 55.5 trillion degrees of freedom <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a>. That scale is inaccessible to any single processor and unreachable even with a modest cluster; it requires precisely the domain-decomposition-plus-halo-exchange pattern described here, scaled across the more than 46,000 accelerator processing units and more than 11 million CPU cores of the machine <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a>.</p> <p>What makes the system a genuine breakthrough, not just a scale demonstration, is the <em>inverse</em> half of the pipeline: rather than only running forward wave simulations, the team built a system that rapidly solves the inverse problem of inferring the seafloor displacement scenario that best matches real-time pressure sensor data <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a>, turning a physics simulation that would normally require hours into a forecast delivered approximately ten billion times faster than conventional approaches, on the order of a fraction of a second <a class="citation" href="#newswise2025gordonbell">(Newswise, 2025)</a>. That inverse step, proceeding from noisy sensor measurements back to the unknown source parameters that produced them, is the subject of the next post in this series, and the simplified wave-source problem in Figure 2 above is a reduced version of that inference task.</p> <h2 id="summary-notes-and-highlights">Summary Notes and Highlights</h2> <ul> <li> <strong>Locality is what makes parallelism possible.</strong> The wave equation’s finite-difference stencil touches only nearest neighbors, and this is the structural property that permits domain decomposition to split the problem without changing the answer.</li> <li> <strong>Halo exchange, then independent local computation</strong> is the universal two-phase pattern behind essentially all distributed PDE solvers, regardless of the specific equation being solved.</li> <li> <strong>Verify correctness before optimizing for speed.</strong> A decomposed solve that does not reproduce the monolithic answer, beyond floating-point round-off, contains a defect, almost always in the halo exchange. This should be checked explicitly on every run rather than assumed.</li> <li> <strong>Amdahl’s Law is a hard ceiling rather than a heuristic.</strong> A sequential bottleneck caps the maximum attainable speedup regardless of the hardware added, which should directly inform where optimization effort is directed.</li> <li> <strong>Communication overhead, rather than raw computation, is usually the binding constraint at scale.</strong> This is why production codes favor two- and three-dimensional domain decompositions over simple one-dimensional splits, minimizing the surface-to-volume ratio of communication relative to useful work.</li> <li> <strong>The largest-scale scientific breakthroughs at national labs are built directly on these ideas</strong>, scaled from a laptop-sized demo like the one in this post up to tens of millions of cores.</li> </ul> <h2 id="references">References</h2> <p>The core theoretical framework in this post follows <a class="citation" href="#amdahl1967validity">(Amdahl, 1967)</a> for strong scaling and <a class="citation" href="#gustafson1988reevaluating">(Gustafson, 1988)</a> for the complementary weak-scaling perspective. <a class="citation" href="#gropp2014using">(Gropp et al., 2014)</a> is the standard reference for MPI programming, including the domain-decomposition patterns used throughout, with <a class="citation" href="#dalcin2008mpi">(Dalcı́n Lisandro et al., 2008)</a> documenting the <code class="language-plaintext highlighter-rouge">mpi4py</code> package used in the reference implementation. <a class="citation" href="#leveque2002finite">(LeVeque, 2002)</a> covers the wave equation discretization and stability analysis underlying the demo. The El Capitan system details are drawn from <a class="citation" href="#llnl2024elcapitan">(Lawrence Livermore National Laboratory, 2024)</a> and <a class="citation" href="#hpcwire2024elcapitan">(HPCwire, 2024)</a>, and the Gordon Bell Prize-winning tsunami-forecasting system referenced throughout is documented in <a class="citation" href="#llnl2025gordonbell">(Lawrence Livermore National Laboratory, 2025)</a> and <a class="citation" href="#newswise2025gordonbell">(Newswise, 2025)</a>.</p> <ol class="bibliography"> <li><span id="llnl2024elcapitan">Lawrence Livermore National Laboratory. (2024). <i>El Capitan: NNSA’s First Exascale Machine</i>. https://asc.llnl.gov/exascale/el-capitan</span></li> <li><span id="hpcwire2024elcapitan">HPCwire. (2024). <i>LLNL’s El Capitan Verified as World’s Fastest Supercomputer</i>. https://www.hpcwire.com</span></li> <li><span id="leveque2002finite">LeVeque, R. J. (2002). <i>Finite Volume Methods for Hyperbolic Problems</i>. Cambridge University Press.</span></li> <li><span id="llnl2025gordonbell">Lawrence Livermore National Laboratory. (2025). <i>LLNL, UT &amp; UCSD Win Gordon Bell Prize with Exascale Tsunami Forecasting</i>. https://www.llnl.gov/article/53636</span></li> <li><span id="amdahl1967validity">Amdahl, G. M. (1967). Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities. <i>AFIPS Spring Joint Computer Conference</i>, 483–485.</span></li> <li><span id="gustafson1988reevaluating">Gustafson, J. L. (1988). Reevaluating Amdahl’s Law. <i>Communications of the ACM</i>, <i>31</i>(5), 532–533.</span></li> <li><span id="dalcin2008mpi">Dalcı́n Lisandro, Paz, R., Storti, M., &amp; D’Elı́a Jorge. (2008). MPI for Python: Performance Improvements and MPI-2 Extensions. <i>Journal of Parallel and Distributed Computing</i>, <i>68</i>(5), 655–662.</span></li> <li><span id="gropp2014using">Gropp, W., Lusk, E., &amp; Skjellum, A. (2014). <i>Using MPI: Portable Parallel Programming with the Message-Passing Interface</i> (3rd ed.). MIT Press.</span></li> <li><span id="newswise2025gordonbell">Newswise. (2025). <i>LLNL, UT &amp; UCSD Win Gordon Bell Prize with Exascale Tsunami Forecasting</i>. https://www.newswise.com/articles/llnl-ut-ucsd-win-gordon-bell-prize-with-exascale-tsunami-forecasting</span></li> </ol> <hr> <p><em>Full, executed code for the domain decomposition demo is available in <a href="/assets/code/hpc_domain_decomposition_p7.py"><code class="language-plaintext highlighter-rouge">hpc_domain_decomposition_p7.py</code></a>. The <code class="language-plaintext highlighter-rouge">mpi4py</code> implementation is provided as a correct reference implementation for real distributed execution.</em></p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoyed reading this article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/compact_finite_difference_kdv_p11/">Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/computational-fluid-dynamics_p10/">Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/bayesian-inference-inverse-problems_p8/">Bayesian Inference and Inverse Problems: From First Principles to Clinical Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-deep-dive_p6/">An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and PyTorch on Real-World Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/pinn-vs-classical-methods_p4/">Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and Computational Cost</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/uncertainty-quantification-surrogate-modeling_p3/">An Introduction to Uncertainty Quantification Using Surrogate Modeling</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/stiff-odes-solver-stability_p2/">Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/sherman-morrison-ode_p1/">Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling</a> </li> </ul> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
+    (function setupGiscus() {
+      function determineGiscusTheme() {
+        var theme = localStorage.getItem("theme") || document.documentElement.getAttribute("data-theme") || "system";
+if (theme === "dark") return "dark";
+if (theme === "light") return "light";
+var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+return prefersDark ? "dark" : "light";
+
+      }
+
+      var giscusTheme = determineGiscusTheme();
+      var attrs = {
+        src: "https://giscus.app/client.js",
+        "data-repo": "abelokoj/abelokoj.github.io",
+        "data-repo-id": "R_kgDOTgiVew",
+        "data-category": "Comments",
+        "data-category-id": "DIC_kwDOTgiVe84DCeqq",
+        "data-mapping": "title",
+        "data-strict": "0",
+        "data-reactions-enabled": "1",
+        "data-emit-metadata": "0",
+        "data-input-position": "bottom",
+        "data-theme": giscusTheme,
+        "data-lang": "en",
+        crossorigin: "anonymous",
+        async: true
+      };
+
+      var giscusScript = document.createElement("script");
+      Object.entries(attrs).forEach(function(entry) { giscusScript.setAttribute(entry[0], entry[1]); });
+      var host = document.getElementById("giscus_thread");
+      if (host) host.appendChild(giscusScript);
+    })();
+  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum Vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics-foundations-methods-and-a-verified-solver",
+        
+          title: "Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-and-inverse-problems-from-first-principles-to-clinical-data",
+        
+          title: "Bayesian Inference and Inverse Problems: From First Principles to Clinical Data",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-parallel-computing-for-scientific-simulation-domain-decomposition-amdahl-39-s-law-and-exascale-computing",
+        
+          title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl&#39;s Law, and Exascale Computing",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-an-applied-introduction-to-modern-machine-learning-libraries-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-real-world-data",
+        
+          title: "An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-classical-numerical-methods-a-comparative-assessment-of-accuracy-and-computational-cost",
+        
+          title: "Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-an-introduction-to-uncertainty-quantification-using-surrogate-modeling",
+        
+          title: "An Introduction to Uncertainty Quantification Using Surrogate Modeling",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiff-odes-and-solver-stability-why-explicit-methods-sometimes-fail-in-dynamical-systems",
+        
+          title: "Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

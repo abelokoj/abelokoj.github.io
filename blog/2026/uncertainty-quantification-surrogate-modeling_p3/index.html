@@ -1,0 +1,384 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> An Introduction to Uncertainty Quantification Using Surrogate Modeling | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="article"> <meta property="og:title" content="Abel Okojunu | An Introduction to Uncertainty Quantification Using Surrogate Modeling"> <meta property="og:url" content="https://abelokoj.github.io/blog/2026/uncertainty-quantification-surrogate-modeling_p3/"> <meta property="og:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="An Introduction to Uncertainty Quantification Using Surrogate Modeling"> <meta name="twitter:description" content="Applied Mathematics, Scientific Computing, Machine Learning and AI. "> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=" lora rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=11721491485ea314a5dd52fc325ebb8b"> <link rel="canonical" href="https://abelokoj.github.io/blog/2026/uncertainty-quantification-surrogate-modeling_p3/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">An Introduction to Uncertainty Quantification Using Surrogate Modeling</h1> <p class="post-meta"> Created on February 22, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/uncertainty-quantification"> <i class="fa-solid fa-hashtag fa-sm"></i> uncertainty-quantification</a>   <a href="/blog/tag/polynomial-chaos"> <i class="fa-solid fa-hashtag fa-sm"></i> polynomial-chaos</a>   <a href="/blog/tag/surrogate-modeling"> <i class="fa-solid fa-hashtag fa-sm"></i> surrogate-modeling</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h2 id="motivation">Motivation</h2> <p>I have previously made posts about making a <em>single</em> simulation run fast: accelerating the linear algebra (<a href="/blog/2026/sherman-morrison-ode_p1/">Sherman-Morrison</a>) and choosing a solver that is not constrained by numerical stiffness (<a href="/blog/2026/stiff-odes-solver-stability_p2/">stiff ODEs</a>). However, in practice, a single does not adequately capture the user’s needs. Real inputs, including material properties, boundary conditions, and flight parameters, are uncertain. As a result, propagating that uncertainty via a simulation to determine its effect on the output (the <em>quantity of interest</em> (QoI)) typically requires running the simulation many times.</p> <p>If a single high-fidelity run takes hours on a cluster, evaluating it tens of thousands of times for a Monte Carlo uncertainty study is infeasible. <strong>Uncertainty quantification (UQ)</strong> exists to close this gap in situations like this. For this reason, we will discuss one of the central tools of uncertainty evaluation/quantification, namely; <strong>surrogate modeling</strong>: which replacing the expensive simulation with an inexpensive and accurate substitute constructed from a modest number of well-chosen runs. This post introduces one of the standard techniques for building such surrogates, <strong>polynomial chaos expansion (PCE)</strong> <a class="citation" href="#wiener1938homogeneous">(Wiener, 1938)</a><a class="citation" href="#ghanem1991stochastic">(Ghanem &amp; Spanos, 1991)</a>, from first principles using a worked example.</p> <h2 id="the-setup">The setup</h2> <p>Suppose an uncertain input parameter $x$, for example, a normalized material property or geometric tolerance, is distributed $x \sim \mathrm{Uniform}(-1, 1)$, and the simulation output, the quantity of interest, is some function $f(x)$. In real applications, $f$ is an expensive black box, such as a CFD solve or a finite-element structural analysis. Here, to keep the mathematics inspectable, a smooth substitute with a genuinely sharp response feature is used, so that the convergence dynamics reported below are not trivially favorable:</p> \[f(x) = \frac{1}{1 + 25x^2}.\] <p>The goal of UQ is typically to estimate statistics of the output induced by the uncertainty in the input, most commonly the mean and variance,</p> \[\mathbb{E}[f(x)], \qquad \mathrm{Var}[f(x)].\] <p>The direct approach is Monte Carlo: draw many samples of $x$, evaluate $f$ at each, and compute sample statistics. It is simple and general, but its error decays only as $O(N^{-1/2})$ in the number of simulation calls $N$, which is prohibitively slow when each call is expensive.</p> <h2 id="polynomial-chaos-expansion">Polynomial chaos expansion</h2> <p>The principle behind PCE is to expand the <em>output</em> as a series in polynomials that are orthogonal with respect to the probability distribution of the <em>input</em>,</p> \[f(x) \approx \sum_{j=0}^{p} c_j\, \Phi_j(x).\] <p>For $x \sim \mathrm{Uniform}(-1,1)$, the correct orthogonal set is the <strong>Legendre polynomials</strong> $\Phi_j = P_j$, satisfying</p> \[\int_{-1}^{1} P_i(x) P_j(x)\, dx = \frac{2}{2j+1}\, \delta_{ij}.\] <p>Different input distributions call for different polynomial families, a correspondence known as the <strong>Askey scheme</strong> <a class="citation" href="#xiu2002wiener">(Xiu &amp; Karniadakis, 2002)</a>: Hermite polynomials for the Gaussian inputs, Laguerre for exponential, and so on. Using an ill-matched polynomial series for a given distribution still converges in principle, but forfeits the fast convergence that makes PCE worthwhile.</p> <p>Because the basis is orthogonal, the expansion coefficients are simply projections,</p> \[c_j = \frac{1}{\|P_j\|^2}\int_{-1}^{1} f(x)\, P_j(x)\, \frac{dx}{2},\] <p>where the factor $dx/2$ normalizes the uniform density on $[-1,1]$ to integrate to $1$. In practice, this integral is evaluated numerically by <strong>Gauss-Legendre quadrature</strong>: a small number of carefully chosen evaluation points that integrate polynomials of a given degree <em>exactly</em>. For a degree-$p$ polynomial integrand, $\lceil (p+1)/2 \rceil$ quadrature nodes suffice, which is why the coefficient budget below scales only linearly with polynomial order rather than with a separately chosen sample count.</p> <p>The consequence is that, once the coefficients $c_j$ are known, the mean and variance of the output follow algebraically, with no further sampling:</p> \[\mathbb{E}[f] = c_0, \qquad \mathrm{Var}[f] = \sum_{j=1}^{p} c_j^2 \, \frac{\|P_j\|^2}{2}.\] <p>This is the key structural advantage over Monte Carlo: the <em>statistics</em> are a direct algebraic readout of the expansion coefficients rather than a separate sampling process layered on top of the surrogate.</p> <h2 id="implementation">Implementation</h2> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="n">numpy.polynomial</span> <span class="kn">import</span> <span class="n">legendre</span> <span class="k">as</span> <span class="n">L</span>
+
+<span class="k">def</span> <span class="nf">legendre_basis_eval</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">Phi[i, j] = P_j(x_i) for orders 0..order.</span><span class="sh">"""</span>
+    <span class="n">n_terms</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">Phi</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">((</span><span class="nf">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">n_terms</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">n_terms</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">n_terms</span><span class="p">)</span>
+        <span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">Phi</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">L</span><span class="p">.</span><span class="nf">legval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Phi</span>
+
+<span class="k">def</span> <span class="nf">pce_coefficients</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="n">n_quad</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">5</span>
+    <span class="n">nodes</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">polynomial</span><span class="p">.</span><span class="n">legendre</span><span class="p">.</span><span class="nf">leggauss</span><span class="p">(</span><span class="n">n_quad</span><span class="p">)</span>
+    <span class="n">fvals</span> <span class="o">=</span> <span class="nf">f</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+    <span class="n">Phi</span> <span class="o">=</span> <span class="nf">legendre_basis_eval</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">nodes</span><span class="p">)</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">norm_j</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">coeffs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">fvals</span> <span class="o">*</span> <span class="n">Phi</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="o">/</span> <span class="n">norm_j</span>
+    <span class="k">return</span> <span class="n">coeffs</span>
+
+<span class="k">def</span> <span class="nf">pce_eval</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">L</span><span class="p">.</span><span class="nf">legval</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)</span>
+</code></pre></div></div> <h2 id="surrogate-accuracy">Surrogate accuracy</h2> <p>Fitting PCE surrogates of increasing polynomial order against the true response function gives the following:</p> <p align="center"> <img src="/assets/img/posts/surrogate_fit_p3.svg" alt="PCE surrogate fit vs true function, multiple polynomial orders" style="width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: True response $f(x)$ against PCE surrogates of order 2, 4, 8, and 14. Low-order expansions miss the sharp peak near $x=0$; by order 14, the surrogate is visually indistinguishable from the truth.</em></p> <p>The low-order surrogates perform least well precisely where $f$ is sharpest, which shows a deliberate choice of test function. A smoother QoI is likely to converge faster still; a more demanding one was selected here to ensure that the convergence results shown below are not artificially favorable.</p> <h2 id="pce-vs-monte-carlo-convergence-comparison">PCE vs. Monte Carlo: convergence comparison</h2> <p>The decisive test is efficiency: for a <em>fixed budget</em> of simulation calls, the relevant question is the accuracy each method obtains in estimating the mean and variance.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># "Exact" reference via a very high-order PCE
+</span><span class="n">coeffs_ref</span> <span class="o">=</span> <span class="nf">pce_coefficients</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="n">mean_ref</span> <span class="o">=</span> <span class="n">coeffs_ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">var_ref</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">((</span><span class="n">coeffs_ref</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nf">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nf">len</span><span class="p">(</span><span class="n">coeffs_ref</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="c1"># mean_ref = 0.274680, var_ref = 0.081122
+</span></code></pre></div></div> <p align="center"> <img src="/assets/img/posts/convergence_p3.svg" alt="Convergence comparison: PCE vs Monte Carlo for mean and variance" style="width: 100%; max-width: 720px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 2: Absolute error in the estimated mean (left) and variance (right) of $f(x)$, as a function of the number of simulation evaluations used, comparing PCE (quadrature-based) against standard Monte Carlo. Both axes are log-scaled.</em></p> <p>The contrast is pronounced. PCE reaches accuracy at the level of machine precision with approximately <strong>15 to 20 simulation evaluations</strong>. Monte Carlo, plotted with its characteristic noisy $O(N^{-1/2})$ decay, remains several orders of magnitude less accurate even after <strong>30,000</strong> evaluations. For a QoI of this smoothness, the advantage of PCE derives from <strong>spectral convergence</strong>: the approximation error declines geometrically, or faster, with polynomial order, in contrast to the fixed $1/\sqrt{N}$ rate of Monte Carlo, which holds regardless of the smoothness of the underlying function.</p> <h2 id="limitations">Limitations</h2> <p>The efficiency of PCE is not unconditional, and the principal failure modes merit explicit statement:</p> <ul> <li> <strong>Curse of dimensionality.</strong> A full tensor-product PCE basis grows as $O(p^d)$ in the number of uncertain inputs $d$, which rapidly becomes less favorable than Monte Carlo for problems with many uncertain parameters. Sparse-grid and adaptive basis-selection methods exist specifically to reduce this, at the cost of additional implementation difficulty.</li> <li> <strong>Non-smooth QoIs.</strong> If the response has a genuine discontinuity, such as a bifurcation, a phase change, or a contact event, global polynomial formulations converge slowly or exhibit Gibbs-type oscillation; the appropriate remedy is often a localized or piecewise surrogate instead.</li> <li> <strong>Correlated or non-standard input distributions</strong> require either a different orthogonal polynomial function set, in accordance with the Askey scheme, or a transform to a standard distribution beforehand. Using an ill-matched basis degrades the convergence rate without producing an outright incorrect answer, which makes the error easy to overlook.</li> </ul> <h2 id="beyond-mean-and-variance-sensitivity-analysis">Beyond mean and variance: sensitivity analysis</h2> <p>A further advantage of constructing a PCE surrogate is that, once it exists, higher-order UQ analyses require additional computation on the surrogate rather than new simulation runs. <strong>Sobol sensitivity indices</strong> <a class="citation" href="#sobol2001global">(Sobol,’ 2001)</a>, which measures how much of the output fluctuation is attributable to each individual input and to interactions among inputs, can be read directly from the PCE coefficients in the multi-input case, with no additional model evaluations required <a class="citation" href="#sudret2008global">(Sudret, 2008)</a>. For a single-input problem such as the one above, the distinction is not visible, since the single input trivially explains $100\%$ of the variance. In a realistic multi-parameter engineering study, however, this is often a more actionable output than the mean and variance alone: identifying which one or two input parameters dominate the output uncertainty indicates where further experimentation or tighter manufacturing tolerances should be directed.</p> <h2 id="two-routes-to-constructing-a-pce-surrogate">Two routes to constructing a PCE surrogate</h2> <p>The projection approach shown above, which uses Gauss quadrature to compute each coefficient via numerical integration, is the classical route and is exact up to quadrature error when the evaluation points may be chosen freely. In some engineering settings, however, a <strong>fixed</strong> set of simulation runs is given, such as a legacy design-of-experiments campaign, and new evaluation points cannot be selected. In that case, PCE coefficients are instead estimated by <strong>least-squares regression</strong>: fitting the coefficients $c_j$ that best match the existing $(x_i, f(x_i))$ data in a least-squares sense, using the same Legendre basis functions. Regression-based PCE recovers the same spectral convergence benefits when the sample points are well-distributed and outnumber the basis terms by a sufficient margin, and it degrades gradually rather than exactly when the data are sparse or unevenly distributed. This makes it a useful, practical alternative when quadrature is unavailable <a class="citation" href="#xiu2010numerical">(Xiu, 2010)</a>.</p> <h2 id="applied-implementation-notes">Applied implementation notes</h2> <p>Several considerations apply before adopting a PCE library, of which <code class="language-plaintext highlighter-rouge">chaospy</code> and <code class="language-plaintext highlighter-rouge">UQpy</code> are common choices in Python, on a real project:</p> <ul> <li> <strong>Validate against a held-out sample.</strong> Fit the surrogate on one set of points, then assess its predictions on points excluded from fitting. This is the same discipline applied to any regression or machine-learning model, and for the same reason: a surrogate that reproduces only its training quadrature points is of no practical use.</li> <li> <strong>Consider the trade-off betwixt polynomial order and evaluation budget.</strong> Higher order yields speedier convergence <em>per basis function</em>, but the number of basis functions itself grows combinatorially with the number of uncertain inputs, so for high-dimensional cases the order must be chosen more conservatively than the single-input example here would suggest.</li> <li> <strong>Non-uniform, correlated, or bounded-but-non-uniform inputs</strong> are common in practice and require either selecting the matching Askey-scheme polynomial class or applying an isoprobabilistic transform, such as the Rosenblatt transform, to map the actual input distribution onto a standard one before building the expansion.</li> </ul> <h2 id="summary-notes-and-highlights">Summary Notes and Highlights</h2> <ul> <li>Surrogate modeling exists to make uncertainty propagation tractable when the underlying simulation is too expensive to evaluate thousands of times.</li> <li>Polynomial chaos expansion constructs that surrogate by projecting the QoI onto polynomials orthogonal to the probability distribution of the input. For smooth QoIs, this yields <strong>spectral</strong> convergence in place of the fixed $1/\sqrt{N}$ rate of Monte Carlo.</li> <li>The performance improvement is conditional: assumptions regarding dimensionality as well as smoothness both require checking before PCE is preferred over more robust, if slower, sampling-based alternatives.</li> </ul> <p>This progression, comprising fast linear algebra, stability-aware time integration, and efficient uncertainty propagation, constitutes much of the standard toolkit of applied computational science: make each simulation call inexpensive, ensure the solver does not silently demand more calls than necessary, and exercise judgment regarding how many calls are required to answer the question posed.</p> <h2 id="references">References</h2> <p>The polynomial-chaos construction used throughout this post traces back to <a class="citation" href="#wiener1938homogeneous">(Wiener, 1938)</a> for Gaussian-type inputs via Hermite polynomials, with <a class="citation" href="#ghanem1991stochastic">(Ghanem &amp; Spanos, 1991)</a> giving the first systematic engineering application. <a class="citation" href="#xiu2002wiener">(Xiu &amp; Karniadakis, 2002)</a> establishes the generalized Askey-scheme correspondence between input distributions and orthogonal algebraic polynomial families used above, and <a class="citation" href="#xiu2010numerical">(Xiu, 2010)</a> gives a thorough textbook treatment of both quadrature- and regression-based parameter calculation. The sensitivity-analysis discussion draws on <a class="citation" href="#sobol2001global">(Sobol,’ 2001)</a> for the classic Sobol indices and <a class="citation" href="#sudret2008global">(Sudret, 2008)</a>, which shows how those indices can be read directly off PCE coefficients without additional simulation runs.</p> <ol class="bibliography"> <li><span id="wiener1938homogeneous">Wiener, N. (1938). The Homogeneous Chaos. <i>American Journal of Mathematics</i>, <i>60</i>(4), 897–936.</span></li> <li><span id="ghanem1991stochastic">Ghanem, R. G., &amp; Spanos, P. D. (1991). <i>Stochastic Finite Elements: A Spectral Approach</i>. Springer.</span></li> <li><span id="xiu2002wiener">Xiu, D., &amp; Karniadakis, G. E. (2002). The Wiener-Askey Polynomial Chaos for Stochastic Differential Equations. <i>SIAM Journal on Scientific Computing</i>, <i>24</i>(2), 619–644.</span></li> <li><span id="sobol2001global">Sobol’, I. M. (2001). Global Sensitivity Indices for Nonlinear Mathematical Models and Their Monte Carlo Estimates. <i>Mathematics and Computers in Simulation</i>, <i>55</i>(1-3), 271–280.</span></li> <li><span id="sudret2008global">Sudret, B. (2008). Global Sensitivity Analysis Using Polynomial Chaos Expansions. <i>Reliability Engineering &amp; System Safety</i>, <i>93</i>(7), 964–979.</span></li> <li><span id="xiu2010numerical">Xiu, D. (2010). <i>Numerical Methods for Stochastic Computations: A Spectral Method Approach</i>. Princeton University Press.</span></li> </ol> <hr> <p><em>Full code for this post is available in <a href="/assets/code/pce_demo_p3.py"><code class="language-plaintext highlighter-rouge">pce_demo_p3.py</code></a>.</em></p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoyed reading this article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/compact_finite_difference_kdv_p11/">Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/computational-fluid-dynamics_p10/">Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/bayesian-inference-inverse-problems_p8/">Bayesian Inference and Inverse Problems: From First Principles to Clinical Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/hpc-domain-decomposition_p7/">Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-deep-dive_p6/">An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and PyTorch on Real-World Data</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/pinn-vs-classical-methods_p4/">Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and Computational Cost</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/stiff-odes-solver-stability_p2/">Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/sherman-morrison-ode_p1/">Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling</a> </li> </ul> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
+    (function setupGiscus() {
+      function determineGiscusTheme() {
+        var theme = localStorage.getItem("theme") || document.documentElement.getAttribute("data-theme") || "system";
+if (theme === "dark") return "dark";
+if (theme === "light") return "light";
+var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+return prefersDark ? "dark" : "light";
+
+      }
+
+      var giscusTheme = determineGiscusTheme();
+      var attrs = {
+        src: "https://giscus.app/client.js",
+        "data-repo": "abelokoj/abelokoj.github.io",
+        "data-repo-id": "R_kgDOTgiVew",
+        "data-category": "Comments",
+        "data-category-id": "DIC_kwDOTgiVe84DCeqq",
+        "data-mapping": "title",
+        "data-strict": "0",
+        "data-reactions-enabled": "1",
+        "data-emit-metadata": "0",
+        "data-input-position": "bottom",
+        "data-theme": giscusTheme,
+        "data-lang": "en",
+        crossorigin: "anonymous",
+        async: true
+      };
+
+      var giscusScript = document.createElement("script");
+      Object.entries(attrs).forEach(function(entry) { giscusScript.setAttribute(entry[0], entry[1]); });
+      var host = document.getElementById("giscus_thread");
+      if (host) host.appendChild(giscusScript);
+    })();
+  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum Vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics-foundations-methods-and-a-verified-solver",
+        
+          title: "Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-and-inverse-problems-from-first-principles-to-clinical-data",
+        
+          title: "Bayesian Inference and Inverse Problems: From First Principles to Clinical Data",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-parallel-computing-for-scientific-simulation-domain-decomposition-amdahl-39-s-law-and-exascale-computing",
+        
+          title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl&#39;s Law, and Exascale Computing",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-an-applied-introduction-to-modern-machine-learning-libraries-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-real-world-data",
+        
+          title: "An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-classical-numerical-methods-a-comparative-assessment-of-accuracy-and-computational-cost",
+        
+          title: "Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-an-introduction-to-uncertainty-quantification-using-surrogate-modeling",
+        
+          title: "An Introduction to Uncertainty Quantification Using Surrogate Modeling",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiff-odes-and-solver-stability-why-explicit-methods-sometimes-fail-in-dynamical-systems",
+        
+          title: "Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-project-1",
+          title: 'project 1',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
