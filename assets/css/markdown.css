@@ -1,0 +1,348 @@
+/* Markdown presentation adapted from the supplied markdown.css and
+   markdown-dark.css. Rules are scoped so the site chrome and specialized
+   layouts retain their own styling. */
+
+:is(.markdown-body, #markdown-content) {
+  --md-base-font-size: 13pt;
+  --md-line-height: 1.3;
+  --md-font-serif: "Lora", "Palatino Linotype", "NewComputerModern10", Palatino, Georgia, serif;
+  --md-font-mono: "Maple Mono", "Maple Mono NF", "FiraCode Nerd Font", "Fira Code", Consolas, "Courier New", monospace;
+  --md-color-text: #333333;
+  --md-color-heading: #000000;
+  --md-color-muted: #777777;
+  --md-color-link: #4183c4;
+  --md-color-border: #cccccc;
+  --md-color-border-light: #eaeaea;
+  --md-color-surface: #f8f8f8;
+  --md-color-table-border: #bfbfbf;
+  --md-color-surface-alt: #f0f0f0;
+  --md-color-bg: #ffffff;
+  --md-color-quote-bar: #dddddd;
+
+  color: var(--md-color-text);
+  font-family: var(--md-font-serif);
+  font-size: var(--md-base-font-size);
+  line-height: var(--md-line-height);
+}
+
+html[data-theme="dark"] :is(.markdown-body, #markdown-content) {
+  --md-color-text: #f0f0f0;
+  --md-color-heading: #ffffff;
+  --md-color-muted: #b4b4b4;
+  --md-color-link: #6cb6ff;
+  --md-color-border: #3c3c3c;
+  --md-color-border-light: #3a3a3a;
+  --md-color-surface: #252526;
+  --md-color-table-border: #444444;
+  --md-color-surface-alt: #2d2d30;
+  --md-color-bg: #1e1e1e;
+  --md-color-quote-bar: #4a4a4a;
+}
+
+:is(.markdown-body, #markdown-content) > :first-child {
+  margin-top: 0 !important;
+}
+
+:is(.markdown-body, #markdown-content) > :last-child {
+  margin-bottom: 0 !important;
+}
+
+:is(.markdown-body, #markdown-content) a {
+  color: var(--md-color-link);
+  text-decoration: none;
+}
+
+:is(.markdown-body, #markdown-content) a.absent {
+  color: #cc0000;
+}
+
+html[data-theme="dark"] :is(.markdown-body, #markdown-content) a.absent {
+  color: #f78166;
+}
+
+:is(.markdown-body, #markdown-content) h1,
+:is(.markdown-body, #markdown-content) h2,
+:is(.markdown-body, #markdown-content) h3,
+:is(.markdown-body, #markdown-content) h4,
+:is(.markdown-body, #markdown-content) h5,
+:is(.markdown-body, #markdown-content) h6 {
+  position: relative;
+  margin: 0 0 0.75em;
+  padding: 0;
+  color: var(--md-color-heading);
+  font-family: var(--md-font-serif);
+  font-weight: 700;
+  line-height: 1.25;
+  -webkit-font-smoothing: antialiased;
+}
+
+:is(.markdown-body, #markdown-content) h1 {
+  padding-bottom: 0.2275em;
+  margin-bottom: 0.7em !important;
+  border-bottom: 1px solid var(--md-color-border);
+  font-size: 2em;
+}
+
+:is(.markdown-body, #markdown-content) h2 {
+  margin-top: 1.2em;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.65em !important;
+  border-bottom: 1px solid var(--md-color-border);
+  font-size: 1.5em;
+}
+
+:is(.markdown-body, #markdown-content) h3 {
+  margin-top: 1.2em;
+  padding-bottom: 0.28em;
+  margin-bottom: 0.6em !important;
+  border-bottom: 1px solid var(--md-color-border);
+  font-size: 1.15em;
+}
+
+:is(.markdown-body, #markdown-content) h4 {
+  margin-top: 1.2em;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.55em !important;
+  border-bottom: 1px solid var(--md-color-border);
+  font-size: 1.05em;
+}
+
+:is(.markdown-body, #markdown-content) h5,
+:is(.markdown-body, #markdown-content) h6 {
+  margin-top: 1em;
+  margin-bottom: 0;
+  font-size: 1em;
+}
+
+:is(.markdown-body, #markdown-content) h6 {
+  color: var(--md-color-muted);
+}
+
+:is(.markdown-body, #markdown-content) :is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+:is(.markdown-body, #markdown-content) :is(h1, h2, h3, h4, h5, h6) :is(code, tt) {
+  font-size: inherit;
+}
+
+:is(.markdown-body, #markdown-content) :is(p, blockquote, ul, ol, dl, li, table, pre) {
+  margin: 0 0 0.4em;
+}
+
+:is(.markdown-body, #markdown-content) p {
+  text-align: left;
+}
+
+:is(.markdown-body, #markdown-content) :is(ul, ol) {
+  padding-left: 1.2em;
+}
+
+:is(.markdown-body, #markdown-content) :is(ul, ol) :first-child {
+  margin-top: 0;
+}
+
+:is(.markdown-body, #markdown-content) :is(ul, ol) :last-child {
+  margin-bottom: 0.4em;
+}
+
+:is(.markdown-body, #markdown-content) li {
+  margin-top: 0;
+  margin-bottom: 0;
+  text-align: justify;
+}
+
+:is(.markdown-body, #markdown-content) hr {
+  height: 1px;
+  margin: 0.4em 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--md-color-border);
+}
+
+:is(.markdown-body, #markdown-content) dl {
+  padding: 0;
+}
+
+:is(.markdown-body, #markdown-content) dl dt {
+  margin: 0.4em 0;
+  padding: 0;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: 700;
+}
+
+:is(.markdown-body, #markdown-content) dl dd {
+  margin: 0 0 1.15em;
+  padding: 0 1.15em;
+}
+
+:is(.markdown-body, #markdown-content) blockquote {
+  padding: 0 1.15em;
+  border-left: 4px solid var(--md-color-quote-bar);
+  color: var(--md-color-muted);
+}
+
+:is(.markdown-body, #markdown-content) blockquote > :first-child {
+  margin-top: 0;
+}
+
+:is(.markdown-body, #markdown-content) blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+:is(.markdown-body, #markdown-content) table {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  border-collapse: collapse;
+  table-layout: auto;
+  font: inherit;
+}
+
+:is(.markdown-body, #markdown-content) .table-wrapper {
+  max-width: 100%;
+  margin-bottom: 0.4em;
+  overflow-x: auto;
+}
+
+:is(.markdown-body, #markdown-content) table tr {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--md-color-table-border);
+  background-color: var(--md-color-bg);
+}
+
+:is(.markdown-body, #markdown-content) table tr:nth-child(2n) {
+  background-color: var(--md-color-surface);
+}
+
+:is(.markdown-body, #markdown-content) table th,
+:is(.markdown-body, #markdown-content) table td {
+  min-width: 0;
+  margin: 0;
+  padding: 0.45em 1em;
+  border: 1px solid var(--md-color-table-border);
+  text-align: left;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}
+
+:is(.markdown-body, #markdown-content) table th {
+  background-color: var(--md-color-surface-alt);
+  font-weight: 700;
+}
+
+:is(.markdown-body, #markdown-content) img {
+  width: 90%;
+  max-width: 400px;
+  margin-top: 1.15em;
+  margin-bottom: 1.15em;
+}
+
+:is(.markdown-body, #markdown-content) span.frame,
+:is(.markdown-body, #markdown-content) span.align-center,
+:is(.markdown-body, #markdown-content) span.align-right {
+  display: block;
+  clear: both;
+  overflow: hidden;
+}
+
+:is(.markdown-body, #markdown-content) span.float-left {
+  display: block;
+  float: left;
+  margin-right: 1em;
+  overflow: hidden;
+}
+
+:is(.markdown-body, #markdown-content) span.float-right {
+  display: block;
+  float: right;
+  margin-left: 1em;
+  overflow: hidden;
+}
+
+:is(.markdown-body, #markdown-content) :is(code, tt) {
+  margin: 0 2px;
+  padding: 0 5px;
+  border: 1px solid var(--md-color-border-light);
+  border-radius: 3px;
+  background-color: var(--md-color-surface);
+  font-family: var(--md-font-mono);
+  font-size: 0.8em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+:is(.markdown-body, #markdown-content) pre,
+:is(.markdown-body, #markdown-content) .highlight pre {
+  max-width: 100%;
+  padding: 0.5em 0.8em;
+  border: 1px solid var(--md-color-border);
+  border-radius: 3px;
+  background-color: var(--md-color-surface);
+  font-family: var(--md-font-mono);
+  font-size: 0.8em;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
+}
+
+:is(.markdown-body, #markdown-content) pre :is(code, tt) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: inherit;
+  white-space: inherit;
+  overflow-wrap: inherit;
+}
+
+:is(.markdown-body, #markdown-content) .contains-task-list {
+  padding-left: 5px;
+}
+
+:is(.markdown-body, #markdown-content) .task-list-item {
+  list-style-type: none;
+}
+
+/* About-only icon sizing: 30% smaller than the theme's 4rem/3.2rem defaults. */
+.social .about-contact-icons {
+  font-size: 2.8rem;
+}
+
+.social .about-contact-icons a img {
+  width: 2.24rem;
+  height: 2.24rem;
+  margin-bottom: 0.7rem;
+}
+
+@media (max-width: 700px) {
+  :is(.markdown-body, #markdown-content) table th,
+  :is(.markdown-body, #markdown-content) table td {
+    padding: 0.4em 0.5em;
+  }
+
+  :is(.markdown-body, #markdown-content) pre,
+  :is(.markdown-body, #markdown-content) .highlight pre {
+    padding: 0.5em 0.6em;
+  }
+
+  :is(.markdown-body, #markdown-content) img {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  :is(.markdown-body, #markdown-content) {
+    --md-base-font-size: 12pt;
+  }
+
+  :is(.markdown-body, #markdown-content) table th,
+  :is(.markdown-body, #markdown-content) table td {
+    padding: 0.35em 0.4em;
+  }
+}

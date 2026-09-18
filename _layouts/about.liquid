@@ -38,7 +38,7 @@ layout: default
       </div>
     {% endif %}
 
-    <div class="clearfix about-intro">{{ content }}</div>
+    <div class="clearfix about-intro markdown-body">{{ content }}</div>
 
     <!-- News -->
     {% if page.announcements and page.announcements.enabled %}
@@ -67,7 +67,7 @@ layout: default
     <!-- Social -->
     {% if page.social %}
       <div class="social">
-        <div class="contact-icons">{% social_links %}</div>
+        <div class="contact-icons about-contact-icons">{% social_links %}</div>
 
         <div class="contact-note">{{ site.contact_note }}</div>
       </div> 
