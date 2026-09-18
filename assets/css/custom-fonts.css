@@ -114,29 +114,35 @@ figure.highlight pre,
   line-height: 1.02;
 }
 
-/* Contact/social icons — brand colors instead of monochrome.
-   The gem paints the glyph color on the i::before pseudo-element
-   (var(--global-text-color)), so overrides must target ::before too. */
-.contact-icons a[href^="mailto"] i::before {
-  color: #ea4335; /* Gmail red */
+/* Contact/social icons — official brand colors on every contact row.
+   Class-based selectors are intentional: the production PurgeCSS pass removes
+   URL-attribute selectors even when the matching links occur in generated HTML. */
+.contact-icons .fa-envelope::before {
+  color: #ea4335 !important; /* Gmail */
 }
-.contact-icons a[href*="linkedin.com"] i::before {
-  color: #0a66c2; /* LinkedIn blue */
+
+.contact-icons .fa-linkedin::before {
+  color: #0a66c2 !important; /* LinkedIn */
 }
-.contact-icons a[href*="orcid.org"] i::before {
-  color: #a6ce39; /* ORCID green */
+
+.contact-icons .ai-orcid::before {
+  color: #a6ce39 !important; /* ORCID */
 }
-.contact-icons a[href*="researchgate.net"] i::before {
-  color: #00ccbb; /* ResearchGate teal */
+
+.contact-icons .ai-researchgate::before {
+  color: #00ccbb !important; /* ResearchGate */
 }
-.contact-icons a[href*="github.com"] i::before {
-  color: #333333; /* GitHub dark */
+
+.contact-icons .fa-github::before {
+  color: #181717 !important; /* GitHub */
 }
-html[data-theme="dark"] .contact-icons a[href*="github.com"] i::before {
-  color: #e6e6e6; /* keep the GitHub mark visible on a dark background */
+
+html[data-theme="dark"] .contact-icons .fa-github::before {
+  color: #ffffff !important;
 }
-.contact-icons a[title="Cv pdf"] i::before {
-  color: var(--global-theme-color);
+
+.contact-icons .ai-cv::before {
+  color: var(--global-theme-color) !important;
 }
 
 
