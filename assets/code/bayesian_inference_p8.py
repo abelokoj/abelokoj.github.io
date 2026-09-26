@@ -228,27 +228,45 @@ ols_ci = np.vstack([ols_coefs - 1.96 * ols_se, ols_coefs + 1.96 * ols_se]).T
 
 # ---- Bayesian linear regression via MCMC over the regression coefficients ----
 # Prior: independent Normal(0, tau^2) on each standardized coefficient (a
-# standard weakly-informative "ridge-like" prior), plus a noise variance.
+# weakly informative, ridge-like prior). The noise standard deviation is set
+# to its OLS estimate (a plug-in, empirical-Bayes choice). An earlier version
+# fixed it at 1.0, but the target is standardized and the model explains
+# about half its variance, so the true residual SD is about 0.7 and sigma = 1
+# widened every credible interval by roughly 1.4x.
 TAU2 = 4.0
-NOISE_STD = 1.0   # fixed for simplicity -- a full model would put a prior on this too
+NOISE_STD = float(np.sqrt(sigma2_hat))
+print(f"Noise SD (plug-in OLS estimate): {NOISE_STD:.4f}")
 
 
 def log_posterior_reg(beta):
-    if np.any(np.abs(beta) > 20):
-        return -np.inf
     resid = y_c - X @ beta
     log_lik = -0.5 * np.sum(resid ** 2) / NOISE_STD ** 2
     log_prior_beta = -0.5 * np.sum(beta ** 2) / TAU2
     return log_lik + log_prior_beta
 
 
-def mh_vector(log_post_fn, theta0, n_samples, step_size, rng):
+# With a Gaussian likelihood, Gaussian prior and fixed sigma the posterior is
+# Gaussian in closed form. It is used here only as an exact check on the
+# sampler, and to shape its proposal.
+post_cov = np.linalg.inv(X.T @ X / NOISE_STD ** 2 + np.eye(d) / TAU2)
+post_mean = post_cov @ (X.T @ y_c) / NOISE_STD ** 2
+post_sd = np.sqrt(np.diag(post_cov))
+
+
+def mh_vector(log_post_fn, theta0, n_samples, prop_chol, rng):
+    """Random-walk Metropolis with a correlated Gaussian proposal.
+
+    s1 and s2 (and s3-s5) are strongly collinear, so an isotropic random walk
+    mixes very slowly along their joint direction. Shaping the proposal like
+    the posterior covariance, scaled by 2.38^2/d (the standard optimal scaling
+    for random-walk Metropolis), removes that problem.
+    """
     theta = np.array(theta0, dtype=float)
     current_lp = log_post_fn(theta)
     samples = np.zeros((n_samples, len(theta)))
     n_accept = 0
     for i in range(n_samples):
-        proposal = theta + rng.normal(0, step_size, size=len(theta))
+        proposal = theta + prop_chol @ rng.normal(size=len(theta))
         proposal_lp = log_post_fn(proposal)
         if np.log(rng.uniform()) < proposal_lp - current_lp:
             theta, current_lp = proposal, proposal_lp
@@ -257,17 +275,39 @@ def mh_vector(log_post_fn, theta0, n_samples, step_size, rng):
     return samples, n_accept / n_samples
 
 
+def effective_sample_size(x):
+    """ESS from the initial positive sequence of autocorrelations (Geyer)."""
+    x = np.asarray(x) - np.mean(x)
+    n = len(x)
+    f = np.fft.rfft(x, 2 * n)
+    acf = np.fft.irfft(f * np.conj(f))[:n] / (np.arange(n, 0, -1) * np.var(x))
+    s, k = 0.0, 1
+    while k + 1 < n and acf[k] + acf[k + 1] > 0:
+        s += acf[k] + acf[k + 1]
+        k += 2
+    return n / (1 + 2 * s)
+
+
 N_SAMPLES_REG = 40000
 BURN_IN_REG = 8000
 beta0 = np.zeros(d)
+prop_chol = np.linalg.cholesky((2.38 ** 2 / d) * post_cov)
 reg_samples, reg_accept = mh_vector(
-    log_posterior_reg, beta0, N_SAMPLES_REG, step_size=0.03, rng=rng
+    log_posterior_reg, beta0, N_SAMPLES_REG, prop_chol, rng=rng
 )
 print(f"Regression MCMC acceptance rate: {reg_accept:.3f}")
 
 reg_posterior = reg_samples[BURN_IN_REG:]
 bayes_mean = reg_posterior.mean(axis=0)
 bayes_ci = np.percentile(reg_posterior, [2.5, 97.5], axis=0).T
+ess = np.array([effective_sample_size(reg_posterior[:, j]) for j in range(d)])
+exact_ci = np.vstack([post_mean - 1.96 * post_sd, post_mean + 1.96 * post_sd]).T
+print(f"Effective sample size per coefficient: min {ess.min():.0f}, max {ess.max():.0f} "
+      f"(of {len(reg_posterior)} post-burn-in draws)")
+print(f"Max |MCMC mean - exact mean|: {np.max(np.abs(bayes_mean - post_mean)):.4f}; "
+      f"max |MCMC interval end - exact|: {np.max(np.abs(bayes_ci - exact_ci)):.4f}")
+print(f"Credible / confidence interval width ratio: "
+      f"{np.mean((bayes_ci[:, 1] - bayes_ci[:, 0]) / (ols_ci[:, 1] - ols_ci[:, 0])):.3f} (mean over features)")
 
 print("\nFeature            OLS coef [95% CI]              Bayes posterior mean [95% credible interval]")
 for j, name in enumerate(feature_names):
@@ -303,6 +343,6 @@ with open("results.txt", "w") as f:
     f.write(f"x0_mean={x0_mean:.4f} x0_ci={x0_ci}\n")
     f.write(f"\nPart B acceptance rate: {reg_accept:.3f}\n")
     for j, name in enumerate(feature_names):
-        f.write(f"{name}: ols={ols_coefs[j]:.4f} bayes_mean={bayes_mean[j]:.4f}\n")
+        f.write(f"{name}: ols={ols_coefs[j]:.4f} bayes_mean={bayes_mean[j]:.4f} exact_mean={post_mean[j]:.4f} ess={ess[j]:.0f}\n")
 
 print("done")

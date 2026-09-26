@@ -1,0 +1,577 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and PyTorch | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="article"> <meta property="og:title" content="Abel Okojunu | Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and PyTorch"> <meta property="og:url" content="https://abelokoj.github.io/blog/2026/ml-toolkit-tour_p5/"> <meta property="og:description" content="Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks."> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and PyTorch"> <meta name="twitter:description" content="Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks."> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&amp;display=swap" rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=cf4ff5dbd262c2a23db37dfec9b9ab26"> <link rel="stylesheet" href="/assets/css/markdown.css?v=1e36405c2bab686ee3b64128c24cf932"> <link rel="canonical" href="https://abelokoj.github.io/blog/2026/ml-toolkit-tour_p5/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post code-theme-default"> <header class="post-header"> <h1 class="post-title">Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and PyTorch</h1> <p class="post-meta"> Created on March 03, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/machine-learning"> <i class="fa-solid fa-hashtag fa-sm"></i> machine-learning</a>   <a href="/blog/tag/deep-learning"> <i class="fa-solid fa-hashtag fa-sm"></i> deep-learning</a>   <a href="/blog/tag/scikit-learn"> <i class="fa-solid fa-hashtag fa-sm"></i> scikit-learn</a>   <a href="/blog/tag/xgboost"> <i class="fa-solid fa-hashtag fa-sm"></i> xgboost</a>   <a href="/blog/tag/tensorflow"> <i class="fa-solid fa-hashtag fa-sm"></i> tensorflow</a>   <a href="/blog/tag/keras"> <i class="fa-solid fa-hashtag fa-sm"></i> keras</a>   <a href="/blog/tag/pytorch"> <i class="fa-solid fa-hashtag fa-sm"></i> pytorch</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <blockquote> <p><strong>How the numbers were produced.</strong> All four libraries were run in a single process on one train/test split of the same dataset, with every random seed fixed, so the results below are directly comparable. The script that produced them is linked at the end of the post.</p> </blockquote> <h2 id="motivation">Motivation</h2> <p>Machine learning is not a single tool but a spectrum of methods, and one of the more useful things an applied mathematician brings to a machine learning team is judgment about <em>where on that spectrum a given problem lies</em>, instead of applying the same deep architecture whatever the data. This post is organized around that principle: one dataset, one problem and four libraries, so that the comparison is between <em>methods</em> and not between unrelated examples.</p> <p>The four libraries fall into two families:</p> <ul> <li> <strong>scikit-learn</strong> and <strong>XGBoost</strong> <a class="citation" href="#pedregosa2011scikit">(Pedregosa et al., 2011)</a><a class="citation" href="#chen2016xgboost">(Chen &amp; Guestrin, 2016)</a> represent classical statistical learning: linear models, kernel methods, and ensembles of decision trees. Their training problems are convex or close to it, they are well understood theoretically and fast to fit, and, as the results below show, they are often hard to beat on small and medium-sized tabular data.</li> <li> <strong>TensorFlow/Keras</strong> and <strong>PyTorch</strong> <a class="citation" href="#abadi2016tensorflow">(Abadi Martı́n et al., 2016)</a><a class="citation" href="#chollet2015keras">(Chollet &amp; others, 2015)</a><a class="citation" href="#paszke2019pytorch">(Paszke et al., 2019)</a> represent deep learning: differentiable function approximators trained by stochastic gradient descent and backpropagation, which pay off on high-dimensional, unstructured data such as images, text and audio, or on very large datasets.</li> </ul> <h2 id="the-running-example">The running example</h2> <p>Every library below solves the <strong>same problem</strong>: binary classification on the Breast Cancer Wisconsin (Diagnostic) dataset <a class="citation" href="#wolberg1995breast">(Wolberg et al., 1995)</a>, comprising 569 samples and 30 real-valued features derived from digitized images of fine needle aspirate biopsies, labeled malignant or benign. It suits this comparison because it is small, tabular and well separated, which is exactly the regime in which the reflex to reach for a neural network deserves scrutiny.</p> \[\mathbf{x} \in \mathbb{R}^{30}, \qquad y \in \{0, 1\} \ (\text{malignant}=0,\ \text{benign}=1).\] <h2 id="part-1-classical-ml-with-scikit-learn">Part 1: Classical ML with scikit-learn</h2> <p>The main strength of scikit-learn is less any single algorithm than its <strong>consistent interface</strong>: every estimator implements <code class="language-plaintext highlighter-rouge">fit</code> and <code class="language-plaintext highlighter-rouge">predict</code>, every preprocessing step composes into a <code class="language-plaintext highlighter-rouge">Pipeline</code>, and cross-validation, metrics and hyperparameter search work the same way whichever model is plugged in. That uniformity reduces a fair four-way comparison to a few dozen lines of code instead of four bespoke training scripts.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+<span class="kn">from</span> <span class="n">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">cross_validate</span>
+<span class="kn">from</span> <span class="n">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="n">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="n">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="n">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="n">sklearn.calibration</span> <span class="kn">import</span> <span class="n">CalibratedClassifierCV</span>
+<span class="kn">from</span> <span class="n">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">GradientBoostingClassifier</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="nf">load_breast_cancer</span><span class="p">()</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">target</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="nf">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sh">"</span><span class="s">Logistic Regression</span><span class="sh">"</span><span class="p">:</span> <span class="nc">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">scale</span><span class="sh">"</span><span class="p">,</span> <span class="nc">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">clf</span><span class="sh">"</span><span class="p">,</span> <span class="nc">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)),</span>
+    <span class="p">]),</span>
+    <span class="sh">"</span><span class="s">SVM (RBF kernel)</span><span class="sh">"</span><span class="p">:</span> <span class="nc">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">scale</span><span class="sh">"</span><span class="p">,</span> <span class="nc">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">clf</span><span class="sh">"</span><span class="p">,</span> <span class="nc">CalibratedClassifierCV</span><span class="p">(</span><span class="nc">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="sh">"</span><span class="s">rbf</span><span class="sh">"</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span>
+                                       <span class="n">ensemble</span><span class="o">=</span><span class="bp">False</span><span class="p">)),</span>
+    <span class="p">]),</span>
+    <span class="sh">"</span><span class="s">Random Forest</span><span class="sh">"</span><span class="p">:</span> <span class="nc">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">clf</span><span class="sh">"</span><span class="p">,</span> <span class="nc">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)),</span>
+    <span class="p">]),</span>
+    <span class="sh">"</span><span class="s">Gradient Boosting</span><span class="sh">"</span><span class="p">:</span> <span class="nc">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="sh">"</span><span class="s">clf</span><span class="sh">"</span><span class="p">,</span> <span class="nc">GradientBoostingClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+                                            <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)),</span>
+    <span class="p">]),</span>
+<span class="p">}</span>
+</code></pre></div></div> <p>The tree-based models omit the <code class="language-plaintext highlighter-rouge">StandardScaler</code> step. A decision tree’s splits are unaffected by monotonic rescaling of a feature, so standardization gains nothing there, whereas it is essential for the SVM and logistic regression, whose objectives are not scale-invariant.</p> <h3 id="cross-validated-comparison">Cross-validated comparison</h3> <p>Stratified 5-fold cross-validation on the training set gives:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>5-fold cross-validation on training set:
+Logistic Regression    acc=0.9789±0.0088  auc=0.9962  f1=0.9833
+SVM (RBF kernel)       acc=0.9718±0.0057  auc=0.9951  f1=0.9776
+Random Forest          acc=0.9578±0.0175  auc=0.9880  f1=0.9665
+Gradient Boosting      acc=0.9554±0.0227  auc=0.9876  f1=0.9642
+</code></pre></div></div> <p>And on the held-out test set:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Held-out test set performance:
+Logistic Regression    test_acc=0.9860  test_auc=0.9977
+SVM (RBF kernel)       test_acc=0.9790  test_auc=0.9969
+Random Forest          test_acc=0.9580  test_auc=0.9949
+Gradient Boosting      test_acc=0.9580  test_auc=0.9929
+</code></pre></div></div> <p align="center"> <img src="/assets/img/posts/roc_curves_p5.svg" alt="ROC curves for four classical ML models" style="width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: ROC curves on the held-out test set. All four models separate the classes well, with test AUC between 0.993 and 0.998. The best of them is the simplest: logistic regression.</em></p> <p>This result deserves attention. <strong>The simplest model in the comparison, plain logistic regression, has the best test AUC and the best test accuracy</strong>, ahead of both tree ensembles, and it also leads in cross-validation, so it is not an accident of one split. It reflects a property of the data: once the features are standardized, the two classes are close to linearly separable. It also shows that a more flexible model is not automatically a better one, since flexibility the problem does not need adds variance without reducing bias. Formally, for a hypothesis class $\mathcal{H}$ with expected test error decomposed as $\mathbb{E}[(\hat{f}(x) - f(x))^2] = \text{Bias}^2 + \text{Variance} + \sigma^2$, adding capacity beyond what the true decision boundary requires can reduce bias only at the cost of variance; if the boundary is already close to linear, that exchange yields no net benefit.</p> <h3 id="where-the-signal-comes-from">Where the signal comes from</h3> <p align="center"> <img src="/assets/img/posts/feature_importance_p5.svg" alt="Random Forest variable importance bar chart" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 2: Random Forest feature importances (mean decrease in impurity), top 12 of 30 features. A handful of features, all measures of cell-nucleus size and of the irregularity of its outline, dominate the model’s decisions.</em></p> <p>Importance scores of this kind are one of the real advantages tree ensembles keep over deep networks on tabular data: they come almost free as a by-product of training, with no separate post hoc interpretability method.</p> <p align="center"> <img src="/assets/img/posts/confusion_matrix_p5.svg" alt="Confusion matrix for logistic regression on the held-out test set" style="width: 100%; max-width: 460px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 3: Confusion matrix for logistic regression, the best model by test AUC, on the 143 held-out samples. Two misclassifications in total: one malignant case predicted benign, and one benign case predicted malignant. The errors are symmetric, which the accuracy figure alone does not show, and in a diagnostic setting the two kinds of error are not equally costly.</em></p> <p>One implementation detail in the code above is easy to pass over. A support vector machine outputs decision-function values, not probabilities, so drawing its ROC curve requires a calibration step to convert them. The pipeline uses <code class="language-plaintext highlighter-rouge">CalibratedClassifierCV(SVC(), ensemble=False)</code>, which fits that conversion explicitly. The older route was <code class="language-plaintext highlighter-rouge">SVC(probability=True)</code>, which performs the same Platt scaling internally; scikit-learn deprecated it in version 1.9 and will remove it in 1.11, and recommends this replacement.</p> <p>The two yield the same AUC to four decimal places, as expected: AUC depends only on the ranking of the scores, and any monotone recalibration leaves that ranking unchanged. Threshold-dependent metrics do vary slightly, since the two fit their sigmoid on different internal folds, and a few borderline cases cross the $p=0.5$ boundary as a result. Cross-validated accuracy moves from $0.9671$ to $0.9718$ and F1 from $0.9740$ to $0.9776$; test-set accuracy is unchanged at $0.9790$. The distinction between rank-based and threshold-based metrics is worth keeping in mind whenever models with differently calibrated scores are compared.</p> <h2 id="part-2-gradient-boosting-at-scale-with-xgboost">Part 2: Gradient boosting at scale with XGBoost</h2> <p>The <code class="language-plaintext highlighter-rouge">GradientBoostingClassifier</code> of scikit-learn used above is a legitimate gradient boosting implementation <a class="citation" href="#friedman2001greedy">(Friedman, 2001)</a>, but <strong>XGBoost</strong> <a class="citation" href="#chen2016xgboost">(Chen &amp; Guestrin, 2016)</a>, like its relatives LightGBM and CatBoost, improves on it in ways that made gradient-boosted trees the standard choice for tabular prediction. The mathematical difference is worth stating precisely. Where classical gradient boosting fits each new tree to the <em>negative gradient</em> of the loss, a first-order, steepest-descent-style step, XGBoost fits each tree using a <strong>second-order Taylor expansion</strong> of the loss function around the current prediction,</p> \[\mathcal{L}^{(t)} \approx \sum_{i=1}^n \left[ g_i f_t(x_i) + \tfrac{1}{2} h_i f_t(x_i)^2 \right] + \Omega(f_t),\] <p>where $g_i = \partial_{\hat{y}} \ell(y_i, \hat{y}^{(t-1)})$ and $h_i = \partial^2_{\hat{y}} \ell(y_i, \hat{y}^{(t-1)})$ are the first and second derivatives of the loss with respect to the current prediction. The procedure is Newton’s method applied tree by tree, in place of plain gradient descent. The regularization term $\Omega(f_t)$ penalizes tree complexity, specifically the number of leaves as well as the magnitude of leaf weights, directly in the objective, which is a large part of why XGBoost overfits less readily than earlier boosting implementations.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">xgboost</span> <span class="k">as</span> <span class="n">xgb</span>
+<span class="kn">from</span> <span class="n">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="n">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+<span class="kn">from</span> <span class="n">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">accuracy_score</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="nf">load_breast_cancer</span><span class="p">()</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">target</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="nf">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="p">.</span><span class="nc">XGBClassifier</span><span class="p">(</span>
+    <span class="n">n_estimators</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">subsample</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">colsample_bytree</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">reg_lambda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>          <span class="c1"># L2 regularization on leaf weights
+</span>    <span class="n">eval_metric</span><span class="o">=</span><span class="sh">"</span><span class="s">logloss</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">cv</span> <span class="o">=</span> <span class="nc">StratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">cv_auc</span> <span class="o">=</span> <span class="nf">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="sh">"</span><span class="s">roc_auc</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">XGBoost CV AUC: </span><span class="si">{</span><span class="n">cv_auc</span><span class="p">.</span><span class="nf">mean</span><span class="p">()</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s"> +/- </span><span class="si">{</span><span class="n">cv_auc</span><span class="p">.</span><span class="nf">std</span><span class="p">()</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="c1"># No eval_set: the test set is touched once, for the final score only.
+</span><span class="n">model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">y_prob</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Test accuracy: </span><span class="si">{</span><span class="nf">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Test ROC-AUC:  </span><span class="si">{</span><span class="nf">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_prob</span><span class="p">)</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="c1"># Feature importance, directly comparable to the Random Forest plot above
+</span><span class="n">xgb</span><span class="p">.</span><span class="nf">plot_importance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">max_num_features</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">importance_type</span><span class="o">=</span><span class="sh">"</span><span class="s">gain</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XGBoost CV AUC: 0.9926 +/- 0.0070
+Test accuracy: 0.9720
+Test ROC-AUC:  0.9950
+</code></pre></div></div> <p>XGBoost’s test AUC of $0.9950$ is slightly above scikit-learn’s <code class="language-plaintext highlighter-rouge">GradientBoostingClassifier</code> ($0.9929$) and level with the Random Forest ($0.9949$; a difference of $10^{-4}$ is noise on 143 test samples). Its test accuracy of $0.9720$ is 1.4 points above both ensembles, which on this test set is two samples. It remains <strong>below plain logistic regression</strong> ($0.9977$), and its test accuracy of $0.9720$ is likewise below logistic regression’s $0.9860$. The second-order updates and built-in regularization do real work relative to the other tree ensembles, but they cannot change the fact that this dataset is nearly linearly separable.</p> <p>The top features by gain, shown in Figure 4, are <code class="language-plaintext highlighter-rouge">worst radius</code> ($22.09$) and <code class="language-plaintext highlighter-rouge">worst perimeter</code> ($22.04$), followed by <code class="language-plaintext highlighter-rouge">worst concave points</code> ($14.34$) and <code class="language-plaintext highlighter-rouge">mean concave points</code> ($11.77$). These are the same quantities the Random Forest ranked highest: two different ensemble algorithms, with different splitting criteria and different regularization, agree on which measurements carry the diagnostic signal.</p> <p align="center"> <img src="/assets/img/posts/xgb_importance_p5.svg" alt="XGBoost feature impact by gain, top 12 features" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 4: XGBoost feature importances by gain, top 12 of 30, measured as the average improvement in the objective over every split that used the feature. The ordering closely matches the Random Forest ranking in Figure 2. Where the two rankings differ, the difference is informative. XGBoost places <code class="language-plaintext highlighter-rouge">worst radius</code> first at $22.09$, where the Random Forest places it fifth, and demotes <code class="language-plaintext highlighter-rouge">worst area</code> from second to sixth. Radius, perimeter, and area are close to functionally dependent for a roughly convex shape, so the three carry largely the same information; which of them a given ensemble credits is partly a matter of which happened to be selected first at a split, and the split ordering is not the same under mean-decrease-in-impurity as it is under gain.</em></p> <p>On a dataset this small and clean, the differences among the tree ensembles amount to one or two test samples. Each sample is $0.7$ percentage points of test accuracy here, so small gaps should not be read as rankings. Its real advantages (built-in regularization, second-order updates, native handling of missing values and much faster histogram-based split finding) show more decisively on <strong>larger, noisier, higher-dimensional</strong> tabular data <a class="citation" href="#shwartzziv2022tabular">(Shwartz-Ziv &amp; Armon, 2022)</a>. With 569 well-separated rows there is simply not enough difficulty for them to matter.</p> <h2 id="part-3-deep-learning-with-tensorflowkeras">Part 3: Deep learning with TensorFlow/Keras</h2> <p>Deep learning departs from the methods above in its architecture. Instead of choosing a fixed model family (a hyperplane, a kernel expansion, an ensemble of trees) and fitting its parameters, layers are composed into a flexible function approximator whose parameters are found by stochastic gradient descent through backpropagation. Keras <a class="citation" href="#chollet2015keras">(Chollet &amp; others, 2015)</a>, the high-level API of TensorFlow <a class="citation" href="#abadi2016tensorflow">(Abadi Martı́n et al., 2016)</a>, makes that composition almost declarative:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">from</span> <span class="n">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">from</span> <span class="n">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+<span class="kn">from</span> <span class="n">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="n">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="nf">load_breast_cancer</span><span class="p">()</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">target</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="nf">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">scaler</span> <span class="o">=</span> <span class="nc">StandardScaler</span><span class="p">()</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="nf">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="nf">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="nc">Sequential</span><span class="p">([</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="sh">"</span><span class="s">relu</span><span class="sh">"</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Dropout</span><span class="p">(</span><span class="mf">0.3</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="sh">"</span><span class="s">relu</span><span class="sh">"</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="nc">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="sh">"</span><span class="s">sigmoid</span><span class="sh">"</span><span class="p">),</span>
+<span class="p">])</span>
+
+<span class="n">model</span><span class="p">.</span><span class="nf">compile</span><span class="p">(</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="nc">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">),</span>
+    <span class="n">loss</span><span class="o">=</span><span class="sh">"</span><span class="s">binary_crossentropy</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">accuracy</span><span class="sh">"</span><span class="p">,</span> <span class="n">keras</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="nc">AUC</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">auc</span><span class="sh">"</span><span class="p">)],</span>
+<span class="p">)</span>
+
+<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+    <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="nc">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">restore_best_weights</span><span class="o">=</span><span class="bp">True</span><span class="p">)],</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span><span class="p">,</span> <span class="n">test_auc</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Test accuracy: </span><span class="si">{</span><span class="n">test_acc</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="s">, Test AUC: </span><span class="si">{</span><span class="n">test_auc</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>epochs actually run: 100 of 100
+best val_loss epoch: 95  (weights restored to this)
+Test accuracy: 0.9720, Test AUC: 0.9937
+trainable params: 1537
+</code></pre></div></div> <p align="center"> <img src="/assets/img/posts/keras_training_p5.svg" alt="Keras training and validation loss and accuracy against epoch" style="width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 5: Keras training history. The dashed line marks epoch 95, where validation loss reached its minimum. Both losses fall steeply over the first 20 epochs and then decline slowly for the rest of the run, so early stopping never triggers within the 100-epoch limit. Validation loss sits below training loss throughout, the expected effect of dropout: it is active during training and disabled at evaluation, so the model is scored in a slightly stronger configuration than the one being fitted.</em></p> <p>The network has 1,537 trainable parameters, against 426 training samples, roughly 3.6 parameters per example. In this run it used all 100 permitted epochs, with its best validation loss at epoch 95: validation loss was still drifting down, very slowly, so the patience-10 rule never fired. The run is reproducible (seeds fixed, deterministic TensorFlow kernels), but the exact epoch counts depend on the library build; an earlier run under a different TensorFlow installation stopped at epoch 49 with essentially the same test scores. The accuracy is what matters here, and it is stable.</p> <p>Three points are worth stating precisely:</p> <ul> <li> <strong>The loss.</strong> Binary cross-entropy is the negative log-likelihood under a Bernoulli model of the labels, $\mathcal{L} = -\frac{1}{n}\sum_i \left[y_i \log \hat{y}_i + (1-y_i)\log(1-\hat{y}_i)\right]$, which is the same objective that logistic regression minimizes. The network here is, in a precise sense, a nonlinear generalization of the logistic regression model from Part 1, with the sigmoid output layer serving the same role.</li> <li> <strong>Dropout</strong> <a class="citation" href="#srivastava2014dropout">(Srivastava et al., 2014)</a> (<code class="language-plaintext highlighter-rouge">Dropout(0.3)</code>) randomly zeroes $30\%$ of the hidden units at each training step, preventing the network from depending on any single neuron. It plays a role similar to XGBoost’s leaf-weight penalty, though by a different mechanism: it prevents co-adaptation of units stochastically, where XGBoost adds an explicit norm penalty.</li> <li> <strong>Early stopping</strong> halts training once validation loss stops improving, which both regularizes the model and saves compute. It is conceptually similar to limiting <code class="language-plaintext highlighter-rouge">n_estimators</code> in tree ensembles, but is set automatically from held-out performance instead of being fixed in advance.</li> </ul> <p>The results make the central comparison concrete. The network reaches a test accuracy of $0.9720$ and a test AUC of $0.9937$, both below logistic regression. All AUCs in this post are computed the same way, with scikit-learn’s exact <code class="language-plaintext highlighter-rouge">roc_auc_score</code>; Keras’s built-in <code class="language-plaintext highlighter-rouge">metrics.AUC</code> is a 200-bin approximation and reports a slightly different figure. A 1,537-parameter network trained for 100 epochs with dropout has arrived just short of a 31-parameter linear model fitted in a fraction of a second.</p> <p>This is the point of the exercise. The network is not underperforming because it is misconfigured: the architecture and training procedure are sound, and early stopping shows the regularization working as intended. The dataset is small, tabular and nearly linearly separable, so a linear decision boundary is already very nearly the right hypothesis, and extra capacity has nothing left to fit.</p> <h2 id="part-4-the-same-network-in-pytorch">Part 4: The same network in PyTorch</h2> <p>Implementing the identical architecture in PyTorch <a class="citation" href="#paszke2019pytorch">(Paszke et al., 2019)</a> is instructive, because once syntax is set aside, the differences that remain show when each framework is the better choice.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">torch</span>
+<span class="kn">import</span> <span class="n">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="n">torch.optim</span> <span class="k">as</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="n">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span>
+<span class="kn">from</span> <span class="n">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+<span class="kn">from</span> <span class="n">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="n">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="n">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="nf">load_breast_cancer</span><span class="p">()</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">.</span><span class="n">target</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="nf">train_test_split</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+<span class="n">scaler</span> <span class="o">=</span> <span class="nc">StandardScaler</span><span class="p">()</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="nf">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="nf">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="n">X_train_t</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">y_train_t</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">).</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X_test_t</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">y_test_t</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">tensor</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="p">.</span><span class="n">float32</span><span class="p">).</span><span class="nf">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BreastCancerNet</span><span class="p">(</span><span class="n">nn</span><span class="p">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">Dropout</span><span class="p">(</span><span class="mf">0.3</span><span class="p">),</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="p">.</span><span class="nc">Linear</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>   <span class="c1"># logits -- no sigmoid here, see loss below
+</span>        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">self</span><span class="p">.</span><span class="nf">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="nc">BreastCancerNet</span><span class="p">()</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="p">.</span><span class="nc">BCEWithLogitsLoss</span><span class="p">()</span>   <span class="c1"># combines sigmoid + BCE for numerical stability
+</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="p">.</span><span class="nc">Adam</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="nf">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+
+<span class="n">n_train</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="nf">len</span><span class="p">(</span><span class="n">X_train_t</span><span class="p">))</span>
+<span class="n">X_tr</span><span class="p">,</span> <span class="n">X_val</span> <span class="o">=</span> <span class="n">X_train_t</span><span class="p">[:</span><span class="n">n_train</span><span class="p">],</span> <span class="n">X_train_t</span><span class="p">[</span><span class="n">n_train</span><span class="p">:]</span>
+<span class="n">y_tr</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">y_train_t</span><span class="p">[:</span><span class="n">n_train</span><span class="p">],</span> <span class="n">y_train_t</span><span class="p">[</span><span class="n">n_train</span><span class="p">:]</span>
+
+<span class="c1"># Minibatches of 32, as in the Keras model: roughly 11 optimizer steps per epoch.
+</span><span class="n">loader</span> <span class="o">=</span> <span class="nc">DataLoader</span><span class="p">(</span><span class="nc">TensorDataset</span><span class="p">(</span><span class="n">X_tr</span><span class="p">,</span> <span class="n">y_tr</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">best_val_loss</span><span class="p">,</span> <span class="n">patience</span><span class="p">,</span> <span class="n">patience_ctr</span> <span class="o">=</span> <span class="nf">float</span><span class="p">(</span><span class="sh">"</span><span class="s">inf</span><span class="sh">"</span><span class="p">),</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">model</span><span class="p">.</span><span class="nf">train</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
+        <span class="n">optimizer</span><span class="p">.</span><span class="nf">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="nf">criterion</span><span class="p">(</span><span class="nf">model</span><span class="p">(</span><span class="n">xb</span><span class="p">),</span> <span class="n">yb</span><span class="p">)</span>
+        <span class="n">loss</span><span class="p">.</span><span class="nf">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="p">.</span><span class="nf">step</span><span class="p">()</span>
+
+    <span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="p">.</span><span class="nf">no_grad</span><span class="p">():</span>
+        <span class="n">val_loss</span> <span class="o">=</span> <span class="nf">criterion</span><span class="p">(</span><span class="nf">model</span><span class="p">(</span><span class="n">X_val</span><span class="p">),</span> <span class="n">y_val</span><span class="p">).</span><span class="nf">item</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">val_loss</span> <span class="o">&lt;</span> <span class="n">best_val_loss</span><span class="p">:</span>
+        <span class="n">best_val_loss</span><span class="p">,</span> <span class="n">patience_ctr</span> <span class="o">=</span> <span class="n">val_loss</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">best_state</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">.</span><span class="nf">clone</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">model</span><span class="p">.</span><span class="nf">state_dict</span><span class="p">().</span><span class="nf">items</span><span class="p">()}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">patience_ctr</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">patience_ctr</span> <span class="o">&gt;=</span> <span class="n">patience</span><span class="p">:</span>
+            <span class="k">break</span>
+
+<span class="n">model</span><span class="p">.</span><span class="nf">load_state_dict</span><span class="p">(</span><span class="n">best_state</span><span class="p">)</span>
+<span class="n">model</span><span class="p">.</span><span class="nf">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="p">.</span><span class="nf">no_grad</span><span class="p">():</span>
+    <span class="n">test_prob</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="nf">sigmoid</span><span class="p">(</span><span class="nf">model</span><span class="p">(</span><span class="n">X_test_t</span><span class="p">)).</span><span class="nf">numpy</span><span class="p">().</span><span class="nf">ravel</span><span class="p">()</span>
+<span class="n">test_auc</span> <span class="o">=</span> <span class="nf">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">test_prob</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Test AUC: </span><span class="si">{</span><span class="n">test_auc</span><span class="si">:</span><span class="p">.</span><span class="mi">4</span><span class="n">f</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div> <p>The script trains this network twice: once exactly as above, and once with the inner loop replaced by a single full-batch step per epoch (<code class="language-plaintext highlighter-rouge">model(X_tr)</code> on the whole training tensor), which is how the loop is often first written.</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[full batch] epochs run: 100 of 100, best val_loss epoch: 100, optimizer steps: 100
+[full batch] Test accuracy: 0.9510, Test AUC: 0.9943
+[minibatch (32)] epochs run: 76 of 100, best val_loss epoch: 66, optimizer steps: 836
+[minibatch (32)] Test accuracy: 0.9580, Test AUC: 0.9935
+trainable params: 1537
+</code></pre></div></div> <p align="center"> <img src="/assets/img/posts/pytorch_training_p5.svg" alt="PyTorch training and validation loss for full-batch and minibatch training" style="width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 6: PyTorch training histories. Left, full-batch training: one optimizer step per epoch, and both losses are still falling in a straight line at the 100-epoch limit, with validation loss near $0.10$. Right, minibatches of 32: the loss drops below $0.05$ within about 20 epochs, early stopping fires at epoch 76, and the best validation loss (dashed line, epoch 66) is about $0.02$.</em></p> <p>The two runs use the same architecture, loss, optimizer, learning rate and early-stopping rule, and the same 1,537 weights. They differ only in how many optimizer steps each epoch takes: 100 steps in total for the full-batch run against 836 for the minibatch run. The full-batch run never converges. Its best validation loss is at the last epoch, so early stopping never fires, and its test accuracy of $0.9510$ is that of a model interrupted partway through fitting. This is undertraining, not overfitting: an overfitting network has learned the training set too well and must be stopped, while this one had not finished learning.</p> <p>With minibatches the network converges and reaches $0.9580$ accuracy and $0.9935$ AUC, close to the Keras result, which is what the matching architecture should produce. The trap is worth remembering because the two versions look equivalent on the page. In Keras the step count follows from a <code class="language-plaintext highlighter-rouge">batch_size</code> argument; in a hand-written PyTorch loop it follows from what the loop passes to the model, which is easy to overlook. Reproducing a Keras result in PyTorch requires iterating over minibatches, ordinarily through a <code class="language-plaintext highlighter-rouge">DataLoader</code>.</p> <p>The point is not that one framework is more accurate. Both compute the same thing. The explicitness that is PyTorch’s main advantage carries an obligation: decisions a higher-level API makes for the user become the user’s own, including ones the user may not notice making.</p> <p>Beyond syntax, three structural differences stand out:</p> <ul> <li> <strong>Explicit training loop.</strong> The <code class="language-plaintext highlighter-rouge">nn.Module</code> of PyTorch provides a <code class="language-plaintext highlighter-rouge">forward</code> method and requires the epoch loop, gradient zeroing, backward pass, and optimizer step to be written explicitly, whereas <code class="language-plaintext highlighter-rouge">model.fit</code> in Keras encapsulates all of this in a single call. The extra code is a trade-off, not just verbosity: the explicitness of PyTorch makes it considerably easier to implement custom training logic, such as multiple losses, custom gradient manipulation, or non-standard data flow, that would otherwise require descending to the lower-level <code class="language-plaintext highlighter-rouge">GradientTape</code> API of Keras.</li> <li> <strong>Logits rather than probabilities until the final step.</strong> <code class="language-plaintext highlighter-rouge">BCEWithLogitsLoss</code> combines the sigmoid activation and the binary cross-entropy computation into a single numerically stable operation, avoiding the $\log(0)$ instability that can arise from applying <code class="language-plaintext highlighter-rouge">log</code> after a separately computed sigmoid saturated near $0$ or $1$. It is a small example of numerical-analysis practice built into these libraries, and a familiar one to anyone coming from numerical methods.</li> <li> <strong>Manual early stopping.</strong> The <code class="language-plaintext highlighter-rouge">EarlyStopping</code> callback in Keras requires a few lines of configuration; the equivalent logic in raw PyTorch is the explicit patience-counter loop above. Libraries such as PyTorch Lightning exist largely to restore this convenience on top of PyTorch’s lower-level primitives, at the cost of an additional abstraction layer.</li> </ul> <h2 id="all-seven-models-measured">All seven models, measured</h2> <p>Because every section ran in one process on one split, the results can go in a single table:</p> <table> <thead> <tr> <th>Model</th> <th>Test accuracy</th> <th>Test AUC</th> <th>Trainable parameters</th> </tr> </thead> <tbody> <tr> <td><strong>Logistic Regression</strong></td> <td><strong>0.9860</strong></td> <td><strong>0.9977</strong></td> <td>31</td> </tr> <tr> <td>SVM (RBF kernel)</td> <td>0.9790</td> <td>0.9969</td> <td>n/a</td> </tr> <tr> <td>XGBoost</td> <td>0.9720</td> <td>0.9950</td> <td>n/a</td> </tr> <tr> <td>TensorFlow/Keras</td> <td>0.9720</td> <td>0.9937</td> <td>1,537</td> </tr> <tr> <td>PyTorch (minibatch)</td> <td>0.9580</td> <td>0.9935</td> <td>1,537</td> </tr> <tr> <td>Random Forest</td> <td>0.9580</td> <td>0.9949</td> <td>n/a</td> </tr> <tr> <td>Gradient Boosting</td> <td>0.9580</td> <td>0.9929</td> <td>n/a</td> </tr> </tbody> </table> <p>Three observations follow.</p> <p>The first is the ordering. Logistic regression is best on both metrics with 31 parameters, 30 coefficients and an intercept. It beats the RBF-kernel SVM, an ensemble of three hundred boosted trees and a network with fifty times as many parameters. That is the empirical content of this post’s argument, and the result was not guaranteed in advance; a dataset like this could plausibly have favored the ensembles.</p> <p>The second is how little separates the middle of the table. XGBoost, the two networks and the Random Forest span $0.9580$ to $0.9720$ in accuracy, one to two test samples apart, and $0.9935$ to $0.9950$ in AUC. A boosted ensemble and a feedforward network are different objects fitted by different procedures, yet on this dataset they extract essentially the same signal, and the remaining error looks like a property of the data, not of any one model class.</p> <p>The third is what the table leaves out. The PyTorch row is the minibatch run. The full-batch run of the same network would have entered the table at $0.9510$, last of all, and nothing in the parameter column would have revealed why; only the epoch and step counts do. A results table is only as trustworthy as the training details reported beside it.</p> <p>The comparison also has a cost dimension that the table omits. Logistic regression fits in a fraction of a second and yields thirty coefficients that can be read directly. The networks require standardization, an architecture choice, a learning rate, a dropout fraction, a batch size, an early-stopping criterion, and tens of training epochs, and they yield 1,537 weights that admit no comparable interpretation. On this dataset, the extra effort buys a lower score.</p> <h2 id="choosing-a-tool-a-decision-framework">Choosing a tool: a decision framework</h2> <p>The questions below are a reasonable checklist before starting a new project, roughly in the order they arise:</p> <table> <thead> <tr> <th>Question</th> <th>Leans toward</th> </tr> </thead> <tbody> <tr> <td>Tabular data, &lt; ~100k rows?</td> <td>scikit-learn / XGBoost</td> </tr> <tr> <td>Need built-in feature importance or interpretability?</td> <td>scikit-learn / XGBoost</td> </tr> <tr> <td>Images, audio, text, or other unstructured/high-dim data?</td> <td>TensorFlow/Keras or PyTorch</td> </tr> <tr> <td>Need a quick baseline with minimal code?</td> <td>scikit-learn, or Keras <code class="language-plaintext highlighter-rouge">Sequential</code> </td> </tr> <tr> <td>Need custom training logic (multi-task loss, custom gradients, RL)?</td> <td>PyTorch</td> </tr> <tr> <td>Deploying to mobile/edge or need TF Serving / TF Lite?</td> <td>TensorFlow/Keras</td> </tr> <tr> <td>Research codebase, need to move fast and modify architectures repeatedly?</td> <td>PyTorch</td> </tr> <tr> <td>Production tabular pipeline needing speed + minimal tuning?</td> <td>XGBoost / LightGBM</td> </tr> </tbody> </table> <p>The urge to start with the most powerful tool available is worth resisting. The most useful empirical observation from this comparison is the one from Part 1: on this dataset, <strong>the simplest model performed best</strong>. That is not an argument against deep learning; it is an argument for beginning with the least costly model that could plausibly succeed, establishing a real baseline, and adopting more flexible tools, which are also more compute-intensive, less interpretable, and more sensitive to hyperparameters, only once the simpler alternatives are confirmed to be underperforming. The same idea runs through the <a href="/blog/2026/sherman-morrison-ode_p1/">earlier posts</a> in this series: establish what the structure of a problem demands before choosing the tool, whether that tool is a neural network, an implicit ODE solver or a rank-$k$ matrix update.</p> <h2 id="summary">Summary</h2> <ul> <li>All four libraries solve the same kind of problem, minimizing a loss over a parameterized family of functions, but they sit at different points on the bias-variance and interpretability-flexibility spectra. Choosing correctly matters more than choosing the most prominent option.</li> <li>The uniform <code class="language-plaintext highlighter-rouge">fit</code>/<code class="language-plaintext highlighter-rouge">predict</code> interface of scikit-learn makes rigorous, directly comparable model evaluation cheap, and there is rarely a good reason to skip it before committing to a more complex approach.</li> <li>XGBoost’s advantage over classical gradient boosting is a contribution in numerical optimization, Newton-style second-order tree fitting with explicit regularization in the objective, and not only faster code, although it shows more on larger and noisier data than on a clean 569-row dataset.</li> <li>TensorFlow/Keras and PyTorch construct the <em>same</em> mathematical objects, namely differentiable computational graphs trained by backpropagation, with different ergonomics: Keras is optimized for producing a working model quickly, whereas PyTorch is optimized for transparent control over each training step.</li> <li>On small, clean, tabular data, classical methods are not a beginner’s fallback. They are often the <em>correct</em> choice, and here logistic regression, with 31 parameters, beat every more elaborate alternative on both accuracy and AUC.</li> <li>The same network, loss and optimizer can still train very differently. A PyTorch loop that passes the whole training set at once takes one optimizer step per epoch, never converges within 100 epochs and scores $0.9510$; with minibatches of 32, like the Keras model, it converges and scores $0.9580$. Reporting the first number without the step count would have been misleading.</li> </ul> <h2 id="references">References</h2> <p>The scikit-learn ecosystem underlying Part 1 is documented in <a class="citation" href="#pedregosa2011scikit">(Pedregosa et al., 2011)</a>, and the dataset is from <a class="citation" href="#wolberg1995breast">(Wolberg et al., 1995)</a>. The XGBoost algorithm and its second-order boosting formulation follow <a class="citation" href="#chen2016xgboost">(Chen &amp; Guestrin, 2016)</a>, building on the traditional gradient-boosting framework of <a class="citation" href="#friedman2001greedy">(Friedman, 2001)</a>. The deep-learning frameworks in Parts 3 and 4 are documented in <a class="citation" href="#abadi2016tensorflow">(Abadi Martı́n et al., 2016)</a>, <a class="citation" href="#chollet2015keras">(Chollet &amp; others, 2015)</a>, and <a class="citation" href="#paszke2019pytorch">(Paszke et al., 2019)</a>, with the Adam optimizer from <a class="citation" href="#kingma2015adam">(Kingma &amp; Ba, 2015)</a> and dropout regularization from <a class="citation" href="#srivastava2014dropout">(Srivastava et al., 2014)</a>. The empirical case for classical methods on tabular data draws on <a class="citation" href="#shwartzziv2022tabular">(Shwartz-Ziv &amp; Armon, 2022)</a>.</p> <ol class="bibliography"> <li><span id="pedregosa2011scikit">Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., &amp; others. (2011). Scikit-Learn: Machine Learning in Python. <i>Journal of Machine Learning Research</i>, <i>12</i>, 2825–2830.</span></li> <li><span id="chen2016xgboost">Chen, T., &amp; Guestrin, C. (2016). XGBoost: A Scalable Tree Boosting System. <i>Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</i>, 785–794.</span></li> <li><span id="abadi2016tensorflow">Abadi Martı́n, Barham, P., Chen, J., Chen, Z., Davis, A., Dean, J., Devin, M., Ghemawat, S., Irving, G., Isard, M., &amp; others. (2016). TensorFlow: A System for Large-Scale Machine Learning. <i>12th USENIX Symposium on Operating Systems Design and Implementation (OSDI 16)</i>, 265–283.</span></li> <li><span id="chollet2015keras">Chollet, F., &amp; others. (2015). <i>Keras</i>. <a href="https://keras.io" target="_blank" rel="noopener">https://keras.io</a></span></li> <li><span id="paszke2019pytorch">Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., Killeen, T., Lin, Z., Gimelshein, N., Antiga, L., &amp; others. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. <i>Advances in Neural Information Processing Systems (NeurIPS)</i>, <i>32</i>, 8026–8037.</span></li> <li><span id="wolberg1995breast">Wolberg, W. H., Street, W. N., &amp; Mangasarian, O. L. (1995). <i>Breast Cancer Wisconsin (Diagnostic) Data Set</i>. UCI Machine Learning Repository.</span></li> <li><span id="friedman2001greedy">Friedman, J. H. (2001). Greedy Function Approximation: A Gradient Boosting Machine. <i>Annals of Statistics</i>, <i>29</i>(5), 1189–1232.</span></li> <li><span id="shwartzziv2022tabular">Shwartz-Ziv, R., &amp; Armon, A. (2022). Tabular Data: Deep Learning is Not All You Need. <i>Information Fusion</i>, <i>81</i>, 84–90.</span></li> <li><span id="srivastava2014dropout">Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., &amp; Salakhutdinov, R. (2014). Dropout: A Simple Way to Prevent Neural Networks from Overfitting. <i>Journal of Machine Learning Research</i>, <i>15</i>(1), 1929–1958.</span></li> <li><span id="kingma2015adam">Kingma, D. P., &amp; Ba, J. (2015). Adam: A Method for Stochastic Optimization. <i>3rd International Conference on Learning Representations (ICLR)</i>.</span></li> </ol> <hr> <p><em>Full code for all four parts, which reproduces every number and figure in this post from one run, is available in <a href="/assets/code/sklearn_comparison_p5.py"><code class="language-plaintext highlighter-rouge">sklearn_comparison_p5.py</code></a>.</em></p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoyed reading this article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/compact_finite_difference_kdv_p11/">Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/optimization-convex-to-trajectory_p9/">Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/computational-fluid-dynamics_p10/">Computational Fluid Dynamics</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/bayesian-inference-inverse-problems_p8/">Bayesian Inference for Inverse Problems: Metropolis Sampling for Source Identification and Linear Regression</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/hpc-domain-decomposition_p7/">Domain Decomposition and Parallel Scaling for Wave Propagation: Amdahl, Gustafson and the Memory-Bandwidth Limit</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-deep-dive_p6/">A Hands-On Machine Learning Workflow: scikit-learn, XGBoost, TensorFlow/Keras and PyTorch on Benchmark Datasets</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/pinn-vs-classical-methods_p4/">Physics-Informed Neural Networks versus Adaptive Runge-Kutta: Accuracy and Cost on a Forced Linear ODE</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/uncertainty-quantification-surrogate-modeling_p3/">Polynomial Chaos Surrogates for Uncertainty Quantification: Legendre Projection versus Monte Carlo</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/stiff-odes-solver-stability_p2/">Stiffness and Absolute Stability: Explicit and Implicit Solvers on the Van der Pol Oscillator</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/sherman-morrison-ode_p1/">Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling</a> </li> </ul> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
+    (function setupGiscus() {
+      function determineGiscusTheme() {
+        var theme = localStorage.getItem("theme") || document.documentElement.getAttribute("data-theme") || "system";
+if (theme === "dark") return "dark";
+if (theme === "light") return "light";
+var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+return prefersDark ? "dark" : "light";
+
+      }
+
+      var giscusTheme = determineGiscusTheme();
+      var attrs = {
+        src: "https://giscus.app/client.js",
+        "data-repo": "abelokoj/abelokoj.github.io",
+        "data-repo-id": "R_kgDOTgiVew",
+        "data-category": "Comments",
+        "data-category-id": "DIC_kwDOTgiVe84DCeqq",
+        "data-mapping": "title",
+        "data-strict": "0",
+        "data-reactions-enabled": "1",
+        "data-emit-metadata": "0",
+        "data-input-position": "bottom",
+        "data-theme": giscusTheme,
+        "data-lang": "en",
+        crossorigin: "anonymous",
+        async: true
+      };
+
+      var giscusScript = document.createElement("script");
+      Object.entries(attrs).forEach(function(entry) { giscusScript.setAttribute(entry[0], entry[1]); });
+      var host = document.getElementById("giscus_thread");
+      if (host) host.appendChild(giscusScript);
+    })();
+  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Built with <a href="https://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a> and <a href="https://github.com/alshedivat/al-folio" target="_blank" rel="noopener">al-folio</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "Research and computational projects, with code and reproducible figures.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "Peer-reviewed articles and preprints, most recent first.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-optimization-gradient-newton-and-quasi-newton-methods-and-minimum-energy-trajectory-optimization",
+        
+          title: "Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization",
+        
+        description: "Gradient descent, Newton&#39;s method, and L-BFGS on convex logistic regression, followed by a minimum-energy trajectory solved by direct collocation and SLSQP.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/optimization-convex-to-trajectory_p9/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics",
+        
+          title: "Computational Fluid Dynamics",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-for-inverse-problems-metropolis-sampling-for-source-identification-and-linear-regression",
+        
+          title: "Bayesian Inference for Inverse Problems: Metropolis Sampling for Source Identification and Linear Regression...",
+        
+        description: "Bayes&#39; theorem, MAP estimation as ridge regression, and Metropolis sampling, applied to a synthetic wave-source inversion and the diabetes dataset.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-domain-decomposition-and-parallel-scaling-for-wave-propagation-amdahl-gustafson-and-the-memory-bandwidth-limit",
+        
+          title: "Domain Decomposition and Parallel Scaling for Wave Propagation: Amdahl, Gustafson and the Memory-Bandwidth...",
+        
+        description: "Domain decomposition for a 2D wave equation under MPI, with Amdahl and Gustafson scaling and laptop benchmarks showing memory-bandwidth limits.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-a-hands-on-machine-learning-workflow-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-benchmark-datasets",
+        
+          title: "A Hands-On Machine Learning Workflow: scikit-learn, XGBoost, TensorFlow/Keras and PyTorch on Benchmark Datasets...",
+        
+        description: "Five runnable tutorials on public datasets with scikit-learn, XGBoost, TensorFlow, Keras and PyTorch, from baselines to training curves and error analysis.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-matching-model-complexity-to-data-a-controlled-comparison-of-scikit-learn-xgboost-keras-and-pytorch",
+        
+          title: "Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and...",
+        
+        description: "Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-tour_p5/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-adaptive-runge-kutta-accuracy-and-cost-on-a-forced-linear-ode",
+        
+          title: "Physics-Informed Neural Networks versus Adaptive Runge-Kutta: Accuracy and Cost on a Forced Linear...",
+        
+        description: "A PINN and an adaptive RK45 solver are compared on a forced linear ODE with a known exact solution, measuring accuracy and wall-clock cost.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-polynomial-chaos-surrogates-for-uncertainty-quantification-legendre-projection-versus-monte-carlo",
+        
+          title: "Polynomial Chaos Surrogates for Uncertainty Quantification: Legendre Projection versus Monte Carlo",
+        
+        description: "A Legendre polynomial chaos surrogate for Runge&#39;s function, built by Gauss quadrature, matches million-sample Monte Carlo accuracy with 20 evaluations.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiffness-and-absolute-stability-explicit-and-implicit-solvers-on-the-van-der-pol-oscillator",
+        
+          title: "Stiffness and Absolute Stability: Explicit and Implicit Solvers on the Van der Pol...",
+        
+        description: "Why stiffness forces explicit ODE solvers to take tiny steps, shown through Dahlquist stability regions and an RK45 versus Radau benchmark on Van der Pol.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "Reusing one LU factorization via the Sherman-Morrison formula cuts implicit Euler cost from O(n^3) to O(n^2) per step, with benchmarks up to n = 640.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-central-compact-schemes-for-the-kdv-equation",
+          title: 'Central Compact Schemes for the KdV Equation',
+          description: "An open-source Python reproduction of the TDCCS third-derivative scheme (Salian, Samala &amp; Ghosh, 2026)",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/tdccs_kdv/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modeling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

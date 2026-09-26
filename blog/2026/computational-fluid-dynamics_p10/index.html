@@ -194,7 +194,7 @@ Run:  python cavity_flow.py
     <span class="nf">savefig_all</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="sh">"</span><span class="s">cavity_flow_v2_p10</span><span class="sh">"</span><span class="p">)</span>
 </code></pre></div></div> <p><code class="language-plaintext highlighter-rouge">requirements.txt</code>:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>numpy&gt;=1.24
 matplotlib&gt;=3.7
-</code></pre></div></div> <hr> <h2 id="11-grid-convergence-study">11. Grid-convergence study</h2> <p>To demonstrate discretization convergence rather than trusting a single mesh, the solver above was rerun at four grid resolutions (21x21, 41x41, 61x61, 81x81), holding the Reynolds number, viscosity, and time-integration scheme fixed, and recording the minimum centerline velocity (a scalar proxy for recirculation strength):</p> <table> <thead> <tr> <th>Grid size</th> <th>Min centerline u(x=0.5)</th> <th>Change from previous grid</th> </tr> </thead> <tbody> <tr> <td>21x21</td> <td>−0.0952</td> <td>—</td> </tr> <tr> <td>41x41</td> <td>−0.1042</td> <td>+9.5%</td> </tr> <tr> <td>61x61</td> <td>−0.1053</td> <td>+1.1%</td> </tr> <tr> <td>81x81</td> <td>−0.1056</td> <td>+0.3%</td> </tr> </tbody> </table> <p>The result converges monotonically toward approximately −0.106 as the mesh is refined, with the change between successive refinements diminishing rapidly, which is the qualitative signature expected of a stable, consistent scheme approaching a mesh-independent solution <a class="citation" href="#quarteroni2008numerical">(Quarteroni &amp; Valli, 2008)</a>. This kind of table, easy to generate from the class-based solver above by simply varying <code class="language-plaintext highlighter-rouge">nx</code>/<code class="language-plaintext highlighter-rouge">ny</code>, is exactly the sort of quantitative verification evidence that distinguishes a rigorous computational-mathematics writeup from a purely illustrative one.</p> <hr> <h2 id="12-verification-results">12. Verification results</h2> <p>Running the solver at $\mathrm{Re} = 100$ on the finest tested grid (81x81) for 600-700 time steps produces:</p> <table> <thead> <tr> <th>Quantity</th> <th>Result</th> <th>Expected behavior</th> </tr> </thead> <tbody> <tr> <td>Lid velocity $u$</td> <td>1.000000</td> <td>Dirichlet BC exactly enforced</td> </tr> <tr> <td>Max $\lvert u \rvert$</td> <td>1.000000</td> <td>Bounded by lid speed</td> </tr> <tr> <td>Min centerline $u(x=0.5)$</td> <td>≈ −0.106</td> <td>Negative → primary vortex confirmed, consistent with grid-convergence trend</td> </tr> <tr> <td>Final step residual</td> <td>2.840e-04, decaying</td> <td>Approaching a steady-state solution</td> </tr> </tbody> </table> <p>All automated checks in <code class="language-plaintext highlighter-rouge">solver.verify()</code> pass (<code class="language-plaintext highlighter-rouge">lid_velocity_enforced</code>, <code class="language-plaintext highlighter-rouge">walls_no_slip</code>, <code class="language-plaintext highlighter-rouge">bounded_velocity</code>, <code class="language-plaintext highlighter-rouge">recirculation_present</code>), confirming the implementation reproduces the qualitatively and quantitatively correct physics of the benchmark: a single dominant recirculation cell with velocity reversal below the moving lid, consistent with the classic <a class="citation" href="#ghia1982high">(Ghia et al., 1982)</a> reference solution and with the mesh-refinement trend of Section 11.</p> <p align="center"> <img src="/assets/img/posts/cavity_flow_v2_p10.svg" alt="Lid-driven cavity velocity field, centerline profile, and convergence history" style="width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: Left, the velocity magnitude field with streamlines, showing the primary recirculation vortex and its direction of rotation. Center, the centerline u-velocity profile at $x=0.5$, whose negative excursion, the recirculation strength, is the scalar diagnostic tracked throughout the grid-convergence study. Right, the per-step residual $\max\lvert\Delta u\rvert$ on a log scale, decaying toward a steady state.</em></p> <hr> <h2 id="13-common-pitfalls">13. Common pitfalls</h2> <p>A short list of mistakes that commonly appear in first CFD implementations, stated explicitly here because each has a specific numerical cause:</p> <ul> <li> <strong>Inconsistent pressure boundary conditions.</strong> The Neumann conditions on the pressure Poisson equation must be derived from the momentum equation evaluated at the boundary, not chosen arbitrarily, or mass conservation will drift.</li> <li> <strong>Ignoring the CFL condition.</strong> Explicit time-stepping with too large a $\Delta t$ relative to $\Delta x$ and the local velocity will blow up even though the scheme is theoretically consistent.</li> <li> <strong>Checkerboard pressure oscillations.</strong> Collocated (non-staggered) grids can develop spurious oscillatory pressure modes; staggered (MAC) grids or Rhie-Chow interpolation are standard fixes.</li> <li> <strong>Under-resolved boundary layers.</strong> Coarse near-wall meshes can produce plausible-looking but quantitatively wrong drag/lift or heat-transfer predictions even when the bulk flow looks reasonable.</li> <li> <strong>Declaring convergence too early.</strong> A visually smooth solution does not guarantee grid convergence; always perform a refinement study before trusting a result (Section 11).</li> </ul> <hr> <h2 id="14-extending-this-work">14. Extending this work</h2> <p>For a stronger dissertation-adjacent portfolio piece, consider layering on:</p> <ul> <li> <strong>Higher Reynolds numbers.</strong> Re = 400, 1000, 3200 reveal secondary and tertiary corner vortices; these require finer meshes or upwind-biased stabilization to remain stable.</li> <li> <strong>Implicit time stepping.</strong> Replacing the explicit advective update with a semi-implicit or fully implicit scheme relaxes the CFL restriction and allows larger time steps.</li> <li> <strong>Vorticity-streamfunction reformulation.</strong> Eliminates pressure entirely for 2D problems, offering a nice mathematical contrast to derive and implement against the primitive-variable formulation used here.</li> <li> <strong>Finite element comparison.</strong> Solve the same benchmark with FEniCSx or Firedrake using Taylor-Hood elements and compare accuracy per degree of freedom against the finite-difference results above.</li> <li> <strong>Reduced-order modeling.</strong> Apply Proper Orthogonal Decomposition (POD) or Dynamic Mode Decomposition (DMD) to the time series generated here as an entry point to data-driven and scientific machine learning methods, an increasingly relevant direction for both academic and industry roles.</li> <li> <strong>Adjoint-based sensitivity analysis.</strong> Compute gradients of a scalar output (e.g., drag or a corner-vortex metric) with respect to geometric or boundary parameters, connecting the solver to design optimization.</li> </ul> <hr> <h2 id="references">References</h2> <ol class="bibliography"> <li><span id="wikipedia_cfd">Wikipedia contributors. (2026). <i>Computational fluid dynamics</i>. Wikipedia, The Free Encyclopedia. https://en.wikipedia.org/wiki/Computational_fluid_dynamics</span></li> <li><span id="plusmaths_cfd">Plus Maths. (2021). <i>Maths in a Minute: Computational fluid dynamics</i>. University of Cambridge. https://plus.maths.org/maths-minute-computational-fluid-dynamics</span></li> <li><span id="harlow1965numerical">Harlow, F. H., &amp; Welch, J. E. (1965). Numerical calculation of time-dependent viscous incompressible flow of fluid with free surface. <i>Physics of Fluids</i>, <i>8</i>(12), 2182–2189.</span></li> <li><span id="bhaskaran_cfd_basics">Bhaskaran, R., &amp; Collins, L. (2020). <i>Introduction to CFD Basics</i>. Cornell University, MAE 5230 Lecture Notes. https://dragonfly.tam.cornell.edu/teaching/mae5230-cfd-intro-notes.pdf</span></li> <li><span id="temam2001navier">Temam, R. (2001). <i>Navier-Stokes Equations: Theory and Numerical Analysis</i>. AMS Chelsea Publishing.</span></li> <li><span id="quarteroni2008numerical">Quarteroni, A., &amp; Valli, A. (2008). <i>Numerical Approximation of Partial Differential Equations</i>. Springer.</span></li> <li><span id="versteeg2007introduction">Versteeg, H. K., &amp; Malalasekera, W. (2007). <i>An Introduction to Computational Fluid Dynamics: The Finite Volume Method</i> (2nd ed.). Pearson Education.</span></li> <li><span id="ferziger2019computational">Ferziger, J. H., Perić, M., &amp; Street, R. L. (2019). <i>Computational Methods for Fluid Dynamics</i> (4th ed.). Springer.</span></li> <li><span id="chorin1968numerical">Chorin, A. J. (1968). Numerical solution of the Navier-Stokes equations. <i>Mathematics of Computation</i>, <i>22</i>(104), 745–762.</span></li> <li><span id="ghia1982high">Ghia, U., Ghia, K. N., &amp; Shin, C. T. (1982). High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method. <i>Journal of Computational Physics</i>, <i>48</i>(3), 387–411.</span></li> <li><span id="julianlork_cavity">Lork, J. (2024). <i>fdm-lid-driven-cavity-flow</i>. GitHub repository. https://github.com/julianlork/fdm-lid-driven-cavity-flow</span></li> <li><span id="faiqshahbaz_cfd">Shahbaz, F. (2023). <i>Basic CFD Flows in Python</i>. Personal project page. https://faiqshahbaz.github.io/projects/3_project/</span></li> </ol> <hr> <p><em>Article prepared for a GitHub Pages academic portfolio. The solver above was executed end-to-end in a Python 3 environment, passed all built-in physical sanity checks at Re = 100, and its grid-convergence behavior was independently verified across four mesh resolutions.</em></p> </div> </article> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
+</code></pre></div></div> <hr> <h2 id="11-grid-convergence-study">11. Grid-convergence study</h2> <p>To demonstrate discretization convergence rather than trusting a single mesh, the solver above was rerun at four grid resolutions (21x21, 41x41, 61x61, 81x81), holding the Reynolds number, viscosity, and time-integration scheme fixed, and recording the minimum centerline velocity (a scalar proxy for recirculation strength):</p> <table> <thead> <tr> <th>Grid size</th> <th>Min centerline u(x=0.5)</th> <th>Change from previous grid</th> </tr> </thead> <tbody> <tr> <td>21x21</td> <td>−0.0952</td> <td>—</td> </tr> <tr> <td>41x41</td> <td>−0.1042</td> <td>+9.5%</td> </tr> <tr> <td>61x61</td> <td>−0.1053</td> <td>+1.1%</td> </tr> <tr> <td>81x81</td> <td>−0.1056</td> <td>+0.3%</td> </tr> </tbody> </table> <p>The result converges monotonically toward approximately −0.106 as the mesh is refined, with the change between successive refinements diminishing rapidly, which is the qualitative signature expected of a stable, consistent scheme approaching a mesh-independent solution <a class="citation" href="#quarteroni2008numerical">(Quarteroni &amp; Valli, 2008)</a>. This kind of table, easy to generate from the class-based solver above by simply varying <code class="language-plaintext highlighter-rouge">nx</code>/<code class="language-plaintext highlighter-rouge">ny</code>, is exactly the sort of quantitative verification evidence that distinguishes a rigorous computational-mathematics writeup from a purely illustrative one.</p> <hr> <h2 id="12-verification-results">12. Verification results</h2> <p>Running the solver at $\mathrm{Re} = 100$ on the finest tested grid (81x81) for 600-700 time steps produces:</p> <table> <thead> <tr> <th>Quantity</th> <th>Result</th> <th>Expected behavior</th> </tr> </thead> <tbody> <tr> <td>Lid velocity $u$</td> <td>1.000000</td> <td>Dirichlet BC exactly enforced</td> </tr> <tr> <td>Max $\lvert u \rvert$</td> <td>1.000000</td> <td>Bounded by lid speed</td> </tr> <tr> <td>Min centerline $u(x=0.5)$</td> <td>≈ −0.106</td> <td>Negative → primary vortex confirmed, consistent with grid-convergence trend</td> </tr> <tr> <td>Final step residual</td> <td>2.840e-04, decaying</td> <td>Approaching a steady-state solution</td> </tr> </tbody> </table> <p>All automated checks in <code class="language-plaintext highlighter-rouge">solver.verify()</code> pass (<code class="language-plaintext highlighter-rouge">lid_velocity_enforced</code>, <code class="language-plaintext highlighter-rouge">walls_no_slip</code>, <code class="language-plaintext highlighter-rouge">bounded_velocity</code>, <code class="language-plaintext highlighter-rouge">recirculation_present</code>), confirming the implementation reproduces the qualitatively and quantitatively correct physics of the benchmark: a single dominant recirculation cell with velocity reversal below the moving lid, consistent with the classic <a class="citation" href="#ghia1982high">(Ghia et al., 1982)</a> reference solution and with the mesh-refinement trend of Section 11.</p> <p align="center"> <img src="/assets/img/posts/cavity_flow_v2_p10.svg" alt="Lid-driven cavity velocity field, centerline profile, and convergence history" style="width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: Left, the velocity magnitude field with streamlines, showing the primary recirculation vortex and its direction of rotation. Center, the centerline u-velocity profile at $x=0.5$, whose negative excursion, the recirculation strength, is the scalar diagnostic tracked throughout the grid-convergence study. Right, the per-step residual $\max\lvert\Delta u\rvert$ on a log scale, decaying toward a steady state.</em></p> <hr> <h2 id="13-common-pitfalls">13. Common pitfalls</h2> <p>A short list of mistakes that commonly appear in first CFD implementations, stated explicitly here because each has a specific numerical cause:</p> <ul> <li> <strong>Inconsistent pressure boundary conditions.</strong> The Neumann conditions on the pressure Poisson equation must be derived from the momentum equation evaluated at the boundary, not chosen arbitrarily, or mass conservation will drift.</li> <li> <strong>Ignoring the CFL condition.</strong> Explicit time-stepping with too large a $\Delta t$ relative to $\Delta x$ and the local velocity will blow up even though the scheme is theoretically consistent.</li> <li> <strong>Checkerboard pressure oscillations.</strong> Collocated (non-staggered) grids can develop spurious oscillatory pressure modes; staggered (MAC) grids or Rhie-Chow interpolation are standard fixes.</li> <li> <strong>Under-resolved boundary layers.</strong> Coarse near-wall meshes can produce plausible-looking but quantitatively wrong drag/lift or heat-transfer predictions even when the bulk flow looks reasonable.</li> <li> <strong>Declaring convergence too early.</strong> A visually smooth solution does not guarantee grid convergence; always perform a refinement study before trusting a result (Section 11).</li> </ul> <hr> <h2 id="14-extending-this-work">14. Extending this work</h2> <p>For a stronger dissertation-adjacent portfolio piece, consider layering on:</p> <ul> <li> <strong>Higher Reynolds numbers.</strong> Re = 400, 1000, 3200 reveal secondary and tertiary corner vortices; these require finer meshes or upwind-biased stabilization to remain stable.</li> <li> <strong>Implicit time stepping.</strong> Replacing the explicit advective update with a semi-implicit or fully implicit scheme relaxes the CFL restriction and allows larger time steps.</li> <li> <strong>Vorticity-streamfunction reformulation.</strong> Eliminates pressure entirely for 2D problems, offering a nice mathematical contrast to derive and implement against the primitive-variable formulation used here.</li> <li> <strong>Finite element comparison.</strong> Solve the same benchmark with FEniCSx or Firedrake using Taylor-Hood elements and compare accuracy per degree of freedom against the finite-difference results above.</li> <li> <strong>Reduced-order modeling.</strong> Apply Proper Orthogonal Decomposition (POD) or Dynamic Mode Decomposition (DMD) to the time series generated here as an entry point to data-driven and scientific machine learning methods, an increasingly relevant direction for both academic and industry roles.</li> <li> <strong>Adjoint-based sensitivity analysis.</strong> Compute gradients of a scalar output (e.g., drag or a corner-vortex metric) with respect to geometric or boundary parameters, connecting the solver to design optimization.</li> </ul> <hr> <h2 id="references">References</h2> <ol class="bibliography"> <li><span id="wikipedia_cfd">Wikipedia contributors. (2026). <i>Computational fluid dynamics</i>. Wikipedia, The Free Encyclopedia. <a href="https://en.wikipedia.org/wiki/Computational_fluid_dynamics" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Computational_fluid_dynamics</a></span></li> <li><span id="plusmaths_cfd">Plus Maths. (2021). <i>Maths in a Minute: Computational fluid dynamics</i>. University of Cambridge. <a href="https://plus.maths.org/maths-minute-computational-fluid-dynamics" target="_blank" rel="noopener">https://plus.maths.org/maths-minute-computational-fluid-dynamics</a></span></li> <li><span id="harlow1965numerical">Harlow, F. H., &amp; Welch, J. E. (1965). Numerical calculation of time-dependent viscous incompressible flow of fluid with free surface. <i>Physics of Fluids</i>, <i>8</i>(12), 2182–2189.</span></li> <li><span id="bhaskaran_cfd_basics">Bhaskaran, R., &amp; Collins, L. (2020). <i>Introduction to CFD Basics</i>. Cornell University, MAE 5230 Lecture Notes. <a href="https://dragonfly.tam.cornell.edu/teaching/mae5230-cfd-intro-notes.pdf" target="_blank" rel="noopener">https://dragonfly.tam.cornell.edu/teaching/mae5230-cfd-intro-notes.pdf</a></span></li> <li><span id="temam2001navier">Temam, R. (2001). <i>Navier-Stokes Equations: Theory and Numerical Analysis</i>. AMS Chelsea Publishing.</span></li> <li><span id="quarteroni2008numerical">Quarteroni, A., &amp; Valli, A. (2008). <i>Numerical Approximation of Partial Differential Equations</i>. Springer.</span></li> <li><span id="versteeg2007introduction">Versteeg, H. K., &amp; Malalasekera, W. (2007). <i>An Introduction to Computational Fluid Dynamics: The Finite Volume Method</i> (2nd ed.). Pearson Education.</span></li> <li><span id="ferziger2019computational">Ferziger, J. H., Perić, M., &amp; Street, R. L. (2019). <i>Computational Methods for Fluid Dynamics</i> (4th ed.). Springer.</span></li> <li><span id="chorin1968numerical">Chorin, A. J. (1968). Numerical solution of the Navier-Stokes equations. <i>Mathematics of Computation</i>, <i>22</i>(104), 745–762.</span></li> <li><span id="ghia1982high">Ghia, U., Ghia, K. N., &amp; Shin, C. T. (1982). High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method. <i>Journal of Computational Physics</i>, <i>48</i>(3), 387–411.</span></li> <li><span id="julianlork_cavity">Lork, J. (2024). <i>fdm-lid-driven-cavity-flow</i>. GitHub repository. <a href="https://github.com/julianlork/fdm-lid-driven-cavity-flow" target="_blank" rel="noopener">https://github.com/julianlork/fdm-lid-driven-cavity-flow</a></span></li> <li><span id="faiqshahbaz_cfd">Shahbaz, F. (2023). <i>Basic CFD Flows in Python</i>. Personal project page. <a href="https://faiqshahbaz.github.io/projects/3_project/" target="_blank" rel="noopener">https://faiqshahbaz.github.io/projects/3_project/</a></span></li> </ol> <hr> <p><em>Article prepared for a GitHub Pages academic portfolio. The solver above was executed end-to-end in a Python 3 environment, passed all built-in physical sanity checks at Re = 100, and its grid-convergence behavior was independently verified across four mesh resolutions.</em></p> <p><em>Full code for the solver and figures in this post is available in <a href="/assets/code/cavity_flow_p10.py"><code class="language-plaintext highlighter-rouge">cavity_flow_p10.py</code></a>.</em></p> </div> </article> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <script>
     (function setupGiscus() {
       function determineGiscusTheme() {
         var theme = localStorage.getItem("theme") || document.documentElement.getAttribute("data-theme") || "system";
@@ -228,7 +228,7 @@ return prefersDark ? "dark" : "light";
       var host = document.getElementById("giscus_thread");
       if (host) host.appendChild(giscusScript);
     })();
-  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  </script> <noscript> Please enable JavaScript to view the <a href="http://giscus.app/?ref_noscript" rel="external nofollow noopener" target="_blank">comments powered by giscus.</a> </noscript> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Built with <a href="https://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a> and <a href="https://github.com/alshedivat/al-folio" target="_blank" rel="noopener">al-folio</a>. </div> </footer> <script>
   window.alFolio = {
     compatBootstrap: false
   };
@@ -262,7 +262,7 @@ ninja.data = [{
           },
         },{id: "nav-projects",
           title: "Projects",
-          description: "A growing collection of your cool projects.",
+          description: "Research and computational projects, with code and reproducible figures.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/projects/";
@@ -276,14 +276,14 @@ ninja.data = [{
           },
         },{id: "nav-cv",
           title: "CV",
-          description: "Curriculum Vitae",
+          description: "Curriculum vitae",
           section: "Navigation",
           handler: () => {
             window.location.href = "/cv/";
           },
         },{id: "nav-publications",
           title: "Publications",
-          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          description: "Peer-reviewed articles and preprints, most recent first.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/publications/";
@@ -320,6 +320,17 @@ ninja.data = [{
             window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
           
         },
+      },{id: "post-optimization-gradient-newton-and-quasi-newton-methods-and-minimum-energy-trajectory-optimization",
+        
+          title: "Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization",
+        
+        description: "Gradient descent, Newton&#39;s method, and L-BFGS on convex logistic regression, followed by a minimum-energy trajectory solved by direct collocation and SLSQP.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/optimization-convex-to-trajectory_p9/";
+          
+        },
       },{id: "post-computational-fluid-dynamics",
         
           title: "Computational Fluid Dynamics",
@@ -331,66 +342,77 @@ ninja.data = [{
             window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
           
         },
-      },{id: "post-bayesian-inference-and-inverse-problems-from-first-principles-to-clinical-data",
+      },{id: "post-bayesian-inference-for-inverse-problems-metropolis-sampling-for-source-identification-and-linear-regression",
         
-          title: "Bayesian Inference and Inverse Problems: From First Principles to Clinical Data",
+          title: "Bayesian Inference for Inverse Problems: Metropolis Sampling for Source Identification and Linear Regression...",
         
-        description: "",
+        description: "Bayes&#39; theorem, MAP estimation as ridge regression, and Metropolis sampling, applied to a synthetic wave-source inversion and the diabetes dataset.",
         section: "Posts",
         handler: () => {
           
             window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
           
         },
-      },{id: "post-parallel-computing-for-scientific-simulation-domain-decomposition-amdahl-39-s-law-and-exascale-computing",
+      },{id: "post-domain-decomposition-and-parallel-scaling-for-wave-propagation-amdahl-gustafson-and-the-memory-bandwidth-limit",
         
-          title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl&#39;s Law, and Exascale Computing",
+          title: "Domain Decomposition and Parallel Scaling for Wave Propagation: Amdahl, Gustafson and the Memory-Bandwidth...",
         
-        description: "",
+        description: "Domain decomposition for a 2D wave equation under MPI, with Amdahl and Gustafson scaling and laptop benchmarks showing memory-bandwidth limits.",
         section: "Posts",
         handler: () => {
           
             window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
           
         },
-      },{id: "post-an-applied-introduction-to-modern-machine-learning-libraries-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-real-world-data",
+      },{id: "post-a-hands-on-machine-learning-workflow-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-benchmark-datasets",
         
-          title: "An Applied Introduction to Modern Machine Learning Libraries: scikit-learn, XGBoost, TensorFlow, Keras, and...",
+          title: "A Hands-On Machine Learning Workflow: scikit-learn, XGBoost, TensorFlow/Keras and PyTorch on Benchmark Datasets...",
         
-        description: "",
+        description: "Five runnable tutorials on public datasets with scikit-learn, XGBoost, TensorFlow, Keras and PyTorch, from baselines to training curves and error analysis.",
         section: "Posts",
         handler: () => {
           
             window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
           
         },
-      },{id: "post-physics-informed-neural-networks-versus-classical-numerical-methods-a-comparative-assessment-of-accuracy-and-computational-cost",
+      },{id: "post-matching-model-complexity-to-data-a-controlled-comparison-of-scikit-learn-xgboost-keras-and-pytorch",
         
-          title: "Physics-Informed Neural Networks versus Classical Numerical Methods: A Comparative Assessment of Accuracy and...",
+          title: "Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and...",
         
-        description: "",
+        description: "Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-tour_p5/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-adaptive-runge-kutta-accuracy-and-cost-on-a-forced-linear-ode",
+        
+          title: "Physics-Informed Neural Networks versus Adaptive Runge-Kutta: Accuracy and Cost on a Forced Linear...",
+        
+        description: "A PINN and an adaptive RK45 solver are compared on a forced linear ODE with a known exact solution, measuring accuracy and wall-clock cost.",
         section: "Posts",
         handler: () => {
           
             window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
           
         },
-      },{id: "post-an-introduction-to-uncertainty-quantification-using-surrogate-modeling",
+      },{id: "post-polynomial-chaos-surrogates-for-uncertainty-quantification-legendre-projection-versus-monte-carlo",
         
-          title: "An Introduction to Uncertainty Quantification Using Surrogate Modeling",
+          title: "Polynomial Chaos Surrogates for Uncertainty Quantification: Legendre Projection versus Monte Carlo",
         
-        description: "",
+        description: "A Legendre polynomial chaos surrogate for Runge&#39;s function, built by Gauss quadrature, matches million-sample Monte Carlo accuracy with 20 evaluations.",
         section: "Posts",
         handler: () => {
           
             window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
           
         },
-      },{id: "post-stiff-odes-and-solver-stability-why-explicit-methods-sometimes-fail-in-dynamical-systems",
+      },{id: "post-stiffness-and-absolute-stability-explicit-and-implicit-solvers-on-the-van-der-pol-oscillator",
         
-          title: "Stiff ODEs and Solver Stability: Why Explicit Methods Sometimes Fail in Dynamical Systems...",
+          title: "Stiffness and Absolute Stability: Explicit and Implicit Solvers on the Van der Pol...",
         
-        description: "",
+        description: "Why stiffness forces explicit ODE solvers to take tiny steps, shown through Dahlquist stability regions and an RK45 versus Radau benchmark on Van der Pol.",
         section: "Posts",
         handler: () => {
           
@@ -401,7 +423,7 @@ ninja.data = [{
         
           title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
         
-        description: "",
+        description: "Reusing one LU factorization via the Sherman-Morrison formula cuts implicit Euler cost from O(n^3) to O(n^2) per step, with benchmarks up to n = 640.",
         section: "Posts",
         handler: () => {
           
@@ -418,19 +440,14 @@ ninja.data = [{
           description: "",
           section: "News",handler: () => {
               window.location.href = "/news/announcement_3/";
-            },},{id: "projects-project-1",
-          title: 'project 1',
-          description: "with background image",
+            },},{id: "projects-central-compact-schemes-for-the-kdv-equation",
+          title: 'Central Compact Schemes for the KdV Equation',
+          description: "An open-source Python reproduction of the TDCCS third-derivative scheme (Salian, Samala &amp; Ghosh, 2026)",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/1_project/";
-            },},{id: "projects-project-2",
-          title: 'project 2',
-          description: "a project with a background image and giscus comments",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/2_project/";
+              window.location.href = "/projects/tdccs_kdv/";
             },},{id: "teachings-mac-1140-precalculus-algebra",
           title: 'MAC 1140 : Precalculus Algebra',
-          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series.",
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modeling, matrices and determinants, and sequences and series.",
           section: "Teachings",handler: () => {
               window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
             },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
