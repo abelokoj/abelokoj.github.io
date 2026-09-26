@@ -25,6 +25,7 @@ refactor-every-step baseline, (2) plots a representative trajectory, and
 (3) benchmarks wall-clock cost across system size n.
 """
 import numpy as np
+from scipy.linalg import lu_factor, lu_solve
 import time
 import matplotlib
 matplotlib.use("Agg")
@@ -101,7 +102,7 @@ def solve_naive(A0, u, v, b, y0, h, steps, T):
     y = y0.copy()
     traj = [y.copy()]
     for k in range(steps):
-        t = k * h
+        t = (k + 1) * h          # backward Euler evaluates A at t_{k+1}
         c = fuel_burn_coeff(t, T)
         Ak = A0 + c * np.outer(u, v)
         M = np.eye(n) - h * Ak
@@ -112,23 +113,25 @@ def solve_naive(A0, u, v, b, y0, h, steps, T):
 
 
 def solve_sherman_morrison(A0, u, v, b, y0, h, steps, T):
-    """Factor B0 once, then apply a rank-one Sherman-Morrison update at
-    each step: O(n^2) per step after the initial O(n^3) factorization."""
-    n = len(y0)
-    B0 = np.eye(n) - h * A0
-    B0_inv = np.linalg.inv(B0)  # single O(n^3) factorization, reused below
+    """Factor B0 = I - h A0 once, then apply the rank-one Sherman-Morrison
+    correction at each step: O(n^3) once, then O(n^2) per step.
+
+    With M_{k+1} = B0 + alpha_{k+1} u v^T and alpha_{k+1} = -h c(t_{k+1}),
+        M^{-1} r = z - alpha (v.z) / (1 + alpha v.p) p,   z = B0^{-1} r, p = B0^{-1} u.
+    p and v.p do not change between steps, so each step costs one pair of
+    triangular solves with the stored LU factors plus two dot products.
+    """
+    B0 = np.eye(len(y0)) - h * A0
+    lu_piv = lu_factor(B0)            # the single O(n^3) factorization
+    p = lu_solve(lu_piv, u)           # B0^{-1} u, reused every step
+    vp = v @ p
     y = y0.copy()
     traj = [y.copy()]
     for k in range(steps):
-        t = k * h
-        c = fuel_burn_coeff(t, T)
-        alpha = -h * c
-        Binv_u = B0_inv @ u
-        v_Binv = v @ B0_inv
-        denom = 1.0 + alpha * (v @ Binv_u)
-        M_inv = B0_inv - (alpha / denom) * np.outer(Binv_u, v_Binv)
-        rhs = y + h * b
-        y = M_inv @ rhs
+        t = (k + 1) * h
+        alpha = -h * fuel_burn_coeff(t, T)
+        z = lu_solve(lu_piv, y + h * b)       # O(n^2)
+        y = z - (alpha * (v @ z) / (1.0 + alpha * vp)) * p
         traj.append(y.copy())
     return np.array(traj)
 
@@ -165,25 +168,29 @@ plt.close(fig)
 # =======================================================================
 # 3) Timing benchmark vs. system size n
 # =======================================================================
-sizes = [20, 40, 80, 160, 320]
+sizes = [20, 40, 80, 160, 320, 640]
 steps_bench = 150
 T_bench = 3.0
 h_bench = T_bench / steps_bench
 
 naive_times, sm_times = [], []
+REPEATS = 5   # report the median of several runs; single timings are noisy
+
+
+def median_time(fn, *args):
+    ts = []
+    for _ in range(REPEATS):
+        t0 = time.perf_counter()
+        fn(*args)
+        ts.append(time.perf_counter() - t0)
+    return float(np.median(ts))
+
+
 for n in sizes:
     A0n, un, vn, bn, y0n = build_system(n, rng)
-
-    t0 = time.perf_counter()
-    solve_naive(A0n, un, vn, bn, y0n, h_bench, steps_bench, T_bench)
-    t1 = time.perf_counter()
-    naive_times.append(t1 - t0)
-
-    t0 = time.perf_counter()
-    solve_sherman_morrison(A0n, un, vn, bn, y0n, h_bench, steps_bench, T_bench)
-    t1 = time.perf_counter()
-    sm_times.append(t1 - t0)
-
+    args = (A0n, un, vn, bn, y0n, h_bench, steps_bench, T_bench)
+    naive_times.append(median_time(solve_naive, *args))
+    sm_times.append(median_time(solve_sherman_morrison, *args))
     print(f"n={n:4d}  naive={naive_times[-1]:.4f}s  "
           f"sherman-morrison={sm_times[-1]:.4f}s  "
           f"speedup={naive_times[-1] / sm_times[-1]:.2f}x")

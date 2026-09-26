@@ -1,0 +1,385 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization | Abel Okojunu </title> <meta name="author" content="Abel Okojunu"> <meta name="description" content="Gradient descent, Newton's method, and L-BFGS on convex logistic regression, followed by a minimum-energy trajectory solved by direct collocation and SLSQP."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta property="og:site_name" content="Abel Okojunu"> <meta property="og:type" content="article"> <meta property="og:title" content="Abel Okojunu | Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization"> <meta property="og:url" content="https://abelokoj.github.io/blog/2026/optimization-convex-to-trajectory_p9/"> <meta property="og:description" content="Gradient descent, Newton's method, and L-BFGS on convex logistic regression, followed by a minimum-energy trajectory solved by direct collocation and SLSQP."> <meta property="og:locale" content="en"> <meta name="twitter:card" content="summary"> <meta name="twitter:title" content="Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization"> <meta name="twitter:description" content="Gradient descent, Newton's method, and L-BFGS on convex logistic regression, followed by a minimum-energy trajectory solved by direct collocation and SLSQP."> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%E2%9A%9B%EF%B8%8F&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&amp;display=swap" rel="stylesheet"> <link rel="stylesheet" href="/assets/css/custom-fonts.css?v=cf4ff5dbd262c2a23db37dfec9b9ab26"> <link rel="stylesheet" href="/assets/css/markdown.css?v=1e36405c2bab686ee3b64128c24cf932"> <link rel="canonical" href="https://abelokoj.github.io/blog/2026/optimization-convex-to-trajectory_p9/"> <script src="/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> <span class="font-weight-bold">Abel</span> Okojunu </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">About </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">Blog Posts </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">Teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">Projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/resume/">Resume </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">Publications </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">Submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/resume/">Resume</a> <a class="dropdown-item " href="/cv/">CV</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">Blog posts</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post code-theme-default"> <header class="post-header"> <h1 class="post-title">Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization</h1> <p class="post-meta"> Created on June 30, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/optimization"> <i class="fa-solid fa-hashtag fa-sm"></i> optimization</a>   <a href="/blog/tag/convex-optimization"> <i class="fa-solid fa-hashtag fa-sm"></i> convex-optimization</a>   <a href="/blog/tag/trajectory-optimization"> <i class="fa-solid fa-hashtag fa-sm"></i> trajectory-optimization</a>   <a href="/blog/tag/numerical-methods"> <i class="fa-solid fa-hashtag fa-sm"></i> numerical-methods</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <h2 id="motivation-the-problem-underneath-the-rest-of-this-series">Motivation: the problem underneath the rest of this series</h2> <p>Almost every earlier post in this series has contained an optimization problem in disguise: fitting a surrogate model, training a PINN, or computing a maximum-likelihood or maximum-a-posteriori estimate, as in the <a href="/blog/2026/bayesian-inference-inverse-problems_p8/">previous post on Bayesian inference</a>. This post makes that structure the explicit subject. It starts from the mathematical guarantees that make some optimization problems provably easy, moves through the algorithms that exploit those guarantees, and ends with a <strong>non-convex</strong> problem (optimal trajectory design) where those guarantees no longer hold and different tools are needed.</p> <h2 id="convexity-the-property-that-makes-optimization-tractable">Convexity: the property that makes optimization tractable</h2> <p>A function $f: \mathbb{R}^n \to \mathbb{R}$ is <strong>convex</strong> if, for any two points $x, y$ and any $\lambda \in [0,1]$,</p> \[f(\lambda x + (1-\lambda) y) \le \lambda f(x) + (1-\lambda) f(y).\] <p>Geometrically, the line segment connecting any two points on the graph of $f$ never lies below the graph. If $f$ is twice differentiable, an equivalent and often more easily checked condition is that its <strong>Hessian matrix is positive semi-definite everywhere</strong> <a class="citation" href="#boyd2004convex">(Boyd &amp; Vandenberghe, 2004)</a>,</p> \[\nabla^2 f(x) \succeq 0 \quad \text{for all } x.\] <h3 id="why-this-single-property-matters">Why this single property matters</h3> <p>For a convex function, <strong>every local minimum is a global minimum</strong>, so there are no other valleys in which to become trapped. The argument follows directly from the definition. Suppose $x^\star$ is a local but not global minimum, so that some $y$ satisfies $f(y) &lt; f(x^\star)$. Convexity forces $f$ along the segment from $x^\star$ to $y$ to lie at or below the chord connecting them, and that chord strictly decreases from $f(x^\star)$; points arbitrarily close to $x^\star$ therefore have smaller values, which contradicts local optimality. The practical consequence is substantial: an algorithm applied to a convex problem comes with a mathematical guarantee of reaching the global optimum, whereas the same algorithm applied to a non-convex problem does not. This is also why applied mathematicians put effort into recognizing convexity, or building it into a formulation, even at the cost of a less “natural” model. Regularized linear and logistic regression, support vector machines, and the LASSO are all formulated to be convex so that their optimization step is provably reliable.</p> <h2 id="the-workhorse-problem-logistic-regression-as-a-convex-optimization-problem">The workhorse problem: logistic regression as a convex optimization problem</h2> <p>To make this concrete with real data, this section returns to the breast cancer diagnostic dataset used in the <a href="/blog/2026/ml-toolkit-tour_p5/">machine learning toolkit post</a>, where logistic regression was the best-performing model, and treats <strong>fitting a logistic regression classifier</strong> as what it is: minimizing a convex loss function. The $L_2$-regularized negative log-likelihood is</p> \[\mathcal{L}(\beta) = -\frac{1}{n}\sum_{i=1}^n \left[y_i \log \sigma(x_i^\top \beta) + (1-y_i)\log(1-\sigma(x_i^\top \beta))\right] + \frac{\lambda}{2n}\|\beta\|_2^2,\] <p>where $\sigma(z) = 1/(1+e^{-z})$ is the sigmoid function, $n$ is the number of training samples, and $\beta \in \mathbb{R}^d$. The convexity claim can be verified directly. The Hessian of this loss is</p> \[\nabla^2 \mathcal{L}(\beta) = \frac{1}{n} X^\top W X + \frac{\lambda}{n} I, \qquad W = \mathrm{diag}\big(\sigma(x_i^\top\beta)(1-\sigma(x_i^\top\beta))\big).\] <p>Since $\sigma(z)(1-\sigma(z)) \geq 0$ for every $z$, $W$ has non-negative diagonal entries, which makes $X^\top W X$ positive semi-definite for any $X$: for any vector $v$, $v^\top X^\top W X v = \sum_i W_{ii}(x_i^\top v)^2 \ge 0$. Adding $\frac{\lambda}{n}I$ with $\lambda &gt; 0$ makes the whole Hessian <strong>strictly</strong> positive definite everywhere. The regularized logistic loss is therefore strictly convex regardless of the dataset it is fit to; this is a general proof, not an empirical observation about this particular dataset.</p> <h2 id="three-optimizers-one-convex-problem-different-convergence">Three optimizers, one convex problem, different convergence</h2> <p>The same model is fit three ways below. Because the problem is convex, the final answers should agree, and they do; the interesting comparison is <strong>how quickly each method gets there</strong>, which is where the mathematical differences appear.</p> <h3 id="gradient-descent-first-order-cheap-steps">Gradient descent: first-order, cheap steps</h3> \[\beta^{(k+1)} = \beta^{(k)} - \eta \nabla \mathcal{L}(\beta^{(k)})\] <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">gradient_descent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="nf">neg_log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">-</span> <span class="n">lr</span> <span class="o">*</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">losses</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="nf">neg_log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">beta</span><span class="p">,</span> <span class="n">losses</span>
+
+<span class="n">beta_gd</span><span class="p">,</span> <span class="n">losses_gd</span> <span class="o">=</span> <span class="nf">gradient_descent</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</code></pre></div></div> <p>Gradient descent uses only <strong>local slope information</strong>. It has no notion of the curvature of the loss surface, so it can zigzag across narrow, curved valleys, and its convergence rate depends on the step size $\eta$ and on the <strong>condition number</strong> $\kappa = \lambda_{\max}(\nabla^2\mathcal{L})/\lambda_{\min}(\nabla^2\mathcal{L})$, the ratio of the largest to the smallest Hessian eigenvalue. For a strongly convex quadratic with $\eta \in (0, 2/\lambda_{\max})$ the iteration converges, and with the optimal fixed step $\eta = 2/(\lambda_{\max}+\lambda_{\min})$ the error contracts by a factor of $\frac{\kappa-1}{\kappa+1}$ per step <a class="citation" href="#nocedal2006numerical">(Nocedal &amp; Wright, 2006)</a>. This is linear convergence, and the factor approaches $1$ (arbitrarily slow progress) as $\kappa$ grows.</p> <h3 id="newtons-method-second-order-expensive-but-better-informed-steps">Newton’s method: second-order, expensive but better-informed steps</h3> \[\beta^{(k+1)} = \beta^{(k)} - \big[\nabla^2 \mathcal{L}(\beta^{(k)})\big]^{-1} \nabla \mathcal{L}(\beta^{(k)})\] <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">newtons_method</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">zeros</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">[</span><span class="nf">neg_log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">n_iter</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="nf">hessian</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="nf">solve</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="n">losses</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="nf">neg_log_likelihood</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">beta</span><span class="p">,</span> <span class="n">losses</span>
+</code></pre></div></div> <p>Newton’s method uses the <strong>full local curvature</strong> (the Hessian) to rescale the step. Geometrically, it fits a quadratic model of the loss at the current point and jumps to the minimizer of that model instead of taking a small step along the gradient. Near a minimizer with a Lipschitz-continuous, positive definite Hessian, this gives <strong>quadratic convergence</strong>: the number of correct digits roughly doubles every iteration, a much faster asymptotic rate than the linear convergence of gradient descent <a class="citation" href="#nocedal2006numerical">(Nocedal &amp; Wright, 2006)</a>. The script uses the pure (undamped) Newton step, which converged here from $\beta = 0$; in general a line search or damping is needed to guarantee convergence from a distant starting point. The cost is also real: forming and factorizing a $d \times d$ Hessian costs $O(d^3)$ per iteration (the same cost structure discussed in the <a href="/blog/2026/sherman-morrison-ode_p1/">first post of this series</a>), which is why Newton’s method is impractical for the very high-dimensional parameter spaces common in deep learning.</p> <h3 id="l-bfgs-approximating-the-hessian-without-forming-it">L-BFGS: approximating the Hessian without forming it</h3> <p>Between these two extremes sits <strong>L-BFGS</strong> (limited-memory Broyden-Fletcher-Goldfarb-Shanno) <a class="citation" href="#liu1989limited">(Liu &amp; Nocedal, 1989)</a>, which also trained the PINN in an earlier post in this series. L-BFGS builds an <em>implicit</em> approximation to the inverse Hessian from only the most recent gradient and step pairs. Each BFGS update is a rank-two correction, and the corresponding inverse update is an instance of the Sherman-Morrison-Woodbury identity from the first post of this series; here it accumulates curvature information instead of solving a fixed linear system with a changing low-rank correction. The same linear-algebra idea that accelerated an ODE solver in that post is what makes practical quasi-Newton optimization work. Full BFGS converges superlinearly near a well-behaved minimizer; the limited-memory variant is in general guaranteed only a linear rate, but in practice it is usually much faster than gradient descent <a class="citation" href="#nocedal2006numerical">(Nocedal &amp; Wright, 2006)</a>.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res</span> <span class="o">=</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">neg_log_likelihood</span><span class="p">,</span> <span class="n">beta0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">jac</span><span class="o">=</span><span class="n">gradient</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="sh">"</span><span class="s">L-BFGS-B</span><span class="sh">"</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span><span class="p">))</span>
+</code></pre></div></div> <h3 id="convergence-results-on-the-breast-cancer-dataset">Convergence results on the breast cancer dataset</h3> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Running optimizers on full 30-feature logistic regression...
+Final training loss -- GD: 0.068652 (500 iters)
+Final training loss -- Newton: 0.068537 (20 iters)
+Final training loss -- L-BFGS: 0.068537 (28 iters)
+Test accuracy -- GD: 0.9860
+Test accuracy -- Newton: 0.9860
+Test accuracy -- L-BFGS: 0.9860
+</code></pre></div></div> <p>All three methods reach the same test accuracy, and Newton’s method and L-BFGS agree on the training loss to six decimal places, as convexity leads one to expect. Newton’s method reaches the minimum to within numerical precision in fewer than 10 of its 20 iterations, whereas gradient descent, after <strong>500</strong> iterations, is still about $10^{-4}$ above it (0.068652 versus 0.068537).</p> <p align="center"> <img src="/assets/img/posts/optimizer_convergence_p9.svg" alt="Convergence comparison of gradient descent, Newton's method, and L-BFGS on logistic regression" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 1: Gap between the loss and the best loss found, per iteration, on a log scale (first 60 iterations shown). Newton’s method (orange) falls from about $10^{-2}$ to the $10^{-12}$ plotting floor within a few iterations, the signature of quadratic convergence. L-BFGS (green) decreases steadily to about $10^{-8}$ in 28 iterations without forming the Hessian. Gradient descent (blue) is still near $10^{-2}$ after 60 iterations.</em></p> <h3 id="the-loss-landscape-and-optimizer-paths">The loss landscape and optimizer paths</h3> <p>To visualize the difference, the model can be restricted to 2 of the 30 features (<code class="language-plaintext highlighter-rouge">mean radius</code> and <code class="language-plaintext highlighter-rouge">mean texture</code>), so that the convex loss surface can be plotted with each optimizer’s path overlaid.</p> <p align="center"> <img src="/assets/img/posts/loss_landscape_paths_p9.svg" alt="Contour plot of the 2D logistic regression loss landscape with gradient descent and Newton's method paths" style="width: 100%; max-width: 560px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 2: Contours of the 2-feature loss surface, which has a single basin, as convexity requires. Both methods start at the origin. Gradient descent (red, 60 steps) takes many short steps whose length shrinks as it moves into the flat, elongated part of the basin, and it stops short of the point reached by Newton’s method. Newton’s method (orange, 8 steps) takes a few long steps because it accounts for the curvature and anisotropy of the basin directly.</em></p> <p>The figure shows the geometric content of the argument above: Newton’s method uses the Hessian to account for the shape of the basin at every step, while gradient descent proceeds using only the local slope and slows down where the surface flattens.</p> <h2 id="a-necessary-detour-what-constrained-optimum-means">A necessary detour: what “constrained optimum” means</h2> <p>Before turning to trajectory optimization, it helps to state what it means, mathematically, for a point to be optimal <em>subject to constraints</em>. A problem simple enough to visualize completely serves this purpose.</p> <p>Consider minimizing $f(x,y) = x^2 + y^2$ (squared distance from the origin) subject to $g(x,y) = x + y - 2 = 0$ (staying on a fixed line). At the constrained optimum, the level curves of $f$ (concentric circles) must be <strong>tangent</strong> to the constraint line: if a circle crossed the line instead of touching it, sliding along the line would reach a smaller circle. Tangency means the gradients are <strong>parallel</strong>,</p> \[\nabla f(x,y) = \lambda\, \nabla g(x,y),\] <p>for some scalar $\lambda$, the <strong>Lagrange multiplier</strong>. This equation, together with $g(x,y)=0$, gives exactly enough equations to solve for $(x, y, \lambda)$. Here $\nabla f = (2x, 2y)$ and $\nabla g = (1,1)$, so $2x = \lambda = 2y$ and hence $x=y$; combined with $x+y=2$, this gives $x=y=1$ and a minimum value $f(1,1)=2$. The result is easy to verify by direct substitution, which is a good habit whenever a Lagrangian calculation is new.</p> <p>The <strong>Karush-Kuhn-Tucker (KKT) conditions</strong> generalize this idea to <em>inequality</em> constraints $h(x) \le 0$ <a class="citation" href="#karush1939minima">(Karush, 1939)</a><a class="citation" href="#kuhn1951nonlinear">(Kuhn &amp; Tucker, 1951)</a>. At a constrained optimum (under a suitable constraint qualification), each inequality constraint is either inactive, in which case it contributes nothing, or active, in which case it contributes a multiplier term to the gradient balance as in the equality case, with the added requirement that its multiplier be non-negative. The sign condition formalizes the statement that pushing against an active constraint is what prevents further improvement. The <code class="language-plaintext highlighter-rouge">dynamics_constraints</code> and <code class="language-plaintext highlighter-rouge">boundary_constraints</code> functions in the trajectory problem below are <em>equality</em> constraints in exactly this Lagrangian sense, and SLSQP works by solving a sequence of quadratic-programming approximations to these optimality conditions.</p> <h2 id="beyond-convexity-trajectory-optimization">Beyond convexity: trajectory optimization</h2> <p>Convexity is valuable when available, but many physically interesting control and design problems lack it. To see what changes, consider a <strong>minimum-fuel trajectory optimization</strong> problem, a simplified one-dimensional stand-in for the kind of aviation trajectory problem referenced elsewhere in this series (and related to the LLNL sustainable-aviation modeling project from which this series grew).</p> <h3 id="the-problem">The problem</h3> <p>A vehicle with position $q(t)$ and velocity $v(t)$ is driven by a control input $u(t)$ (thrust) against quadratic drag,</p> \[\dot{q} = v, \qquad \dot{v} = u - k\, v |v|,\] <p>with $k = 0.02$ in the script. Starting from rest at $q(0)=0$, the goal is to reach $q(T) = q_f$ with zero final velocity at $T = 10$, with $q_f = 20$, while <strong>minimizing fuel usage</strong>. Fuel is approximated here by $\int_0^T u(t)^2\,dt$, a smooth proxy (strictly a control-energy cost) that keeps the problem gradient-friendly:</p> \[\min_{u(\cdot)} \int_0^T u(t)^2\, dt \quad \text{subject to } \dot{q}=v,\ \dot{v}=u-kv|v|,\ q(0)=0,\ v(0)=0,\ q(T)=q_f,\ v(T)=0.\] <h3 id="how-this-differs-from-the-logistic-regression-problem">How this differs from the logistic regression problem</h3> <table> <tbody> <tr> <td>This is an <strong>infinite-dimensional</strong> optimization problem, since the unknown is an entire function $u(t)$ and not a finite vector. More importantly for convexity, the drag term $v</td> <td>v</td> <td>$ is nonlinear, so after discretization the dynamics become nonlinear <em>equality</em> constraints. A feasible set defined by nonlinear equalities is in general not convex, so the discretized problem is <strong>not convex</strong>: there is no guarantee that a local minimum found by a numerical solver is the global one, and different initial guesses can in principle converge to different local solutions.</td> </tr> </tbody> </table> <h3 id="direct-collocation-from-a-function-optimization-problem-to-a-finite-one">Direct collocation: from a function-optimization problem to a finite one</h3> <p>The standard practical approach, <strong>direct collocation</strong> <a class="citation" href="#betts2010practical">(Betts, 2010)</a>, discretizes time into $N$ nodes (60 in the script) and treats the state and control values at each node as ordinary optimization variables. The dynamics are then enforced as <strong>equality constraints</strong> connecting consecutive nodes, here via the trapezoidal rule:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">dynamics_constraints</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">u</span> <span class="o">=</span> <span class="nf">unpack_traj</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">cons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">N_NODES</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># trapezoidal collocation for q and v
+</span>        <span class="n">drag_k</span> <span class="o">=</span> <span class="n">DRAG_COEF</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">drag_k1</span> <span class="o">=</span> <span class="n">DRAG_COEF</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">abs</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">q_next_pred</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt_traj</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">v_next_pred</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt_traj</span> <span class="o">*</span> <span class="p">((</span><span class="n">u</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">drag_k</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">drag_k1</span><span class="p">))</span>
+        <span class="n">cons</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">q_next_pred</span><span class="p">)</span>
+        <span class="n">cons</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v_next_pred</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">cons</span><span class="p">)</span>
+</code></pre></div></div> <p>This converts the continuous-time problem into a finite-dimensional nonlinear program with 180 variables, which is solved with <strong>Sequential Least Squares Programming (SLSQP)</strong> <a class="citation" href="#kraft1988software">(Kraft, 1988)</a>, a general-purpose sequential quadratic programming method for constrained nonlinear problems. The initial guess is a straight-line position profile, a constant velocity, and zero control.</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="sh">"</span><span class="s">type</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">eq</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">fun</span><span class="sh">"</span><span class="p">:</span> <span class="n">dynamics_constraints</span><span class="p">},</span>
+    <span class="p">{</span><span class="sh">"</span><span class="s">type</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">eq</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">fun</span><span class="sh">"</span><span class="p">:</span> <span class="n">boundary_constraints</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">result</span> <span class="o">=</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="sh">"</span><span class="s">SLSQP</span><span class="sh">"</span><span class="p">,</span>
+                   <span class="n">options</span><span class="o">=</span><span class="nf">dict</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">))</span>
+</code></pre></div></div> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PART B: Minimum-fuel trajectory optimization
+Optimization success: True, message: Optimization terminated successfully
+Final fuel cost (integral of u^2): 4.9367
+</code></pre></div></div> <p>A useful check is available. Without drag ($k = 0$) the problem is the classical minimum-energy rest-to-rest transfer of a double integrator, whose optimal control is linear in time, $u^\star(t) = \frac{6 q_f}{T^2}\left(1 - \frac{2t}{T}\right)$, with minimum cost $12 q_f^2 / T^3$. For $q_f = 20$ and $T = 10$ this gives $4.8$. The computed cost of 4.9367 is about 3% higher, which is consistent with the additional thrust needed to overcome the small drag term.</p> <p align="center"> <img src="/assets/img/posts/trajectory_optimization_p9.svg" alt="Optimized position, velocity, and control trajectories for minimum-fuel trajectory optimization" style="width: 100%; max-width: 720px; height: auto; display: block; margin: 0 auto;"> </p> <p><em>Figure 3: The optimized position, velocity, and control (thrust) trajectories. The control decreases almost linearly from about $1.2$ to about $-1.2$, changing sign shortly before $t = 6$; the velocity rises to a peak of about $3$ near $t = 5$ and returns to zero at $t = 10$, and the position reaches the target of 20 smoothly. The near-linear control is close to the drag-free analytic optimum; the drag term shifts the sign change slightly later than the midpoint, since some thrust is needed to counter drag.</em></p> <h3 id="what-solved-means-here">What “solved” means here</h3> <p>Unlike the logistic regression example, <code class="language-plaintext highlighter-rouge">result.success = True</code> here means that SLSQP found a point satisfying the <strong>KKT conditions</strong> to within tolerance. These are first-order necessary conditions for a <em>local</em> constrained optimum, not a certificate of global optimality. For a problem this simple (smooth, low-dimensional, with one sensible physical strategy, and close to a convex drag-free problem) the local optimum found is very likely the global one, but that is a statement about this particular problem, not a guarantee provided by SLSQP. For more complex trajectory problems (multiple obstacles, discrete mode switches, highly oscillatory dynamics), practitioners commonly run the optimizer from several initial guesses and compare the results, because a single successful run does not rule out a better solution elsewhere in the search space.</p> <h2 id="neural-networks-at-the-intersection-of-optimization-and-physics-informed-learning">Neural networks at the intersection of optimization and physics-informed learning</h2> <p>An active research direction, which connects back to the PINN post earlier in this series, uses neural networks <em>inside</em> the optimization loop for trajectory and control problems, not only as forward PDE solvers. Instead of parameterizing the control $u(t)$ at a fixed set of collocation nodes, as above, a small neural network $u_\theta(t)$ can represent the control as a smooth function of time, with the <em>network weights</em> as the optimization variables. A related line of work uses deep networks to approximate solutions of the Hamilton-Jacobi-Bellman equation and hence optimal feedback controls in high dimensions <a class="citation" href="#nakamura2021adaptive">(Nakamura-Zimmerer et al., 2021)</a>. These approaches are attractive for high-dimensional state spaces and for settings in which the dynamics are only partially known and must be learned from data along with the control, which is a different regime from the fully known dynamics solved by direct collocation above. The trade-offs mirror those in the PINN post: a more flexible representation and easier handling of high-dimensional state spaces, at the cost of the convergence guarantees that a well-posed classical collocation method provides when the dynamics are fully known. Understanding both approaches, and when each is appropriate, is more useful than treating either as a replacement for the other.</p> <h2 id="summary">Summary</h2> <ul> <li> <strong>Convexity is a provable, checkable property</strong> (for example, via the Hessian), and determining whether a problem is convex is one of the first steps in choosing a solution method: it separates a guaranteed global optimum from a possibly local one.</li> <li> <strong>Newton’s method converges much faster than gradient descent near a solution</strong> (quadratic versus linear convergence) by using curvature information, at the cost of an $O(d^3)$ Hessian solve per iteration, the same cost/benefit trade-off explored with the Sherman-Morrison formula in the first post of this series.</li> <li> <strong>L-BFGS obtains much of Newton’s benefit without forming the Hessian</strong>, by building an implicit low-rank approximation from recent gradient history using the same rank-update mathematics as the Sherman-Morrison acceleration technique.</li> <li> <strong>Direct collocation</strong> is the standard practical bridge from a continuous-time, infinite-dimensional control problem to a finite, numerically solvable one, turning the dynamics into equality constraints.</li> <li> <strong>A successful non-convex optimization run guarantees only a local optimum</strong>, so on problems that are not provably convex it is worth checking the result against multiple starting points or a known reference solution, as with the drag-free cost of 4.8 above.</li> </ul> <p>The <a href="/blog/2026/computational-fluid-dynamics_p10/">next post</a> turns to computational fluid dynamics.</p> <h2 id="references">References</h2> <p>The convexity theory and algorithms in Part A follow <a class="citation" href="#boyd2004convex">(Boyd &amp; Vandenberghe, 2004)</a> and <a class="citation" href="#nocedal2006numerical">(Nocedal &amp; Wright, 2006)</a>, with the L-BFGS method due to <a class="citation" href="#liu1989limited">(Liu &amp; Nocedal, 1989)</a>. The KKT optimality conditions trace back to <a class="citation" href="#karush1939minima">(Karush, 1939)</a> and <a class="citation" href="#kuhn1951nonlinear">(Kuhn &amp; Tucker, 1951)</a>. <a class="citation" href="#wright2015coordinate">(Wright, 2015)</a> offers a complementary perspective on first-order methods beyond plain gradient descent. The SLSQP algorithm used for trajectory optimization in Part B is due to <a class="citation" href="#kraft1988software">(Kraft, 1988)</a>, with <a class="citation" href="#betts2010practical">(Betts, 2010)</a> as a standard reference for direct collocation, and <a class="citation" href="#nakamura2021adaptive">(Nakamura-Zimmerer et al., 2021)</a> as an example of recent neural-network-based work on optimal control.</p> <ol class="bibliography"> <li><span id="boyd2004convex">Boyd, S., &amp; Vandenberghe, L. (2004). <i>Convex Optimization</i>. Cambridge University Press.</span></li> <li><span id="nocedal2006numerical">Nocedal, J., &amp; Wright, S. J. (2006). <i>Numerical Optimization</i> (2nd ed.). Springer.</span></li> <li><span id="liu1989limited">Liu, D. C., &amp; Nocedal, J. (1989). On the Limited Memory BFGS Method for Large Scale Optimization. <i>Mathematical Programming</i>, <i>45</i>(1), 503–528.</span></li> <li><span id="karush1939minima">Karush, W. (1939). <i>Minima of Functions of Several Variables with Inequality Constraints</i> [Master's thesis]. University of Chicago.</span></li> <li><span id="kuhn1951nonlinear">Kuhn, H. W., &amp; Tucker, A. W. (1951). Nonlinear Programming. <i>Proceedings of the Second Berkeley Symposium on Mathematical Statistics and Probability</i>, 481–492.</span></li> <li><span id="betts2010practical">Betts, J. T. (2010). <i>Practical Methods for Optimal Control and Estimation Using Nonlinear Programming</i> (2nd ed.). SIAM.</span></li> <li><span id="kraft1988software">Kraft, D. (1988). <i>A Software Package for Sequential Quadratic Programming</i> (No. DFVLR-FB 88-28; Issue DFVLR-FB 88-28). Institut für Dynamik der Flugsysteme, DFVLR.</span></li> <li><span id="nakamura2021adaptive">Nakamura-Zimmerer, T., Gong, Q., &amp; Kang, W. (2021). Adaptive Deep Learning for High-Dimensional Hamilton-Jacobi-Bellman Equations. <i>SIAM Journal on Scientific Computing</i>, <i>43</i>(2), A1221–A1247.</span></li> <li><span id="wright2015coordinate">Wright, S. J. (2015). Coordinate Descent Algorithms. <i>Mathematical Programming</i>, <i>151</i>(1), 3–34.</span></li> </ol> <hr> <p><em>Code:</em> the full script for the logistic regression optimizer comparison and the trajectory optimization example is available as <a href="/assets/code/optimization_p9.py"><code class="language-plaintext highlighter-rouge">optimization_p9.py</code></a>.</p> </div> </article> <br> <hr> <br> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoyed reading this article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <ul class="list-disc pl-7 my-3 space-y-2 marker:text-[var(--global-theme-color)]"> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/compact_finite_difference_kdv_p11/">Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/computational-fluid-dynamics_p10/">Computational Fluid Dynamics</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/bayesian-inference-inverse-problems_p8/">Bayesian Inference for Inverse Problems: Metropolis Sampling for Source Identification and Linear Regression</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/hpc-domain-decomposition_p7/">Domain Decomposition and Parallel Scaling for Wave Propagation: Amdahl, Gustafson and the Memory-Bandwidth Limit</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-deep-dive_p6/">A Hands-On Machine Learning Workflow: scikit-learn, XGBoost, TensorFlow/Keras and PyTorch on Benchmark Datasets</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/ml-toolkit-tour_p5/">Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and PyTorch</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/pinn-vs-classical-methods_p4/">Physics-Informed Neural Networks versus Adaptive Runge-Kutta: Accuracy and Cost on a Forced Linear ODE</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/uncertainty-quantification-surrogate-modeling_p3/">Polynomial Chaos Surrogates for Uncertainty Quantification: Legendre Projection versus Monte Carlo</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/stiff-odes-solver-stability_p2/">Stiffness and Absolute Stability: Explicit and Implicit Solvers on the Van der Pol Oscillator</a> </li> <li class="leading-relaxed"> <a class="underline decoration-1 hover:text-[var(--global-hover-color)]" href="/blog/2026/sherman-morrison-ode_p1/">Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation Modeling</a> </li> </ul> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Abel Okojunu. Built with <a href="https://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a> and <a href="https://github.com/alshedivat/al-folio" target="_blank" rel="noopener">al-folio</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "About",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog-posts",
+          title: "Blog Posts",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-teaching",
+          title: "Teaching",
+          description: "Course materials, schedules, and student resources.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-projects",
+          title: "Projects",
+          description: "Research and computational projects, with code and reproducible figures.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-resume",
+          title: "Resume",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/resume/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "Curriculum vitae",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-publications",
+          title: "Publications",
+          description: "Peer-reviewed articles and preprints, most recent first.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "dropdown-resume",
+              title: "Resume",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/resume/";
+              },
+            },{id: "dropdown-cv",
+              title: "CV",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/cv/";
+              },
+            },{id: "dropdown-blog-posts",
+              title: "Blog posts",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-reproducing-a-central-compact-finite-difference-scheme-for-the-korteweg-de-vries-equation",
+        
+          title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/compact_finite_difference_kdv_p11/";
+          
+        },
+      },{id: "post-optimization-gradient-newton-and-quasi-newton-methods-and-minimum-energy-trajectory-optimization",
+        
+          title: "Optimization: Gradient, Newton and Quasi-Newton Methods and Minimum-Energy Trajectory Optimization",
+        
+        description: "Gradient descent, Newton&#39;s method, and L-BFGS on convex logistic regression, followed by a minimum-energy trajectory solved by direct collocation and SLSQP.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/optimization-convex-to-trajectory_p9/";
+          
+        },
+      },{id: "post-computational-fluid-dynamics",
+        
+          title: "Computational Fluid Dynamics",
+        
+        description: "A  technical overview of CFD theory, numerical methods, a grid-convergence study, and a fully verified Python lid-driven cavity solver.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/computational-fluid-dynamics_p10/";
+          
+        },
+      },{id: "post-bayesian-inference-for-inverse-problems-metropolis-sampling-for-source-identification-and-linear-regression",
+        
+          title: "Bayesian Inference for Inverse Problems: Metropolis Sampling for Source Identification and Linear Regression...",
+        
+        description: "Bayes&#39; theorem, MAP estimation as ridge regression, and Metropolis sampling, applied to a synthetic wave-source inversion and the diabetes dataset.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/bayesian-inference-inverse-problems_p8/";
+          
+        },
+      },{id: "post-domain-decomposition-and-parallel-scaling-for-wave-propagation-amdahl-gustafson-and-the-memory-bandwidth-limit",
+        
+          title: "Domain Decomposition and Parallel Scaling for Wave Propagation: Amdahl, Gustafson and the Memory-Bandwidth...",
+        
+        description: "Domain decomposition for a 2D wave equation under MPI, with Amdahl and Gustafson scaling and laptop benchmarks showing memory-bandwidth limits.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/hpc-domain-decomposition_p7/";
+          
+        },
+      },{id: "post-a-hands-on-machine-learning-workflow-scikit-learn-xgboost-tensorflow-keras-and-pytorch-on-benchmark-datasets",
+        
+          title: "A Hands-On Machine Learning Workflow: scikit-learn, XGBoost, TensorFlow/Keras and PyTorch on Benchmark Datasets...",
+        
+        description: "Five runnable tutorials on public datasets with scikit-learn, XGBoost, TensorFlow, Keras and PyTorch, from baselines to training curves and error analysis.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-deep-dive_p6/";
+          
+        },
+      },{id: "post-matching-model-complexity-to-data-a-controlled-comparison-of-scikit-learn-xgboost-keras-and-pytorch",
+        
+          title: "Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and...",
+        
+        description: "Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ml-toolkit-tour_p5/";
+          
+        },
+      },{id: "post-physics-informed-neural-networks-versus-adaptive-runge-kutta-accuracy-and-cost-on-a-forced-linear-ode",
+        
+          title: "Physics-Informed Neural Networks versus Adaptive Runge-Kutta: Accuracy and Cost on a Forced Linear...",
+        
+        description: "A PINN and an adaptive RK45 solver are compared on a forced linear ODE with a known exact solution, measuring accuracy and wall-clock cost.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/pinn-vs-classical-methods_p4/";
+          
+        },
+      },{id: "post-polynomial-chaos-surrogates-for-uncertainty-quantification-legendre-projection-versus-monte-carlo",
+        
+          title: "Polynomial Chaos Surrogates for Uncertainty Quantification: Legendre Projection versus Monte Carlo",
+        
+        description: "A Legendre polynomial chaos surrogate for Runge&#39;s function, built by Gauss quadrature, matches million-sample Monte Carlo accuracy with 20 evaluations.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/uncertainty-quantification-surrogate-modeling_p3/";
+          
+        },
+      },{id: "post-stiffness-and-absolute-stability-explicit-and-implicit-solvers-on-the-van-der-pol-oscillator",
+        
+          title: "Stiffness and Absolute Stability: Explicit and Implicit Solvers on the Van der Pol...",
+        
+        description: "Why stiffness forces explicit ODE solvers to take tiny steps, shown through Dahlquist stability regions and an RK45 versus Radau benchmark on Van der Pol.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/stiff-odes-solver-stability_p2/";
+          
+        },
+      },{id: "post-accelerating-ode-solvers-with-the-sherman-morrison-formula-a-case-study-in-sustainable-aviation-modeling",
+        
+          title: "Accelerating ODE Solvers with the Sherman-Morrison Formula: A Case Study in Sustainable Aviation...",
+        
+        description: "Reusing one LU factorization via the Sherman-Morrison formula cuts implicit Euler cost from O(n^3) to O(n^2) per step, with benchmarks up to n = 640.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sherman-morrison-ode_p1/";
+          
+        },
+      },{id: "news-gold-medal-at-the-national-mathematics-competition-for-university-students",
+          title: 'Gold Medal at the National Mathematics Competition for University Students',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-selected-as-an-educationusa-opportunity-funds-scholar",
+          title: 'Selected as an EducationUSA Opportunity Funds Scholar',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_3/";
+            },},{id: "projects-central-compact-schemes-for-the-kdv-equation",
+          title: 'Central Compact Schemes for the KdV Equation',
+          description: "An open-source Python reproduction of the TDCCS third-derivative scheme (Salian, Samala &amp; Ghosh, 2026)",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/tdccs_kdv/";
+            },},{id: "teachings-mac-1140-precalculus-algebra",
+          title: 'MAC 1140 : Precalculus Algebra',
+          description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modeling, matrices and determinants, and sequences and series.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac1140-precalculus-algebra-fa23/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-fa24/";
+            },},{id: "teachings-mac-2311-calculus-with-analytic-geometry-i",
+          title: 'MAC 2311 : Calculus with Analytic Geometry I',
+          description: "The first course in the calculus sequence: limits and continuity, the derivative and its applications, and an introduction to the definite integral and antiderivatives.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2311-calculus-1-sp24/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-fa25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp25/";
+            },},{id: "teachings-mac-2313-calculus-with-analytic-geometry-iii",
+          title: 'MAC 2313 : Calculus with Analytic Geometry III',
+          description: "Multivariable calculus: vectors and alternative coordinate systems, differentiation and integration of functions of several variables, vector fields, and the classical integral theorems of vector calculus.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mac2313-calculus-3-sp26/";
+            },},{id: "teachings-mas-3105-applied-linear-algebra-i",
+          title: 'MAS 3105 : Applied Linear Algebra I',
+          description: "A first course in applied linear algebra: linear systems and matrix algebra through vector spaces, eigenvalue analysis, orthogonality and least squares, and the singular value decomposition.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/mas3105-applied-linear-algebra-su25/";
+            },},{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%61%62%65%6C%6F%6B%6F%6A%75%6E%75@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/abel-okojunu/", "_blank");
+        },
+      },{
+        id: 'social-orcid',
+        title: 'ORCID',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://orcid.org/0000-0002-5544-3402", "_blank");
+        },
+      },{
+        id: 'social-researchgate',
+        title: 'ResearchGate',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.researchgate.net/profile/Abel-Okojunu/", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/abelokoj", "_blank");
+        },
+      },{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/abel_okojunu_cv_updated_april_10th_2026.pdf", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.ratemyprofessors.com/professor/2931172", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>

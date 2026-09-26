@@ -259,7 +259,7 @@ plt.close(fig)
 # A simple 1D vehicle: position q(t), velocity v(t), control u(t) = thrust
 #   dq/dt = v,  dv/dt = u - k*v^2*sign(v)   (thrust minus quadratic drag)
 # Objective: reach target position q_f at time T with v(T)=0, minimizing
-# total fuel (integral of |u|), discretized via direct collocation.
+# a control-energy proxy for fuel (integral of u^2; see fuel_cost below), discretized via direct collocation.
 print("\n\nPART B: Minimum-fuel trajectory optimization")
 
 N_NODES = 60
