@@ -39,7 +39,7 @@ schedule:
 
   - week: "8–9"
     date: "Jul 2 – Jul 14"
-    topic: "Exam 02"
+    topic: "Midterm Exam 2"
     description: "Assessment"
 
   - week: "10"
@@ -60,9 +60,7 @@ schedule:
 
 ## Role
 
-Instructor of record, **Summer 2025** — classroom instruction, student mentoring,
-and assessment feedback. A coordinated multi-section course following a common
-departmental syllabus and shared assessments.
+Instructor of record, **Summer 2025**, responsible for classroom instruction, student mentoring, and assessment feedback. The course was coordinated across multiple sections, with a common departmental syllabus and shared assessments.
 
 ## Course Overview
 

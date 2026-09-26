@@ -1,0 +1,7 @@
+max_err=1.948e-11
+n=20 naive=0.01153 sm=0.01427 speedup=0.81
+n=40 naive=0.01917 sm=0.00713 speedup=2.69
+n=80 naive=0.03539 sm=0.00916 speedup=3.86
+n=160 naive=0.12452 sm=0.01698 speedup=7.33
+n=320 naive=0.62247 sm=0.02053 speedup=30.33
+n=640 naive=4.61661 sm=0.05411 speedup=85.31

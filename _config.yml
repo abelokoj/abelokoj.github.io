@@ -7,13 +7,11 @@ first_name: Abel
 middle_name: 
 last_name: Okojunu
 contact_note: >
-  Best way to reach me is by email at abelokojunu@gmail.com.
+  The best way to reach me is by email at <a href="mailto:abelokojunu@gmail.com">abelokojunu@gmail.com</a>.
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  Applied Mathematics, Scientific Computing, Machine Learning and AI.
+  Applied mathematics, scientific computing, machine learning, and AI.
 footer_text: >
-  Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
-  Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
-  Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
+  Built with <a href="https://jekyllrb.com/" target="_blank" rel="noopener">Jekyll</a> and <a href="https://github.com/alshedivat/al-folio" target="_blank" rel="noopener">al-folio</a>.
 keywords: jekyll, jekyll-theme, academic-website, portfolio-website # add your own keywords or leave empty
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: ⚛️ # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
@@ -220,6 +218,10 @@ kramdown:
 # Includes & excludes
 include: ["_pages"]
 exclude:
+  # Code, data and archives kept beside the project pages. Without this, Jekyll would publish every README.md / blog_post.md inside them as a stray project page and copy the .zip files to the site.
+  - _projects/tdccs_project/
+  - _projects/*.zip
+  - code/   # per-post working archive of scripts, data and figures (kept in git, not published)
   - al-folio-upgrade-report.md
   - bin/
   - CONTRIBUTING.md
@@ -345,8 +347,8 @@ display_categories: ["AI-ML", "CFD", "HPC", "Scientific-Computing", "Research", 
 # Jekyll Scholar
 # -----------------------------------------------------------------------------
 scholar:
-  last_name: [Einstein]
-  first_name: [Albert, A.]
+  last_name: [Okojunu]
+  first_name: [Abel, A.]
 
   style: apa
   locale: en
@@ -356,7 +358,20 @@ scholar:
   # bibliography_template: bib
   # source: ./_bibliography
   bibliography: blog_references.bib
-  bibliography_template: "{{reference}}"
+  # The APA style prints an entry's DOI and URL as plain text. This template wraps them in links. The DOI is handled first, and the URL is skipped when it is the same DOI address, so a link is never nested inside another.
+  bibliography_template: >-
+    {%- assign r = reference -%}
+    {%- assign d = "" -%}
+    {%- if entry.doi and entry.doi != "" -%}
+    {%- assign d = entry.doi | prepend: "https://doi.org/" -%}
+    {%- capture a -%}<a href="{{ d }}" target="_blank" rel="noopener">{{ d }}</a>{%- endcapture -%}
+    {%- assign r = r | replace: d, a -%}
+    {%- endif -%}
+    {%- if entry.url and entry.url != "" and entry.url != d -%}
+    {%- capture a -%}<a href="{{ entry.url }}" target="_blank" rel="noopener">{{ entry.url }}</a>{%- endcapture -%}
+    {%- assign r = r | replace: entry.url, a -%}
+    {%- endif -%}
+    {{- r -}}
   # Note: if you have latex math in your bibtex, the latex filter
   # preprocessing may conflict with MathJAX if the latter is enabled.
   # See https://github.com/alshedivat/al-folio/issues/357.
@@ -419,7 +434,7 @@ max_author_limit: 3 # leave blank to always show all authors
 more_authors_animation_delay: 10 # more authors are revealed on click using animation; smaller delay means faster animation
 
 # Enables publication thumbnails. If disabled, none of the publications will display thumbnails, even if specified in the bib entry.
-enable_publication_thumbnails: true
+enable_publication_thumbnails: false
 
 # -----------------------------------------------------------------------------
 # Jekyll Link Attributes

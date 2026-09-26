@@ -1,0 +1,2 @@
+classical_time_ms=62.6585 classical_err=3.328e-10
+pinn_time_ms=2960.4889 pinn_err=1.483e-02 pinn_iters=338

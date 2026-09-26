@@ -1,2 +1,18 @@
+# Store all text files with LF line endings in the repository, whatever the
+# editor or OS (Windows editors and OneDrive can introduce CRLF). This keeps
+# diffs clean and stops workflow files from appearing modified.
+* text=auto eol=lf
 # Force LF line endings, needed for Docker to work on Windows
 *.sh text eol=lf
+# Binary files: never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+*.npz binary
+*.mp4 binary

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jekyll-dev",
+      "runtimeExecutable": "bundle",
+      "runtimeArgs": ["exec", "jekyll", "serve", "--baseurl", "", "--livereload", "--force_polling"],
+      "port": 4000,
+      "autoPort": false
+    }
+  ]
+}

@@ -15,3 +15,15 @@ node_modules/
 output/playwright/
 test-results/
 vendor
+__pycache__/
+*.pyc
+
+# Local working notes (never pushed)
+_changelog.md
+_todo.md
+
+# Benchmark scratch output
+assets/code/bench_p7_quick.json
+
+# Private notes (never pushed)
+_private/
