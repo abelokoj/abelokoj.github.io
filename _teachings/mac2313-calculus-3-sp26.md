@@ -75,9 +75,7 @@ schedule:
 
 ## Role
 
-Instructor of record, **Spring 2026** — classroom instruction, student mentoring,
-and assessment feedback. A coordinated multi-section course following a common
-departmental syllabus and shared assessments.
+Instructor of record, **Spring 2026**, responsible for classroom instruction, student mentoring, and assessment feedback. The course was coordinated across multiple sections, with a common departmental syllabus and shared assessments.
 
 ## Course Overview
 

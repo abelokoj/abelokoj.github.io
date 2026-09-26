@@ -29,6 +29,7 @@ toc:
 
 _styles: >
   .citation { color: var(--global-theme-color); }
+published: true
 ---
 <!-- # Computational Fluid Dynamics: Foundations, Methods, and a Verified Solver -->
 
@@ -511,3 +512,5 @@ For a stronger dissertation-adjacent portfolio piece, consider layering on:
 ---
 
 *Article prepared for a GitHub Pages academic portfolio. The solver above was executed end-to-end in a Python 3 environment, passed all built-in physical sanity checks at Re = 100, and its grid-convergence behavior was independently verified across four mesh resolutions.*
+
+*Full code for the solver and figures in this post is available in [`cavity_flow_p10.py`]({{ '/assets/code/cavity_flow_p10.py' | relative_url }}).*

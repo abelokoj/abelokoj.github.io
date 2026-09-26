@@ -1,26 +1,28 @@
 ---
 layout: post
-title: "A Comparative Evaluation of Modern ML Libraries: scikit-learn, XGBoost, TensorFlow/Keras, and PyTorch on a Common Problem"
+title: "Matching Model Complexity to Data: A Controlled Comparison of scikit-learn, XGBoost, Keras and PyTorch"
 date: 2026-03-03
 tags: [machine-learning, deep-learning, scikit-learn, xgboost, tensorflow, keras, pytorch]
 giscus_comments: true
-published: false
+published: true
+description: Four ML libraries on one tabular dataset, one split and fixed seeds, showing when a 31-parameter logistic regression beats ensembles and neural networks.
+# edited: true
 ---
 
-> **A note on scope.** Every section of this post is **executed and verified**. All five tools were run in a single process, using a single train/test split of the same dataset, with seeds held fixed throughout, so the numbers reported below are directly comparable rather than assembled from separate runs. An earlier version of this post could execute only the scikit-learn section, and the remaining four were presented as reference implementations; that limitation no longer applies, and every figure quoted here comes from a measured run.
+> **How the numbers were produced.** All four libraries were run in a single process on one train/test split of the same dataset, with every random seed fixed, so the results below are directly comparable. The script that produced them is linked at the end of the post.
 
 ## Motivation
 
-"Machine learning" denotes not a single tool but a spectrum of methods, and one of the more useful capabilities an applied mathematician brings to a machine learning team is judgment about *where on that spectrum a given problem lies*, rather than applying the same deep architecture regardless of the data at hand. This post is organized around that principle: one dataset, one problem, and five tools, so that the comparison concerns the *methods* rather than assembling unrelated examples that cannot be compared directly.
+Machine learning is not a single tool but a spectrum of methods, and one of the more useful things an applied mathematician brings to a machine learning team is judgment about *where on that spectrum a given problem lies*, instead of applying the same deep architecture whatever the data. This post is organized around that principle: one dataset, one problem and four libraries, so that the comparison is between *methods* and not between unrelated examples.
 
-The five tools divide naturally into two families:
+The four libraries fall into two families:
 
-- **scikit-learn** and **XGBoost** {% cite pedregosa2011scikit %}{% cite chen2016xgboost %} represent classical statistical learning: linear models, kernel methods, and ensembles of decision trees. These are convex or near-convex optimization problems with strong theoretical validations, fast to train, and, as demonstrated below, often difficult to outperform on small-to-medium tabular data.
-- **TensorFlow/Keras** and **PyTorch** {% cite abadi2016tensorflow %}{% cite chollet2015keras %}{% cite paszke2019pytorch %} represent deep learning: differentiable function approximators trained by stochastic gradient descent and backpropagation, which become advantageous on high-dimensional, unstructured data such as images, text, and audio, or on genuinely big datasets.
+- **scikit-learn** and **XGBoost** {% cite pedregosa2011scikit %}{% cite chen2016xgboost %} represent classical statistical learning: linear models, kernel methods, and ensembles of decision trees. Their training problems are convex or close to it, they are well understood theoretically and fast to fit, and, as the results below show, they are often hard to beat on small and medium-sized tabular data.
+- **TensorFlow/Keras** and **PyTorch** {% cite abadi2016tensorflow %}{% cite chollet2015keras %}{% cite paszke2019pytorch %} represent deep learning: differentiable function approximators trained by stochastic gradient descent and backpropagation, which pay off on high-dimensional, unstructured data such as images, text and audio, or on very large datasets.
 
 ## The running example
 
-To ensure comparability, every tool below solves the **same problem**: binary classification on the Breast Cancer Wisconsin (Diagnostic) dataset {% cite wolberg1995breast %}, comprising 569 samples and 30 real-valued features derived from digitized images of fine needle aspirate biopsies, labeled malignant or benign. It is a useful dataset for this comparison precisely because it is small, tabular, and well-separated, which is the regime in which the reflex to apply a neural network warrants scrutiny.
+Every library below solves the **same problem**: binary classification on the Breast Cancer Wisconsin (Diagnostic) dataset {% cite wolberg1995breast %}, comprising 569 samples and 30 real-valued features derived from digitized images of fine needle aspirate biopsies, labeled malignant or benign. It suits this comparison because it is small, tabular and well separated, which is exactly the regime in which the reflex to reach for a neural network deserves scrutiny.
 
 $$
 \mathbf{x} \in \mathbb{R}^{30}, \qquad y \in \{0, 1\} \ (\text{malignant}=0,\ \text{benign}=1).
@@ -28,7 +30,7 @@ $$
 
 ## Part 1: Classical ML with scikit-learn
 
-The principal strength of scikit-learn lies less in any single algorithm than in its **consistent interface**: every estimator implements `fit`/`predict`, every preprocessing step composes into a `Pipeline`, and cross-validation, metrics, as well as hyperparameter search interoperate cleanly regardless of which model is substituted. That uniformity is what reduces a fair four-way model comparison to a few dozen lines of code rather than four separate bespoke training scripts.
+The main strength of scikit-learn is less any single algorithm than its **consistent interface**: every estimator implements `fit` and `predict`, every preprocessing step composes into a `Pipeline`, and cross-validation, metrics and hyperparameter search work the same way whichever model is plugged in. That uniformity reduces a fair four-way comparison to a few dozen lines of code instead of four bespoke training scripts.
 
 ```python
 from sklearn.datasets import load_breast_cancer
@@ -37,6 +39,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
 data = load_breast_cancer()
@@ -53,7 +56,8 @@ models = {
     ]),
     "SVM (RBF kernel)": Pipeline([
         ("scale", StandardScaler()),
-        ("clf", SVC(kernel="rbf", probability=True, random_state=42)),
+        ("clf", CalibratedClassifierCV(SVC(kernel="rbf", random_state=42),
+                                       ensemble=False)),
     ]),
     "Random Forest": Pipeline([
         ("clf", RandomForestClassifier(n_estimators=300, random_state=42)),
@@ -65,11 +69,11 @@ models = {
 }
 ```
 
-The tree-based models (`RandomForestClassifier`, `GradientBoostingClassifier`) omit the `StandardScaler` step: splitting decisions in a decision tree are independent of monotonic feature rescaling, so standardization confers no benefit there, whereas it is essential for the distance- as well as gradient-based methods (SVM, logistic regression), whose objective functions are not scale-invariant.
+The tree-based models omit the `StandardScaler` step. A decision tree's splits are unaffected by monotonic rescaling of a feature, so standardization gains nothing there, whereas it is essential for the SVM and logistic regression, whose objectives are not scale-invariant.
 
 ### Cross-validated comparison
 
-Running stratified 5-fold cross-validation on the training set:
+Stratified 5-fold cross-validation on the training set gives:
 
 ```
 5-fold cross-validation on training set:
@@ -93,41 +97,39 @@ Gradient Boosting      test_acc=0.9580  test_auc=0.9929
   <img src="/assets/img/posts/roc_curves_p5.svg" alt="ROC curves for four classical ML models" style="width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 1: ROC curves on the held-out test set. All four models separate the classes well (AUC $>0.99$ for the top two), which is insightful in itself: this dataset is nearly linearly separable in its 30-dimensional feature space, so the simplest model in the comparison, logistic regression, performs best.*
+*Figure 1: ROC curves on the held-out test set. All four models separate the classes well, with test AUC between 0.993 and 0.998. The best of them is the simplest: logistic regression.*
 
-This result merits attention rather than being passed over. **The simplest model considered, plain logistic regression, achieves the best test-set AUC as well as accuracy**, exceeding both tree ensembles. This outcome is not an artifact of the particular random seed; it shows a structural property of the data, namely that the classes are nearly linearly separable once the features are standardized. It also indicates that a more flexible model is not necessarily a better one: flexibility that is not required adds variance without any corresponding reduction in bias. Formally, for a hypothesis class $\mathcal{H}$ with expected test error decomposed as $\mathbb{E}[(\hat{f}(x) - f(x))^2] = \text{Bias}^2 + \text{Variance} + \sigma^2$, adding capacity beyond what the true decision boundary requires can reduce bias only at the cost of variance; if the boundary is already close to linear, that exchange yields no net benefit.
+This result deserves attention. **The simplest model in the comparison, plain logistic regression, has the best test AUC and the best test accuracy**, ahead of both tree ensembles, and it also leads in cross-validation, so it is not an accident of one split. It reflects a property of the data: once the features are standardized, the two classes are close to linearly separable. It also shows that a more flexible model is not automatically a better one, since flexibility the problem does not need adds variance without reducing bias. Formally, for a hypothesis class $\mathcal{H}$ with expected test error decomposed as $\mathbb{E}[(\hat{f}(x) - f(x))^2] = \text{Bias}^2 + \text{Variance} + \sigma^2$, adding capacity beyond what the true decision boundary requires can reduce bias only at the cost of variance; if the boundary is already close to linear, that exchange yields no net benefit.
 
-### The source of the model's discriminative signal
+### Where the signal comes from
 
 <p align="center">
   <img src="/assets/img/posts/feature_importance_p5.svg" alt="Random Forest variable importance bar chart" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 2: Random Forest feature importances (mean decrease in impurity), top 12 of 30 features. A small number of features, specifically cell-nucleus size and shape irregularity measures, dominate the model's decisions, consistent with the clinical literature on this diagnostic task.*
+*Figure 2: Random Forest feature importances (mean decrease in impurity), top 12 of 30 features. A handful of features, all measures of cell-nucleus size and of the irregularity of its outline, dominate the model's decisions.*
 
-Plots that display variable importance of this kind are among the genuine advantages that classical tree-based methods retain over deep networks on tabular data: the basis for a prediction is available at negligible additional cost, computed as a byproduct of training rather than requiring a separate post hoc interpretability method.
+Importance scores of this kind are one of the real advantages tree ensembles keep over deep networks on tabular data: they come almost free as a by-product of training, with no separate post hoc interpretability method.
 
 <p align="center">
   <img src="/assets/img/posts/confusion_matrix_p5.svg" alt="Confusion matrix for logistic regression on the held-out test set" style="width: 100%; max-width: 460px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 3: Confusion matrix for logistic regression, the best model by test AUC, on the 143 held-out samples. Two misclassifications in total: one malignant case predicted benign, and one benign case predicted malignant. The errors are symmetric, which is not something the accuracy figure alone conveys, and in a diagnostic setting, the two are not equally costly.*
+*Figure 3: Confusion matrix for logistic regression, the best model by test AUC, on the 143 held-out samples. Two misclassifications in total: one malignant case predicted benign, and one benign case predicted malignant. The errors are symmetric, which the accuracy figure alone does not show, and in a diagnostic setting the two kinds of error are not equally costly.*
 
-One implementation detail in the code above is worth drawing out, because it concerns a step that is easy to apply without noticing. A support vector machine produces decision-function values rather than probabilities, so the ROC curve of Figure 1 requires a calibration step to convert them. The pipeline uses `CalibratedClassifierCV(SVC(), ensemble=False)`, which explicitly fits that conversion. The older route was to pass `probability=True` to `SVC`, which performs the same Platt scaling internally; scikit-learn deprecated it in version 1.9 and removed it in 1.11.
+One implementation detail in the code above is easy to pass over. A support vector machine outputs decision-function values, not probabilities, so drawing its ROC curve requires a calibration step to convert them. The pipeline uses `CalibratedClassifierCV(SVC(), ensemble=False)`, which fits that conversion explicitly. The older route was `SVC(probability=True)`, which performs the same Platt scaling internally; scikit-learn deprecated it in version 1.9 and will remove it in 1.11, and recommends this replacement.
 
-The two yield the same AUC to four decimal places, as expected: AUC depends only on the ranking of the scores, and any monotone recalibration leaves that ranking unchanged. Threshold-dependent metrics do vary slightly, since the two fit their sigmoid on different internal folds, and a few borderline cases cross the $p=0.5$ boundary as a result. Cross-validated accuracy moves from $0.9671$ to $0.9718$ and F1 from $0.9740$ to $0.9776$; test-set accuracy is unchanged at $0.9790$. The distinction between rank-based and threshold-based metrics is a small but useful point to keep in mind when comparing models with differently calibrated scores.
+The two yield the same AUC to four decimal places, as expected: AUC depends only on the ranking of the scores, and any monotone recalibration leaves that ranking unchanged. Threshold-dependent metrics do vary slightly, since the two fit their sigmoid on different internal folds, and a few borderline cases cross the $p=0.5$ boundary as a result. Cross-validated accuracy moves from $0.9671$ to $0.9718$ and F1 from $0.9740$ to $0.9776$; test-set accuracy is unchanged at $0.9790$. The distinction between rank-based and threshold-based metrics is worth keeping in mind whenever models with differently calibrated scores are compared.
 
 ## Part 2: Gradient boosting at scale with XGBoost
 
-*(Executed and verified.)*
-
-The `GradientBoostingClassifier` of scikit-learn used above is a legitimate gradient boosting implementation {% cite friedman2001greedy %}, but **XGBoost** {% cite chen2016xgboost %}, together with its close relatives LightGBM and CatBoost, improved on it in ways that established gradient-boosted trees as the dominant method in tabular-data competitions, Kaggle in particular, for much of a decade. The mathematical distinction merits a precise statement. Where classical gradient boosting fits each new tree to the *negative gradient* of the loss, a first-order, steepest-descent-style step, XGBoost fits each tree using a **second-order Taylor expansion** of the loss function around the current prediction,
+The `GradientBoostingClassifier` of scikit-learn used above is a legitimate gradient boosting implementation {% cite friedman2001greedy %}, but **XGBoost** {% cite chen2016xgboost %}, like its relatives LightGBM and CatBoost, improves on it in ways that made gradient-boosted trees the standard choice for tabular prediction. The mathematical difference is worth stating precisely. Where classical gradient boosting fits each new tree to the *negative gradient* of the loss, a first-order, steepest-descent-style step, XGBoost fits each tree using a **second-order Taylor expansion** of the loss function around the current prediction,
 
 $$
 \mathcal{L}^{(t)} \approx \sum_{i=1}^n \left[ g_i f_t(x_i) + \tfrac{1}{2} h_i f_t(x_i)^2 \right] + \Omega(f_t),
 $$
 
-where $g_i = \partial_{\hat{y}} \ell(y_i, \hat{y}^{(t-1)})$ and $h_i = \partial^2_{\hat{y}} \ell(y_i, \hat{y}^{(t-1)})$ are the first and second derivatives of the loss with respect to the current prediction. The procedure amounts to Newton's method applied tree by tree, rather than plain gradient descent. The regularization term $\Omega(f_t)$ penalizes tree complexity, specifically the number of leaves as well as the magnitude of leaf weights, directly in the objective, which accounts for the characteristic resistance of XGBoost's trees to overfitting relative to earlier boosting implementations.
+where $g_i = \partial_{\hat{y}} \ell(y_i, \hat{y}^{(t-1)})$ and $h_i = \partial^2_{\hat{y}} \ell(y_i, \hat{y}^{(t-1)})$ are the first and second derivatives of the loss with respect to the current prediction. The procedure is Newton's method applied tree by tree, in place of plain gradient descent. The regularization term $\Omega(f_t)$ penalizes tree complexity, specifically the number of leaves as well as the magnitude of leaf weights, directly in the objective, which is a large part of why XGBoost overfits less readily than earlier boosting implementations.
 
 ```python
 import xgboost as xgb
@@ -154,19 +156,16 @@ model = xgb.XGBClassifier(
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 cv_auc = cross_val_score(model, X_train, y_train, cv=cv, scoring="roc_auc")
-print(f"XGBoost CV AUC: {cv_auc.mean():.4f} ± {cv_auc.std():.4f}")
+print(f"XGBoost CV AUC: {cv_auc.mean():.4f} +/- {cv_auc.std():.4f}")
 
-model.fit(
-    X_train, y_train,
-    eval_set=[(X_test, y_test)],
-    verbose=False,
-)
+# No eval_set: the test set is touched once, for the final score only.
+model.fit(X_train, y_train, verbose=False)
 y_prob = model.predict_proba(X_test)[:, 1]
 y_pred = model.predict(X_test)
 print(f"Test accuracy: {accuracy_score(y_test, y_pred):.4f}")
 print(f"Test ROC-AUC:  {roc_auc_score(y_test, y_prob):.4f}")
 
-# Feature significance, directly comparable to the Random Forest plot above
+# Feature importance, directly comparable to the Random Forest plot above
 xgb.plot_importance(model, max_num_features=12, importance_type="gain")
 ```
 
@@ -176,24 +175,22 @@ Test accuracy: 0.9720
 Test ROC-AUC:  0.9950
 ```
 
-The measured result confirms the expectation, and rather more sharply than anticipated. XGBoost's test AUC of $0.9950$ places it above scikit-learn's `GradientBoostingClassifier` ($0.9929$) and its own Random Forest ($0.9949$), which is consistent with the ordering predicted by the literature. But it remains **below plain logistic regression** ($0.9977$), and its test accuracy of $0.9720$ is likewise below logistic regression's $0.9860$. The second-order updates and built-in regularization are doing real work compared with other tree ensembles; they are not enough to overcome the fact that this dataset is nearly linearly separable.
+XGBoost's test AUC of $0.9950$ is slightly above scikit-learn's `GradientBoostingClassifier` ($0.9929$) and level with the Random Forest ($0.9949$; a difference of $10^{-4}$ is noise on 143 test samples). Its test accuracy of $0.9720$ is 1.4 points above both ensembles, which on this test set is two samples. It remains **below plain logistic regression** ($0.9977$), and its test accuracy of $0.9720$ is likewise below logistic regression's $0.9860$. The second-order updates and built-in regularization do real work relative to the other tree ensembles, but they cannot change the fact that this dataset is nearly linearly separable.
 
-The top features by gain, shown in Figure 4, are `worst radius` ($22.09$) and `worst perimeter` ($22.04$), followed by `worst concave points` ($14.34$) and `mean concave points` ($11.77$). These are the same quantities the Random Forest ranked highest, which is reassuring: two different ensemble algorithms, with different splitting criteria and different regularization, agree on which measurements carry the diagnostic signal.
+The top features by gain, shown in Figure 4, are `worst radius` ($22.09$) and `worst perimeter` ($22.04$), followed by `worst concave points` ($14.34$) and `mean concave points` ($11.77$). These are the same quantities the Random Forest ranked highest: two different ensemble algorithms, with different splitting criteria and different regularization, agree on which measurements carry the diagnostic signal.
 
 <p align="center">
   <img src="/assets/img/posts/xgb_importance_p5.svg" alt="XGBoost feature impact by gain, top 12 features" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 4: XGBoost feature importances by gain, top 12 of 30, measured as the average improvement in the objective across every split that used the feature. The ordering closely agrees with the Random Forest ranking in Figure 2, which is the substantive point: two ensembles with different splitting criteria and different regularization identify the same measurements as carrying the diagnostic signal. The two rankings are not identical, and the disagreement offers useful information. XGBoost places `worst radius` first at $22.09$, where the Random Forest places it fifth, and demotes `worst area` from second to sixth. Radius, perimeter, and area are close to functionally dependent for a roughly convex shape, so the three carry largely the same information; which of them a given ensemble credits is partly a matter of which happened to be selected first at a split, and the split ordering is not the same under mean-decrease-in-impurity as it is under gain.*
+*Figure 4: XGBoost feature importances by gain, top 12 of 30, measured as the average improvement in the objective over every split that used the feature. The ordering closely matches the Random Forest ranking in Figure 2. Where the two rankings differ, the difference is informative. XGBoost places `worst radius` first at $22.09$, where the Random Forest places it fifth, and demotes `worst area` from second to sixth. Radius, perimeter, and area are close to functionally dependent for a roughly convex shape, so the three carry largely the same information; which of them a given ensemble credits is partly a matter of which happened to be selected first at a split, and the split ordering is not the same under mean-decrease-in-impurity as it is under gain.*
 
 
-Based on the documented behavior of XGBoost relative to plain gradient boosting in the literature, its accuracy would be expected to fall within a range similar to the scikit-learn `GradientBoostingClassifier` result above on a dataset of this size and cleanliness, and it does. Its substantive advantages, namely built-in regularization, second-order updates, native handling of missing values, and substantially faster training through histogram-based split-finding, become apparent more decisively on **larger, noisier, higher-dimensional** tabular datasets. On a 569-row, well-separated dataset, XGBoost, scikit-learn's gradient boosting, and plain logistic regression may all fall within one or two percentage points of one another; the dataset is simply not large or complex enough to exhibit the advantages of XGBoost.
+On a dataset this small and clean, the differences among the tree ensembles amount to one or two test samples. Each sample is $0.7$ percentage points of test accuracy here, so small gaps should not be read as rankings. Its real advantages (built-in regularization, second-order updates, native handling of missing values and much faster histogram-based split finding) show more decisively on **larger, noisier, higher-dimensional** tabular data {% cite shwartzziv2022tabular %}. With 569 well-separated rows there is simply not enough difficulty for them to matter.
 
 ## Part 3: Deep learning with TensorFlow/Keras
 
-*(Executed and verified.)*
-
-The core departure of deep learning from the methods above rests in its architecture. Rather than selecting a fixed model family, such as a line, a kernel expansion, or an ensemble of trees, and fitting its parameters, layers are composed into an arbitrarily flexible function approximator, and stochastic gradient descent, implemented through backpropagation, determines the parameters. Keras {% cite chollet2015keras %}, now the official high-level API of TensorFlow {% cite abadi2016tensorflow %}, renders this composition close to declarative:
+Deep learning departs from the methods above in its architecture. Instead of choosing a fixed model family (a hyperplane, a kernel expansion, an ensemble of trees) and fitting its parameters, layers are composed into a flexible function approximator whose parameters are found by stochastic gradient descent through backpropagation. Keras {% cite chollet2015keras %}, the high-level API of TensorFlow {% cite abadi2016tensorflow %}, makes that composition almost declarative:
 
 ```python
 import tensorflow as tf
@@ -240,9 +237,9 @@ print(f"Test accuracy: {test_acc:.4f}, Test AUC: {test_auc:.4f}")
 ```
 
 ```
-epochs actually run: 49 of 100
-best val_loss epoch: 39  (weights restored to this)
-Test accuracy: 0.9720, Test AUC: 0.9950
+epochs actually run: 100 of 100
+best val_loss epoch: 95  (weights restored to this)
+Test accuracy: 0.9720, Test AUC: 0.9937
 trainable params: 1537
 ```
 
@@ -250,30 +247,29 @@ trainable params: 1537
   <img src="/assets/img/posts/keras_training_p5.svg" alt="Keras training and validation loss and accuracy against epoch" style="width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 5: Keras training history. The dashed line marks epoch 39, where validation loss reached its minimum, and to which the weights were restored. Both curves have flattened well before that point, and validation accuracy is effectively constant from about epoch 10 onward. Validation loss sits below training loss throughout, which is the expected consequence of dropout: it is active during training and disabled at evaluation, so the model is scored in a slightly stronger configuration than the one being fitted.*
+*Figure 5: Keras training history. The dashed line marks epoch 95, where validation loss reached its minimum. Both losses fall steeply over the first 20 epochs and then decline slowly for the rest of the run, so early stopping never triggers within the 100-epoch limit. Validation loss sits below training loss throughout, the expected effect of dropout: it is active during training and disabled at evaluation, so the model is scored in a slightly stronger configuration than the one being fitted.*
 
-Early stopping halted training after 49 of the permitted 100 epochs, restoring the weights from epoch 39. The behavior is worth recording because it indicates that the network had finished learning: validation loss reached its minimum at epoch 39 and failed to improve over the following ten, which is what the patience setting is there to detect. The network has 1,537 trainable parameters, compared with 569 samples in the full dataset and 426 in the training split, roughly 3 parameters per training example.
+The network has 1,537 trainable parameters, against 426 training samples, roughly 3.6 parameters per example. In this run it used all 100 permitted epochs, with its best validation loss at epoch 95: validation loss was still drifting down, very slowly, so the patience-10 rule never fired. The run is reproducible (seeds fixed, deterministic TensorFlow kernels), but the exact epoch counts depend on the library build; an earlier run under a different TensorFlow installation stopped at epoch 49 with essentially the same test scores. The accuracy is what matters here, and it is stable.
 
-Several points merit explicit mathematical statement:
+Three points are worth stating precisely:
 
 - **The loss.** Binary cross-entropy is the negative log-likelihood under a Bernoulli model of the labels, $\mathcal{L} = -\frac{1}{n}\sum_i \left[y_i \log \hat{y}_i + (1-y_i)\log(1-\hat{y}_i)\right]$, which is the same objective that logistic regression minimizes. The network here is, in a precise sense, a nonlinear generalization of the logistic regression model from Part 1, with the sigmoid output layer serving the same role.
-- **Dropout** {% cite srivastava2014dropout %} (`Dropout(0.3)`) randomly zeroes $30\%$ of the hidden units at each training step, preventing the network from depending on any single neuron. This regularization strategy plays a role broadly analogous to the leaf-weight penalty of XGBoost above, although the mechanism, namely prevention of stochastic co-adaptation as against an explicit norm penalty, differs substantially.
-- **Early stopping** halts training once validation loss ceases to improve, functioning as both a regularizer and a means of reducing compute. It is conceptually similar to limiting `n_estimators` in tree ensembles, but is tuned automatically based on held-out performance rather than being fixed in advance.
+- **Dropout** {% cite srivastava2014dropout %} (`Dropout(0.3)`) randomly zeroes $30\%$ of the hidden units at each training step, preventing the network from depending on any single neuron. It plays a role similar to XGBoost's leaf-weight penalty, though by a different mechanism: it prevents co-adaptation of units stochastically, where XGBoost adds an explicit norm penalty.
+- **Early stopping** halts training once validation loss stops improving, which both regularizes the model and saves compute. It is conceptually similar to limiting `n_estimators` in tree ensembles, but is set automatically from held-out performance instead of being fixed in advance.
 
-The verified numbers make the central comparison concrete. The network reaches a test AUC of $0.9950$ and accuracy of $0.9720$, identical to XGBoost to four decimal places on both metrics, and below logistic regression on both. A 1,537-parameter network trained for 49 epochs, with dropout and early stopping, has arrived at precisely the same place as a 31-parameter linear model fitted in a fraction of a second.
+The results make the central comparison concrete. The network reaches a test accuracy of $0.9720$ and a test AUC of $0.9937$, both below logistic regression. All AUCs in this post are computed the same way, with scikit-learn's exact `roc_auc_score`; Keras's built-in `metrics.AUC` is a 200-bin approximation and reports a slightly different figure. A 1,537-parameter network trained for 100 epochs with dropout has arrived just short of a 31-parameter linear model fitted in a fraction of a second.
 
-This is the point of the exercise. Deep learning is not underperforming here due to misconfiguration; the architecture and model training procedure are sound, and the early-stopping behavior shows that the regularization is working as intended. The dataset is simply small, tabular, and nearly linearly separable; in that regime, a linear decision boundary is very nearly the correct hypothesis. Additional capacity has nothing left to fit.
+This is the point of the exercise. The network is not underperforming because it is misconfigured: the architecture and training procedure are sound, and early stopping shows the regularization working as intended. The dataset is small, tabular and nearly linearly separable, so a linear decision boundary is already very nearly the right hypothesis, and extra capacity has nothing left to fit.
 
 ## Part 4: The same network in PyTorch
 
-*(Executed and verified.)*
-
-Comparing the identical architecture implemented in PyTorch {% cite paszke2019pytorch %} with the Keras version above is instructive, because the remaining differences, once syntax is set aside, indicate when each framework is the more appropriate choice.
+Implementing the identical architecture in PyTorch {% cite paszke2019pytorch %} is instructive, because once syntax is set aside, the differences that remain show when each framework is the better choice.
 
 ```python
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -312,19 +308,21 @@ model = BreastCancerNet()
 criterion = nn.BCEWithLogitsLoss()   # combines sigmoid + BCE for numerical stability
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-best_val_loss = float("inf")
-patience, patience_ctr = 10, 0
 n_train = int(0.8 * len(X_train_t))
 X_tr, X_val = X_train_t[:n_train], X_train_t[n_train:]
 y_tr, y_val = y_train_t[:n_train], y_train_t[n_train:]
 
+# Minibatches of 32, as in the Keras model: roughly 11 optimizer steps per epoch.
+loader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=32, shuffle=True)
+
+best_val_loss, patience, patience_ctr = float("inf"), 10, 0
 for epoch in range(100):
     model.train()
-    optimizer.zero_grad()
-    logits = model(X_tr)
-    loss = criterion(logits, y_tr)
-    loss.backward()
-    optimizer.step()
+    for xb, yb in loader:
+        optimizer.zero_grad()
+        loss = criterion(model(xb), yb)
+        loss.backward()
+        optimizer.step()
 
     model.eval()
     with torch.no_grad():
@@ -345,70 +343,66 @@ test_auc = roc_auc_score(y_test, test_prob)
 print(f"Test AUC: {test_auc:.4f}")
 ```
 
+The script trains this network twice: once exactly as above, and once with the inner loop replaced by a single full-batch step per epoch (`model(X_tr)` on the whole training tensor), which is how the loop is often first written.
+
 ```
-epochs actually run: 100 of 100
-best val_loss epoch: 100  (weights restored to this)
-Test AUC: 0.9943
-Test accuracy: 0.9510
+[full batch] epochs run: 100 of 100, best val_loss epoch: 100, optimizer steps: 100
+[full batch] Test accuracy: 0.9510, Test AUC: 0.9943
+[minibatch (32)] epochs run: 76 of 100, best val_loss epoch: 66, optimizer steps: 836
+[minibatch (32)] Test accuracy: 0.9580, Test AUC: 0.9935
 trainable params: 1537
 ```
 
 <p align="center">
-  <img src="/assets/img/posts/pytorch_training_p5.svg" alt="PyTorch training and validation loss against epoch, still decreasing at the epoch limit" style="width: 100%; max-width: 560px; height: auto; display: block; margin: 0 auto;">
+  <img src="/assets/img/posts/pytorch_training_p5.svg" alt="PyTorch training and validation loss for full-batch and minibatch training" style="width: 100%; max-width: 760px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 6: PyTorch training history, and the clearest evidence in this post that the run did not converge. Compare the shape against Figure 5. The Keras curves flatten by epoch 20, and the run halts at 49; here, both curves are still descending steeply at epoch 100, where the dashed line marks not a detected minimum but the epoch ceiling. Validation loss is roughly $0.10$ and still falling, compared to about $0.025$ for the converged Keras model. Training and validation curves also remain almost coincident throughout, indicating that the model has not yet begun to fit the training set preferentially, which is the opposite of the overfitting pattern that early stopping exists to catch.*
+*Figure 6: PyTorch training histories. Left, full-batch training: one optimizer step per epoch, and both losses are still falling in a straight line at the 100-epoch limit, with validation loss near $0.10$. Right, minibatches of 32: the loss drops below $0.05$ within about 20 epochs, early stopping fires at epoch 76, and the best validation loss (dashed line, epoch 66) is about $0.02$.*
 
-The number of parameters confirms that the two networks are identical: 1,537 trainable weights in both, as they must be for a $30 \rightarrow 32 \rightarrow 16 \rightarrow 1$ architecture. Yet the PyTorch model records the lowest accuracy of any method examined in this post, $0.9510$, compared with $0.9720$ for its Keras counterpart.
+The two runs use the same architecture, loss, optimizer, learning rate and early-stopping rule, and the same 1,537 weights. They differ only in how many optimizer steps each epoch takes: 100 steps in total for the full-batch run against 836 for the minibatch run. The full-batch run never converges. Its best validation loss is at the last epoch, so early stopping never fires, and its test accuracy of $0.9510$ is that of a model interrupted partway through fitting. This is undertraining, not overfitting: an overfitting network has learned the training set too well and must be stopped, while this one had not finished learning.
 
-The epoch counts identify the cause, and Figure 6 makes it visible. Keras stopped at epoch 49, having found its best validation loss at epoch 39; the ten subsequent epochs without improvement are what triggered the halt. The PyTorch loop ran all 100 permitted epochs, and its best validation loss occurred at **epoch 100**, the final one. Early stopping never fired. The model was still improving when it reached the epoch ceiling.
+With minibatches the network converges and reaches $0.9580$ accuracy and $0.9935$ AUC, close to the Keras result, which is what the matching architecture should produce. The trap is worth remembering because the two versions look equivalent on the page. In Keras the step count follows from a `batch_size` argument; in a hand-written PyTorch loop it follows from what the loop passes to the model, which is easy to overlook. Reproducing a Keras result in PyTorch requires iterating over minibatches, ordinarily through a `DataLoader`.
 
-This is undertraining, not overfitting, and one should be careful to make the distinction in situations like this. A network that overfits has learned the training set too well and must be stopped; a network in the state above has not finished learning at all, and the ceiling that stopped it was arbitrary. The reported figure of $0.9510$ is therefore not the accuracy of this architecture on this problem. It is the accuracy of this architecture that is interrupted partway through fitting.
+The point is not that one framework is more accurate. Both compute the same thing. The explicitness that is PyTorch's main advantage carries an obligation: decisions a higher-level API makes for the user become the user's own, including ones the user may not notice making.
 
-The reason lies in a single difference between the two sections. The Keras model is fitted with `batch_size=32`. With 341 samples in its internal training split, that is roughly 11 optimizer steps per epoch, and 49 epochs, therefore, amount to about 539 parameter tweaks. The PyTorch loop above computes `model(X_tr)` on the entire training tensor, so it performs exactly one step per epoch: 100 updates in total, roughly a fifth as many, and the validation curve had not yet flattened.
+Beyond syntax, three structural differences stand out:
 
-The difficulty is a genuine trap rather than an artifact of this post. The two code blocks appear equivalent on inspection: the same layers, the same loss, Adam at $10^{-3}$ in both, early stopping on validation loss in both. The training procedure that separates them is expressed in one case through a `batch_size` argument and, in the other, through what the loop passes to the model, which a reader does not check. Reproducing the Keras result in PyTorch requires iterating over minibatches within the epoch loop, ordinarily through a `DataLoader`.
-
-The correct reading, then, is not that PyTorch is less accurate than Keras. The frameworks are computing the same thing. It is that the explicitness identified below as the principal advantage of PyTorch carries a corresponding obligation: decisions that a higher-level API makes on the user's behalf become the user's to make, including decisions the user may not notice are being made. A defensible comparison would either fix the epoch ceiling high enough for the full-batch loop to converge, or introduce minibatching so that both sections take a comparable number of optimizer steps.
-
-Several structural differences, as distinct from surface syntax, merit identification:
-
-- **Explicit training loop.** The `nn.Module` of PyTorch provides a `forward` method and requires the epoch loop, gradient zeroing, backward pass, and optimizer step to be written explicitly, whereas `model.fit` in Keras encapsulates all of this in a single call. The additional code constitutes a genuine trade-off  as opposed to mere verbosity: the explicitness of PyTorch makes it considerably easier to implement custom training logic, such as multiple losses, custom gradient manipulation, or non-standard data flow, that would otherwise require descending to the lower-level `GradientTape` API of Keras.
-- **Logits rather than probabilities until the final step.** `BCEWithLogitsLoss` combines the sigmoid activation and the binary cross-entropy computation into a single numerically stable operation, avoiding the $\log(0)$ instability that can arise from applying `log` after a separately computed sigmoid saturated near $0$ or $1$. The detail is a small but instructive example of how these schemes incorporate numerical analysis practice and is directly relevant when approaching the subject from a numerical methods rather than a purely machine learning background.
+- **Explicit training loop.** The `nn.Module` of PyTorch provides a `forward` method and requires the epoch loop, gradient zeroing, backward pass, and optimizer step to be written explicitly, whereas `model.fit` in Keras encapsulates all of this in a single call. The extra code is a trade-off, not just verbosity: the explicitness of PyTorch makes it considerably easier to implement custom training logic, such as multiple losses, custom gradient manipulation, or non-standard data flow, that would otherwise require descending to the lower-level `GradientTape` API of Keras.
+- **Logits rather than probabilities until the final step.** `BCEWithLogitsLoss` combines the sigmoid activation and the binary cross-entropy computation into a single numerically stable operation, avoiding the $\log(0)$ instability that can arise from applying `log` after a separately computed sigmoid saturated near $0$ or $1$. It is a small example of numerical-analysis practice built into these libraries, and a familiar one to anyone coming from numerical methods.
 - **Manual early stopping.** The `EarlyStopping` callback in Keras requires a few lines of configuration; the equivalent logic in raw PyTorch is the explicit patience-counter loop above. Libraries such as PyTorch Lightning exist largely to restore this convenience on top of PyTorch's lower-level primitives, at the cost of an additional abstraction layer.
 
 ## All seven models, measured
 
-Because every section was run in one process against one split, the results can be placed in a single table without qualification:
+Because every section ran in one process on one split, the results can go in a single table:
 
 | Model | Test accuracy | Test AUC | Trainable parameters |
 |---|---|---|---|
 | **Logistic Regression** | **0.9860** | **0.9977** | 31 |
-| SVM (RBF kernel) | 0.9790 | 0.9969 | — |
-| XGBoost | 0.9720 | 0.9950 | — |
-| TensorFlow/Keras | 0.9720 | 0.9950 | 1,537 |
-| Random Forest | 0.9580 | 0.9949 | — |
-| Gradient Boosting | 0.9580 | 0.9929 | — |
-| PyTorch | 0.9510 | 0.9943 | 1,537 |
+| SVM (RBF kernel) | 0.9790 | 0.9969 | n/a |
+| XGBoost | 0.9720 | 0.9950 | n/a |
+| TensorFlow/Keras | 0.9720 | 0.9937 | 1,537 |
+| PyTorch (minibatch) | 0.9580 | 0.9935 | 1,537 |
+| Random Forest | 0.9580 | 0.9949 | n/a |
+| Gradient Boosting | 0.9580 | 0.9929 | n/a |
 
-Three observations follow, none of which were available before the sections were executed.
+Three observations follow.
 
-The first concerns the ordering. Logistic regression is the best model on both metrics, achieving this with 31 parameters: 30 coefficients and an intercept. The nearest competitors are the RBF-kernel SVM and a boosted ensemble of three hundred trees, and a network with fifty times as many parameters, all of which it beats. This is the empirical content of the post's argument, and it is worth stating that the result was not guaranteed in advance; a dataset of this kind could plausibly have rewarded the ensembles.
+The first is the ordering. Logistic regression is best on both metrics with 31 parameters, 30 coefficients and an intercept. It beats the RBF-kernel SVM, an ensemble of three hundred boosted trees and a network with fifty times as many parameters. That is the empirical content of this post's argument, and the result was not guaranteed in advance; a dataset like this could plausibly have favored the ensembles.
 
-The second concerns the middle of the table. XGBoost and Keras agree to four decimal places on both metrics, at $0.9720$ and $0.9950$. A gradient-boosted ensemble and a feedforward network are different objects fitted by different procedures, and their arriving at identical figures is a coincidence of this dataset rather than a general property. It is nonetheless instructive: it indicates that both have extracted essentially the same signal, and that the remaining error is a property of the data rather than of either model class.
+The second is how little separates the middle of the table. XGBoost, the two networks and the Random Forest span $0.9580$ to $0.9720$ in accuracy, one to two test samples apart, and $0.9935$ to $0.9950$ in AUC. A boosted ensemble and a feedforward network are different objects fitted by different procedures, yet on this dataset they extract essentially the same signal, and the remaining error looks like a property of the data, not of any one model class.
 
-The third concerns the gap between the two deep-learning entries. The table suggests that PyTorch is the weaker framework, and nothing in the parameter column contradicts this, since both report 1,537 weights. The epoch counts, which the table omits, contradict it directly: the Keras model stopped early at epoch 49, having converged, while the PyTorch model exhausted all 100 permitted epochs with its best validation loss at the last one. The figure of $0.9510$ measures an unconverged model, and belongs in the table only with that qualification attached.
+The third is what the table leaves out. The PyTorch row is the minibatch run. The full-batch run of the same network would have entered the table at $0.9510$, last of all, and nothing in the parameter column would have revealed why; only the epoch and step counts do. A results table is only as trustworthy as the training details reported beside it.
 
-The comparison also has a cost dimension that the table omits. Logistic regression fits in a fraction of a second and yields thirty coefficients that can be read directly. The networks require standardization, an architecture choice, a learning rate, a dropout fraction, a batch size, an early-stopping criterion, and tens of training epochs, and they yield 1,537 weights that admit no comparable interpretation. In this dataset, the expenditure has a lower score.
+The comparison also has a cost dimension that the table omits. Logistic regression fits in a fraction of a second and yields thirty coefficients that can be read directly. The networks require standardization, an architecture choice, a learning rate, a dropout fraction, a batch size, an early-stopping criterion, and tens of training epochs, and they yield 1,537 weights that admit no comparable interpretation. On this dataset, the extra effort buys a lower score.
 
 ## Choosing a tool: a decision framework
 
-The following framework may be applied before beginning a new project, ordered approximately by the sequence in which the questions arise:
+The questions below are a reasonable checklist before starting a new project, roughly in the order they arise:
 
 | Question                                                             | Leans toward                        |
 | -------------------------------------------------------------------- | ----------------------------------- |
 | Tabular data, < ~100k rows?                                          | scikit-learn / XGBoost              |
-| Need built-in feature contribution / interpretability?                 | scikit-learn / XGBoost              |
+| Need built-in feature importance or interpretability?                | scikit-learn / XGBoost              |
 | Images, audio, text, or other unstructured/high-dim data?            | TensorFlow/Keras or PyTorch         |
 | Need a quick baseline with minimal code?                             | scikit-learn, or Keras `Sequential` |
 | Need custom training logic (multi-task loss, custom gradients, RL)?  | PyTorch                             |
@@ -416,23 +410,23 @@ The following framework may be applied before beginning a new project, ordered a
 | Research codebase, need to move fast and modify architectures repeatedly? | PyTorch                             |
 | Production tabular pipeline needing speed + minimal tuning?          | XGBoost / LightGBM                  |
 
-The inclination to adopt the most powerful available tool at the outset warrants resistance. The most useful empirical observation from this comparison is the one from Part 1: on this dataset, **the simplest model performed best**. That is not an argument against deep learning; it is an argument for beginning with the least costly model that could plausibly succeed, establishing a genuine baseline, and adopting more flexible tools, which are also more compute-intensive, less interpretable, and more sensitive to hyperparameters, only once the simpler alternatives are confirmed to be underperforming. This conveys a broader idea from the earlier posts in this series: establish what the structure of a problem demands before selecting the most powerful available tool, whether that tool is a neural network, an implicit ODE solver, or a rank-$k$ matrix update.
+The urge to start with the most powerful tool available is worth resisting. The most useful empirical observation from this comparison is the one from Part 1: on this dataset, **the simplest model performed best**. That is not an argument against deep learning; it is an argument for beginning with the least costly model that could plausibly succeed, establishing a real baseline, and adopting more flexible tools, which are also more compute-intensive, less interpretable, and more sensitive to hyperparameters, only once the simpler alternatives are confirmed to be underperforming. The same idea runs through the [earlier posts]({{ '/blog/2026/sherman-morrison-ode_p1/' | relative_url }}) in this series: establish what the structure of a problem demands before choosing the tool, whether that tool is a neural network, an implicit ODE solver or a rank-$k$ matrix update.
 
-## Summary Notes and Highlights
+## Summary
 
-- All five tools ultimately address the same category of problem, minimizing a loss function over a parameterized family of functions, but they occupy genuinely different positions on the bias and variance tradeoff and interpretability-flexibility spectra. Selecting correctly matters more than selecting the most prominent option.
-- The uniform `fit`/`predict` interface of scikit-learn makes rigorous, directly comparable model evaluation inexpensive, and there is seldom adequate justification for omitting it before committing to a more complex approach.
-- The advantage of XGBoost in comparison to classical gradient boosting is a genuine contribution in numerical optimization, namely second-order, Newton-style tree fitting combined with explicit regularization in the objective, rather than merely faster code, although that advantage is more apparent on larger and noisier data than a clean 569-row dataset.
+- All four libraries solve the same kind of problem, minimizing a loss over a parameterized family of functions, but they sit at different points on the bias-variance and interpretability-flexibility spectra. Choosing correctly matters more than choosing the most prominent option.
+- The uniform `fit`/`predict` interface of scikit-learn makes rigorous, directly comparable model evaluation cheap, and there is rarely a good reason to skip it before committing to a more complex approach.
+- XGBoost's advantage over classical gradient boosting is a contribution in numerical optimization, Newton-style second-order tree fitting with explicit regularization in the objective, and not only faster code, although it shows more on larger and noisier data than on a clean 569-row dataset.
 - TensorFlow/Keras and PyTorch construct the *same* mathematical objects, namely differentiable computational graphs trained by backpropagation, with different ergonomics: Keras is optimized for producing a working model quickly, whereas PyTorch is optimized for transparent control over each training step.
-- On small, clean, tabular data, standard methods are not simply an introductory fallback. They are frequently the *correct* choice, and in the comparison conducted here logistic regression, with 31 parameters, outperformed every other elaborate alternative on both predictive accuracy measures and AUC.
-- Two code blocks implementing the same architecture, the same loss, and the same optimizer can still train differently. The Keras and PyTorch networks in Parts 3 and 4 are identical in every respect a reader would check, down to the number of parameters, yet one takes roughly 11 optimizer steps per epoch and the other exactly 1, because the first specifies a batch size and the second passes the whole training set at once. The consequence was not a marginal difference in accuracy, but a model that never converged: the PyTorch run exhausted its epoch ceiling while validation loss was still falling. Reporting that number without the epoch count attached would have been misleading.
+- On small, clean, tabular data, classical methods are not a beginner's fallback. They are often the *correct* choice, and here logistic regression, with 31 parameters, beat every more elaborate alternative on both accuracy and AUC.
+- The same network, loss and optimizer can still train very differently. A PyTorch loop that passes the whole training set at once takes one optimizer step per epoch, never converges within 100 epochs and scores $0.9510$; with minibatches of 32, like the Keras model, it converges and scores $0.9580$. Reporting the first number without the step count would have been misleading.
 
 ## References
 
-The scikit-learn ecosystem underlying Part 1 is documented in {% cite pedregosa2011scikit %}, and the dataset is from {% cite wolberg1995breast %}. The XGBoost algorithm and its second-order boosting formulation follow {% cite chen2016xgboost %}, building on the traditional gradient-boosting framework of {% cite friedman2001greedy %}. The deep-learning frameworks inside Parts 3 and 4 are documented in {% cite abadi2016tensorflow %}, {% cite chollet2015keras %}, and {% cite paszke2019pytorch %}, with the Adam optimizer from {% cite kingma2015adam %} and dropout regularization from {% cite srivastava2014dropout %}. The empirical case for standard methods on tabular data referenced throughout draws on {% cite shwartzziv2022tabular %}.
+The scikit-learn ecosystem underlying Part 1 is documented in {% cite pedregosa2011scikit %}, and the dataset is from {% cite wolberg1995breast %}. The XGBoost algorithm and its second-order boosting formulation follow {% cite chen2016xgboost %}, building on the traditional gradient-boosting framework of {% cite friedman2001greedy %}. The deep-learning frameworks in Parts 3 and 4 are documented in {% cite abadi2016tensorflow %}, {% cite chollet2015keras %}, and {% cite paszke2019pytorch %}, with the Adam optimizer from {% cite kingma2015adam %} and dropout regularization from {% cite srivastava2014dropout %}. The empirical case for classical methods on tabular data draws on {% cite shwartzziv2022tabular %}.
 
 {% bibliography --cited --file blog_references %}
 
 ---
 
-*Full code for the scikit-learn section, executed and verified, is available in [`sklearn_comparison_p5.py`]({{ '/assets/code/sklearn_comparison_p5.py' | relative_url }}). The XGBoost, TensorFlow/Keras, and PyTorch code is provided as reference implementations and should be run and verified before being relied upon.*
+*Full code for all four parts, which reproduces every number and figure in this post from one run, is available in [`sklearn_comparison_p5.py`]({{ '/assets/code/sklearn_comparison_p5.py' | relative_url }}).*

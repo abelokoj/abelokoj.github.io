@@ -1,0 +1,4 @@
+Part A: GD final loss=0.068652 iters=500
+Part A: Newton final loss=0.068537 iters=20
+Part A: LBFGS final loss=0.068537 iters=28
+Part B: success=True fuel_cost=4.9367

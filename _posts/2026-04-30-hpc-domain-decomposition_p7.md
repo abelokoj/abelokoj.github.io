@@ -1,123 +1,65 @@
 ---
 layout: post
-title: "Parallel Computing for Scientific Simulation: Domain Decomposition, Amdahl's Law, and Exascale Computing"
+title: "Domain Decomposition and Parallel Scaling for Wave Propagation: Amdahl, Gustafson and the Memory-Bandwidth Limit"
 date: 2026-04-30
 tags: [hpc, parallel-computing, mpi, domain-decomposition, numerical-methods]
+description: "Domain decomposition for a 2D wave equation under MPI, with Amdahl and Gustafson scaling and laptop benchmarks showing memory-bandwidth limits."
 giscus_comments: true
+# edited: true
+published: true
 ---
 
-> **A note on scope.** This post uses `mpi4py` for real distributed execution, but the sandboxed environment it was written in has a single CPU core and no internet access from which to install MPI libraries. The domain decomposition demonstration below is therefore **verified**: it simulates in serial Python the exact communication pattern (ghost-cell halo exchange) that a real MPI program uses, and confirms that it reproduces the monolithic solution exactly. The `mpi4py` code that would run this across distributed nodes is provided as a ready-to-run reference implementation; run it on a cluster or multi-core machine to observe the actual wall-clock speedup.
+## Motivation
 
-```python
-# Real distributed implementation via mpi4py -- run with:
-#   mpirun -n 16 python wave_mpi.py
-from mpi4py import MPI
-import numpy as np
+Every earlier post in this series treated solving an equation and running the code as the same task. At the scale of a national laboratory they are not. A high-fidelity three-dimensional simulation of inertial confinement fusion, climate dynamics, or tsunami propagation can involve trillions of degrees of freedom, far more than one processor can hold in memory, let alone advance in useful time. Problems of that size can be solved only by distributing the work across thousands to millions of processors. Parallel computing is therefore not an optimization added at the end; for this class of problems it is part of the method.
 
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-n_procs = comm.Get_size()
-
-# Each rank computes its own slice of the global domain
-NX_GLOBAL, NY = 240, 240
-bounds = np.linspace(0, NX_GLOBAL, n_procs + 1).astype(int)
-lo, hi = bounds[rank], bounds[rank + 1]
-local_nx = hi - lo
-
-u_prev = np.zeros((local_nx + 2, NY))   # +2 for ghost rows
-u_curr = np.zeros((local_nx + 2, NY))
-# ... initialize u_curr[1:-1, :] with this rank's slice of the initial condition ...
-
-left_neighbor = rank - 1 if rank > 0 else MPI.PROC_NULL
-right_neighbor = rank + 1 if rank < n_procs - 1 else MPI.PROC_NULL
-
-for step in range(N_STEPS):
-    # Non-blocking halo exchange: post receives and sends together, then wait.
-    # This lets MPI overlap communication with other work when possible,
-    # which is considerably faster than blocking send-then-receive calls.
-    reqs = []
-    reqs.append(comm.Isend(u_curr[1, :], dest=left_neighbor))
-    reqs.append(comm.Isend(u_curr[-2, :], dest=right_neighbor))
-    recv_left = np.empty(NY)
-    recv_right = np.empty(NY)
-    reqs.append(comm.Irecv(recv_left, source=left_neighbor))
-    reqs.append(comm.Irecv(recv_right, source=right_neighbor))
-    MPI.Request.Waitall(reqs)
-    if rank > 0:
-        u_curr[0, :] = recv_left
-    if rank < n_procs - 1:
-        u_curr[-1, :] = recv_right
-
-    # Local update -- identical stencil math to the serial version above
-    lap_x = u_curr[2:, :] + u_curr[:-2, :] - 2 * u_curr[1:-1, :]
-    lap_y = np.roll(u_curr, 1, axis=1) + np.roll(u_curr, -1, axis=1) - 2 * u_curr
-    u_next = 2 * u_curr[1:-1, :] - u_prev[1:-1, :] + r2 * (lap_x + lap_y[1:-1, :])
-    u_prev, u_curr[1:-1, :] = u_curr.copy(), u_next
-
-# Gather the full field onto rank 0 for output/analysis
-local_result = u_curr[1:-1, :]
-if rank == 0:
-    full_result = np.empty((NX_GLOBAL, NY))
-else:
-    full_result = None
-comm.Gatherv(local_result, full_result, root=0)
-```
-
-
-
-## Motivation: why a mathematician should care about parallel computing
-
-Every post so far in this series has implicitly assumed that solving the equation and running the code are the same task. At the scale at which national laboratories operate, they are not. A single high-fidelity three-dimensional simulation of inertial confinement fusion, climate dynamics, or tsunami wave propagation can involve **trillions** of degrees of freedom, far more than the memory of any single processor can hold, let alone compute within a useful time. Problems at that scale can be solved only by distributing the work across thousands to millions of processors operating together. That requirement defines **parallel computing** in this context: not a performance optimization added afterward, but a structural requirement for the class of problems considered here.
-
-This matters directly for the kind of role a computational mathematician might apply for at a place like Lawrence Livermore National Laboratory. The **El Capitan** system at LLNL, deployed in 2024 and, as of this writing, still among the fastest supercomputers in the world, delivers more than 2.79 exaflops of peak performance {% cite llnl2024elcapitan %}, built from more than 11,000 nodes connected by a high-speed interconnect fabric {% cite hpcwire2024elcapitan %}. None of that raw computational power is usable without algorithms and code specifically designed to be split across that many independent processors, which is exactly the mathematical and engineering problem this post walks through from first principles, on a problem small enough to run on a laptop.
+Lawrence Livermore National Laboratory's **El Capitan** illustrates the scale. Deployed in 2024, its theoretical peak (Rpeak) exceeds 2.79 exaflops {% cite llnl2024elcapitan %}, and in November 2024 it was verified as the fastest supercomputer in the world on the TOP500 list, which ranks systems by their measured High-Performance Linpack performance (Rmax) and not by peak, with more than 11,000 nodes joined by a high-speed interconnect {% cite hpcwire2024elcapitan %}. None of that capacity is usable without algorithms designed to be split across that many independent processors. This post builds the central such algorithm, domain decomposition, from first principles on a problem small enough for a laptop, then runs it under MPI on my own machine to see what actually limits it.
 
 ## The core idea: domain decomposition
 
-The dominant strategy for parallelizing a PDE solve across many processors is **domain decomposition**: split the physical domain (a grid, a mesh) into pieces, assign each piece to a different processor, and have neighboring processors exchange a thin strip of boundary data, called **ghost cells** or a **halo**, at each time step, so that each processor holds exactly enough information about its neighbors to update its own piece correctly.
+The dominant strategy for parallelizing a PDE solve is **domain decomposition**. The physical domain (a grid or mesh) is split into pieces, each piece is assigned to a processor, and neighboring processors exchange a thin strip of boundary data, called **ghost cells** or a **halo**, at every time step. Each processor then holds exactly enough information about its neighbors to update its own piece correctly.
 
 ### A concrete problem: wave propagation from a localized source
 
-To make this tangible, this post works with the 2D linear wave equation
-{% cite leveque2002finite %},
+The test problem is the two-dimensional linear wave equation {% cite leveque2002finite %},
 
 $$
 \frac{\partial^2 u}{\partial t^2} = c^2 \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right),
 $$
 
-with an initial Gaussian "uplift" pulse as the initial condition. The Gaussian pulse is a deliberately simplified representation of the seafloor-displacement source that drives a real tsunami, and an apt one: it belongs to the same class of PDE, a wave equation on a large two- or three-dimensional spatial domain, underlying the work of the LLNL-led team that won the 2025 ACM Gordon Bell Prize for a real-time tsunami early-warning framework running on El Capitan {% cite llnl2025gordonbell %}, which this post returns to at the end.
+with a Gaussian "uplift" pulse as the initial condition and zero initial velocity. The pulse is a simplified stand-in for the seafloor displacement that drives a tsunami. The choice is not arbitrary: a wave equation on a large spatial domain is also the model behind the LLNL-led tsunami early-warning framework that won the 2025 ACM Gordon Bell Prize {% cite llnl2025gordonbell %}, to which I return at the end.
 
-Discretizing with a standard second-order central-difference (leapfrog) scheme in both space and time gives the explicit update rule,
+A second-order central-difference (leapfrog) discretization in space and time gives the explicit update
 
 $$
 u^{n+1}_{i,j} = 2u^n_{i,j} - u^{n-1}_{i,j} + \left(\frac{c\,\Delta t}{\Delta x}\right)^2 \left(u^n_{i+1,j} + u^n_{i-1,j} + u^n_{i,j+1} + u^n_{i,j-1} - 4u^n_{i,j}\right).
 $$
 
-The key structural fact this whole post rests on: **updating $u^{n+1}_{i,j}$ only requires the four nearest neighbors of $(i,j)$ at the previous time step.** This locality is what makes domain decomposition possible: a processor requires data only from its immediate neighbors, rather than from the entire global domain, to advance its local piece by one time step. Formally, the discrete Laplacian stencil has support radius $1$ in each spatial index, so the dependency graph of the update is itself local, and partitioning the grid into contiguous blocks introduces dependencies only across block boundaries.
+Everything in this post rests on one structural fact: **computing $u^{n+1}_{i,j}$ requires only the four nearest neighbors of $(i,j)$ at the previous step.** The discrete Laplacian has support radius one in each index, so the dependency graph of the update is local, and cutting the grid into contiguous blocks creates dependencies only across block boundaries. A processor therefore needs data from its immediate neighbors, not from the whole domain, to advance its block by one step.
 
 ### Splitting the grid
 
-Suppose a grid of $N_x$ rows is split into $P$ contiguous blocks, one per processor (a **1D decomposition**; real production codes often use 2D or 3D decompositions for better surface-area-to-volume ratios, discussed below). Each processor's local array is padded with **one extra "ghost" row** on each side:
+Let the first array index $i$ (the $x$ direction) label the rows of the grid, and suppose the $N_x$ rows are divided into $P$ contiguous blocks, one per processor. This is a **one-dimensional decomposition**; production codes usually decompose in two or three dimensions, for reasons discussed below. Each processor's local array is padded with **one ghost row** on each side.
 
 <p align="center">
-  <img src="/assets/img/posts/domain_decomposition_p7.svg" alt="Domain decomposition schematic showing the wave field split into 4 subdomains" style="width: 100%; max-width: 460px; height: auto; display: block; margin: 0 auto;">
+  <img src="/assets/img/posts/domain_decomposition_p7.svg" alt="Domain decomposition schematic showing the wave field split into 4 subdomains" style="width: 100%; max-width: 660px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 1: The same wave field from the monolithic solve below, with vertical lines showing how it would be partitioned across 4 processor "ranks." Each rank owns a contiguous vertical strip.*
+*Figure 1: The wave field from the monolithic solve below, plotted with $x$ on the horizontal axis. The vertical lines mark a partition of the rows ($x$ index) into four subdomains ("ranks"), so each rank's contiguous block of rows appears as a vertical strip spanning the full $y$ range.*
 
-At every time step, before any local computation happens, each rank exchanges its boundary row with its neighbors:
+At every time step, before any local computation, each rank copies its neighbors' boundary rows into its own ghost rows. In the serial simulation of this pattern, the exchange is a pair of array copies:
 
 ```python
-# Halo exchange: each rank sends its boundary row to neighbors,
-# receives into its own ghost rows -- exactly the communication pattern
-# of MPI_Sendrecv between neighboring ranks.
+# Halo exchange: each rank's ghost rows receive its neighbors' boundary rows,
+# the same data movement as an MPI send-receive between neighboring ranks.
 for p in range(n_procs):
     if p > 0:
-        blocks_curr[p][0, :] = blocks_curr[p - 1][-2, :]    # recv from left neighbor
+        blocks_curr[p][0, :] = blocks_curr[p - 1][-2, :]    # from the left neighbor
     if p < n_procs - 1:
-        blocks_curr[p][-1, :] = blocks_curr[p + 1][1, :]    # recv from right neighbor
+        blocks_curr[p][-1, :] = blocks_curr[p + 1][1, :]    # from the right neighbor
 ```
 
-Once every rank has valid data in its ghost rows, each rank computes its own update **completely independently**, requiring no further communication until the next time step:
+Once the ghost rows are valid, every rank computes its update independently, with no further communication until the next step:
 
 ```python
 lap_x = np.zeros_like(local_curr)
@@ -126,11 +68,11 @@ lap_y = np.roll(local_curr, 1, axis=1) + np.roll(local_curr, -1, axis=1) - 2 * l
 local_next = 2 * local_curr - local_prev + r2 * (lap_x + lap_y)
 ```
 
-This alternation, in which boundary data are **communicated and local computation then proceeds independently**, is the central pattern in distributed scientific computing. Nearly every parallel PDE solver, regardless of the specific equation, follows this two-phase structure at every time step.
+This alternation, exchange boundary data and then compute locally, is the central pattern of distributed scientific computing. Nearly every parallel PDE solver follows the same two-phase structure at every step, whatever the equation.
 
-## Correctness first: verifying that decomposition reproduces the reference solution
+## Correctness first
 
-Before reasoning about speed at all, it is essential to verify that splitting the computation in this way does not silently change the answer. The check applies the same discipline as the correctness check in the first post of this series, applied here to a parallel algorithm rather than a sequential one.
+Before measuring speed, I check that splitting the computation does not change the answer, the same discipline applied to the sequential solver in the [first post]({{ '/blog/2026/sherman-morrison-ode_p1/' | relative_url }}) of this series. The serial simulation of the decomposed solve is compared with a single monolithic solve on the full $240 \times 240$ grid after 300 steps:
 
 ```python
 u_mono, sensor_traces = solve_monolithic()
@@ -143,157 +85,173 @@ for n_procs in [1, 2, 4, 8, 16]:
 
 ```
 Correctness check: decomposed solve vs monolithic solve
-  P=  1 subdomains: max abs difference = 4.302e-16
-  P=  2 subdomains: max abs difference = 4.302e-16
-  P=  4 subdomains: max abs difference = 4.302e-16
-  P=  8 subdomains: max abs difference = 4.302e-16
-  P= 16 subdomains: max abs difference = 4.302e-16
+  P=  1 subdomains: max abs difference = 5.135e-16
+  P=  2 subdomains: max abs difference = 5.135e-16
+  P=  4 subdomains: max abs difference = 5.135e-16
+  P=  8 subdomains: max abs difference = 5.135e-16
+  P= 16 subdomains: max abs difference = 5.135e-16
 ```
 
-The result is identical, to floating-point round-off, regardless of the number of pieces into which the domain is split. Agreement to round-off is the expected outcome: the explicit finite-difference stencil is a purely local operation, and domain decomposition with correct halo exchange is mathematically an *exact* reformulation of the same computation rather than an approximation. Whenever a decomposed solve fails to match the monolithic one beyond expected round-off, the defect is almost always in the halo-exchange logic; a missing or off-by-one ghost-cell update is the most common bug in production MPI-based PDE codes.
+The two solutions agree to round-off for every number of subdomains, as they should: with a correct halo exchange, domain decomposition is an exact reformulation of the same computation, not an approximation. The residual $5 \times 10^{-16}$ does not come from the decomposition at all. The decomposed code sums the stencil as `lap_x + lap_y` while the monolithic code adds the four neighbors in a different order, and floating-point addition is not associative. The MPI implementation below evaluates the stencil in exactly the monolithic order, and its result matches the monolithic solution bit for bit. When a decomposed solve disagrees with the monolithic one by more than round-off, the defect is almost always in the halo exchange; a missing or off-by-one ghost-row update is the most common bug in MPI-based PDE codes.
 
 <p align="center">
-  <img src="/assets/img/posts/wave_field_sensors_p7.svg" alt="Simulated wave field and sensor recordings" style="width: 100%; max-width: 680px; height: auto; display: block; margin: 0 auto;">
+  <img src="/assets/img/posts/wave_field_sensors_p7.svg" alt="Simulated wave field and sensor recordings" style="width: 100%; max-width: 90%; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 2: Left, the simulated wave field after 300 time steps, spreading outward from the Gaussian source pulse, with black triangles marking sensor locations. Right, the amplitude recorded at each sensor over time. This configuration, comprising a localized wave source, sensors recording its passage, and the inverse problem of reasoning backward from sensor data to source parameters, is the subject of the next post in this series, on Bayesian inverse problems.*
+*Figure 2: Left, the wave field after 300 steps, spreading outward from the Gaussian source, with black triangles marking sensor locations. Right, the amplitude recorded at each sensor over time. Inferring the source from such recordings is an inverse problem, the subject of the [next post]({{ '/blog/2026/bayesian-inference-inverse-problems_p8/' | relative_url }}) in this series.*
 
-## From correctness to performance: Amdahl's Law
+## Amdahl's Law: the ceiling on strong scaling
 
-Having confirmed that decomposition yields the correct answer, the next question concerns the magnitude of the speedup obtained. The answer begins with a constraining result established in 1967 {% cite amdahl1967validity %}.
-
-Suppose a fraction $f$ of a program's total work can be perfectly parallelized across $P$ processors, while a fraction $(1-f)$ is inherently sequential (I/O, setup, a part of the algorithm that cannot be split). **Amdahl's Law** gives the theoretical speedup,
+With correctness established, the next question is how much faster the decomposed solve can run. The classical starting point is a result from 1967 {% cite amdahl1967validity %}. Suppose a fraction $f$ of a program's work parallelizes perfectly across $P$ processors and the remaining fraction $1-f$ is inherently sequential (input and output, setup, or an unsplittable part of the algorithm). **Amdahl's Law** gives the speedup
 
 $$
-S(P) = \frac{1}{(1-f) + \dfrac{f}{P}}.
-$$
-
-As $P \to \infty$, this does not diverge; it converges to a **hard
-ceiling**,
-
-$$
+S(P) = \frac{1}{(1-f) + \dfrac{f}{P}},
+\qquad
 \lim_{P \to \infty} S(P) = \frac{1}{1-f}.
 $$
+
+The speedup does not grow without bound; it approaches a hard ceiling set by the sequential fraction.
 
 <p align="center">
   <img src="/assets/img/posts/amdahl_law_p7.svg" alt="Amdahl's Law speedup curves for various parallel fractions" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 3: Theoretical speedup vs. number of processes, for several values of the parallel fraction $f$. Even at $f=0.99$, corresponding to 99% of the code being perfectly parallelized, the maximum possible speedup is capped at $100\times$ regardless of the number of processors applied. The bound reflects no limitation of particular hardware; it is a mathematical ceiling.*
+*Figure 3: Theoretical speedup against the number of processes for several parallel fractions $f$. Even with 99% of the work parallelized, the speedup can never exceed $100\times$. This is a property of the arithmetic, not of any hardware.*
 
-This has a very concrete implication for how a computational scientist should spend their time: **profile before parallelizing.** If a code spends 20% of its time in an unavoidably sequential setup phase, no amount of additional hardware will ever get more than a $5\times$ speedup, and chasing a bigger cluster allocation to fix a bottleneck that Amdahl's Law has already capped is a common, avoidable waste of both compute budget and engineering time.
+The practical lesson is to **profile before parallelizing**. If a code spends 20% of its time in an unavoidably sequential phase, no amount of hardware will deliver more than a $5\times$ speedup, and requesting a larger allocation to fix a bottleneck that Amdahl's Law has already capped wastes both compute budget and engineering time.
 
-## Weak scaling: a different, often more relevant question
+## Weak scaling
 
-Amdahl's Law addresses **strong scaling**, in which the total problem size is fixed and processors are added. Production HPC codes are frequently run in the opposite regime, **weak scaling** {% cite gustafson1988reevaluating %}, in which problem size grows *with* the number of processors, so that each processor handles a fixed-size local portion irrespective of the processor count. The relevant question in that regime is not how much faster the same problem runs, but whether adding processors permits a proportionally larger problem to be solved within the same wall-clock time.
+Amdahl's Law describes **strong scaling**: the problem size is fixed and processors are added. Production codes are often run in the opposite regime, **weak scaling** {% cite gustafson1988reevaluating %}, where the problem grows with the processor count so that each processor keeps a fixed amount of local work. The question then is not how much faster the same problem runs, but whether $P$ times more processors can solve a $P$ times larger problem in the same wall-clock time. Gustafson's scaled speedup expresses this regime: with $f$ now the parallel fraction of the run on $P$ processors, $S(P) = (1-f) + fP$, which grows linearly in $P$ instead of saturating {% cite gustafson1988reevaluating %}.
 
-The obstacle to *ideal* weak scaling (perfectly flat efficiency as $P$ grows) is **communication overhead**: every additional processor means more neighbor-to-neighbor halo exchanges happening across the interconnect, and at large enough $P$, that communication cost starts to compete meaningfully with the local computation time.
+The textbook obstacle to ideal weak scaling (efficiency that stays at one as $P$ grows) is **communication overhead**. More processors mean more halo exchanges across the interconnect, and at large enough $P$ that cost competes with the local computation.
 
 <p align="center">
   <img src="/assets/img/posts/weak_scaling_p7.svg" alt="Weak scaling efficiency curves under a simple communication overhead model" style="width: 100%; max-width: 700px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 4: Parallel efficiency under a simple model where communication overhead grows logarithmically with the number of processes (a simplification of real network topology effects). The dashed black line is the unattainable ideal; the colored curves show how efficiency degrades as the communication-to-computation ratio increases. Communication overhead is the trade-off that HPC teams devote substantial engineering effort to managing, through improved interconnect topology, overlapping communication with computation, and reducing message counts.*
+*Figure 4: A simple model of weak-scaling efficiency in which communication overhead grows logarithmically with the number of processes, a crude stand-in for network topology effects. The dashed line is the ideal. Real machines add effects this model omits; the measurements below show one of them.*
 
-This is precisely why real production codes use **2D or 3D domain decomposition** rather than the simple 1D column-split used in this post's demo: for a fixed number of processors $P$, a 2D decomposition gives each processor a roughly square rather than elongated local domain, which **minimizes the surface-area-to-volume ratio**. Since communication cost scales with the boundary, or surface, that each processor shares with its neighbors, while useful computation scales with the interior, or volume, minimizing that ratio directly minimizes communication overhead relative to useful work. Concretely, for a square local domain of side length $\ell$ split among $P$ processors in a $\sqrt{P}\times\sqrt{P}$ grid, each processor's halo perimeter scales as $O(\ell)$ while its interior scales as $O(\ell^2)$; for the equivalent 1D strip decomposition the halo is a fixed-width edge running the *full* domain length, independent of $P$, so the communication-to-computation ratio degrades faster as $P$ grows. The underlying argument is isoperimetric in character, favoring compact shapes over elongated ones to minimize boundary relative to area, and it applies directly to supercomputer performance engineering.
+Communication cost is also why production codes decompose in two or three dimensions. Communication scales with the boundary each processor shares with its neighbors, while useful work scales with its interior. A one-dimensional strip has a halo that runs the full width of the domain regardless of $P$, whereas a $\sqrt{P} \times \sqrt{P}$ decomposition of an $N \times N$ grid gives each processor a square block of side $N/\sqrt{P}$, whose halo shrinks as $P$ grows. The argument is isoperimetric: compact subdomains minimize boundary relative to area, and hence communication relative to computation.
 
-## From simulated ranks to a real MPI implementation
+## A real MPI implementation
 
-The demonstration above simulates $P$ ranks as Python lists within a single process, which is useful for understanding and verifying the algorithm but is not itself parallel. A production implementation, run across a cluster, uses `mpi4py` {% cite dalcin2008mpi %} to bind each rank to a genuinely separate process (often on a separate physical node), communicating via the Message Passing Interface (MPI) standard {% cite gropp2014using %}:
+The serial simulation above represents ranks as Python lists inside one process, which is useful for understanding and verifying the algorithm but is not parallel. A distributed implementation binds each rank to a separate process with `mpi4py` {% cite dalcin2008mpi %}, and the processes communicate through the Message Passing Interface (MPI) standard {% cite gropp2014using %}. The core of the solver I ran, [`wave_mpi_p7.py`]({{ '/assets/code/wave_mpi_p7.py' | relative_url }}), is the following loop:
 
 ```python
-# Real distributed implementation via mpi4py -- run with:
-#   mpirun -n 16 python wave_mpi.py
-from mpi4py import MPI
-import numpy as np
+# Run with, for example:  mpirun -n 8 python3 wave_mpi_p7.py --check
+up = rank - 1 if rank > 0 else MPI.PROC_NULL
+down = rank + 1 if rank < size - 1 else MPI.PROC_NULL
 
-comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-n_procs = comm.Get_size()
+for _ in range(steps):
+    # Halo exchange: send owned boundary rows, receive into ghost rows.
+    comm.Sendrecv(u_curr[1], dest=up, recvbuf=u_curr[-1], source=down)
+    comm.Sendrecv(u_curr[-2], dest=down, recvbuf=u_curr[0], source=up)
 
-# Each rank computes its own slice of the global domain
-NX_GLOBAL, NY = 240, 240
-bounds = np.linspace(0, NX_GLOBAL, n_procs + 1).astype(int)
-lo, hi = bounds[rank], bounds[rank + 1]
-local_nx = hi - lo
-
-u_prev = np.zeros((local_nx + 2, NY))   # +2 for ghost rows
-u_curr = np.zeros((local_nx + 2, NY))
-# ... initialize u_curr[1:-1, :] with this rank's slice of the initial condition ...
-
-left_neighbor = rank - 1 if rank > 0 else MPI.PROC_NULL
-right_neighbor = rank + 1 if rank < n_procs - 1 else MPI.PROC_NULL
-
-for step in range(N_STEPS):
-    # Non-blocking halo exchange: post receives and sends together, then wait.
-    # This lets MPI overlap communication with other work when possible,
-    # which is considerably faster than blocking send-then-receive calls.
-    reqs = []
-    reqs.append(comm.Isend(u_curr[1, :], dest=left_neighbor))
-    reqs.append(comm.Isend(u_curr[-2, :], dest=right_neighbor))
-    recv_left = np.empty(NY)
-    recv_right = np.empty(NY)
-    reqs.append(comm.Irecv(recv_left, source=left_neighbor))
-    reqs.append(comm.Irecv(recv_right, source=right_neighbor))
-    MPI.Request.Waitall(reqs)
-    if rank > 0:
-        u_curr[0, :] = recv_left
-    if rank < n_procs - 1:
-        u_curr[-1, :] = recv_right
-
-    # Local update -- identical stencil math to the serial version above
-    lap_x = u_curr[2:, :] + u_curr[:-2, :] - 2 * u_curr[1:-1, :]
-    lap_y = np.roll(u_curr, 1, axis=1) + np.roll(u_curr, -1, axis=1) - 2 * u_curr
-    u_next = 2 * u_curr[1:-1, :] - u_prev[1:-1, :] + r2 * (lap_x + lap_y[1:-1, :])
-    u_prev, u_curr[1:-1, :] = u_curr.copy(), u_next
-
-# Gather the full field onto rank 0 for output/analysis
-local_result = u_curr[1:-1, :]
-if rank == 0:
-    full_result = np.empty((NX_GLOBAL, NY))
-else:
-    full_result = None
-comm.Gatherv(local_result, full_result, root=0)
+    # Local update, in the same arithmetic order as the monolithic solver.
+    c = u_curr[1:-1]
+    lap = (u_curr[:-2] + u_curr[2:]
+           + np.roll(c, 1, axis=1) + np.roll(c, -1, axis=1)
+           - 4 * c)
+    u_next = 2 * c - u_prev[1:-1] + r2 * lap
+    u_next[:, 0] = u_next[:, -1] = 0.0            # Dirichlet edges in y
+    if lo == 0:
+        u_next[0] = 0.0                           # top edge of the domain
+    if hi == nx:
+        u_next[-1] = 0.0                          # bottom edge of the domain
+    u_prev[1:-1] = c
+    u_curr[1:-1] = u_next
 ```
 
-Every piece of this maps directly onto the serial simulation above: `Isend`/`Irecv` implement the exact halo-exchange logic from the `blocks_curr[p][0, :] = ...` lines; `MPI.PROC_NULL` cleanly handles the domain's physical edges (a rank with no left neighbor simply communicates with a "null" process that does nothing); and `Gatherv` reassembles the distributed pieces back into a single global array, exactly like the reassembly loop at the end of the serial `solve_decomposed` function.
+Each piece maps onto the serial simulation. `Sendrecv` performs the halo exchange, pairing each send with the matching receive so that neighboring ranks cannot deadlock. `MPI.PROC_NULL` handles the physical edges of the domain: a rank with no neighbor on one side exchanges with a null process, and the call does nothing. At the end, `Gatherv` reassembles the distributed rows on rank 0, where the `--check` option compares them with the monolithic solver.
 
-## A second axis of parallelism: what's inside each node
+## Running it on real hardware
 
-The discussion above concerns parallelism *across* nodes, with MPI ranks communicating over a network. Modern supercomputers, including El Capitan, add a second, orthogonal axis of parallelism *within* each node: each El Capitan compute node is built around AMD Instinct MI300A **APUs**, which combine CPU cores, GPU cores, and a shared pool of high-bandwidth memory in a single package. Using such a machine effectively requires combining two distinct parallel programming models:
+I ran the solver on my laptop, an AMD Ryzen 7 6800H with 8 cores and 16 hardware threads and 7.4 GiB of memory available to WSL2 Ubuntu 26.04, using Python 3.12, NumPy 2.5.3, mpi4py 4.1.2 and Open MPI 5.0.11. Ranks were pinned to physical cores up to 8 and to hardware threads beyond that, and each timing is the fastest of three runs. The driver script, [`bench_mpi_p7.py`]({{ '/assets/code/bench_mpi_p7.py' | relative_url }}), and the raw results, [`bench_p7.json`]({{ '/assets/code/bench_p7.json' | relative_url }}), are linked so the numbers can be reproduced.
 
-- **MPI (distributed-memory parallelism)**: the domain-decomposition pattern treated throughout this post, splitting the *problem* across independent processes that each hold private memory and communicate explicitly by message passing.
-- **Data parallelism on a GPU (shared-memory, SIMD-style parallelism)**: within a single node, a GPU applies the *same* arithmetic operation to thousands of data elements simultaneously. Returning to the local update step in the serial demonstration above,
+**Correctness under real MPI.** For 1, 2, 4, 8, 12 and 16 ranks, the gathered field after 300 steps on the $240 \times 240$ grid differs from the monolithic solution by exactly $0$. Because the stencil is evaluated in the same order, the parallel code is not merely close to the serial one; it performs the same floating-point operations.
+
+**Strong scaling.** On a $2048 \times 2048$ grid for 200 steps, the results fall well short of the ideal:
+
+| Ranks $P$ | Wall time (s) | Speedup | Halo exchange (s) |
+|---|---|---|---|
+| 1 | 15.55 | 1.00 | 0.00 |
+| 2 | 8.61 | 1.81 | 0.18 |
+| 4 | 7.77 | 2.00 | 0.60 |
+| 8 | 7.18 | 2.16 | 0.76 |
+| 12 | 7.47 | 2.08 | 2.37 |
+| 16 | 6.97 | 2.23 | 3.02 |
+
+<p align="center">
+  <img src="/assets/img/posts/strong_scaling_measured_p7.svg" alt="Measured strong scaling on a 2048 by 2048 grid, with the split between computation and halo exchange" style="width: 100%; max-width: 90%; height: auto; display: block; margin: 0 auto;">
+</p>
+
+*Figure 5: Left, measured speedup on a $2048 \times 2048$ grid against the ideal $S(P) = P$ and a least-squares Amdahl fit. The shaded region uses hardware threads. Right, time spent in computation and in halo exchange on the slowest rank.*
+
+Two ranks nearly halve the run time, and after that the curve is almost flat. The right panel rules out communication as the main cause up to 8 ranks: the halo exchange never exceeds 0.8 s. What stops improving is the **computation itself**, which falls from 15.5 s on one rank to 8.5 s on two and then only to 6.6 s on eight, even though each rank's share of the grid keeps shrinking.
+
+An Amdahl fit to these points returns $f \approx 0.60$, as if 40% of the program were sequential. It is not: every rank does the same fraction of the same stencil, and nothing runs serially. The fit matches the shape of the curve but describes the wrong mechanism, a useful reminder that a model which fits the data is not thereby an explanation of it.
+
+**Weak scaling** makes the cause visible. With 256 rows per rank and 2048 columns, every rank does identical work at every $P$, so in the ideal case the wall time would not change. Instead the efficiency drops to 0.64 at two ranks, 0.42 at four and 0.22 at eight. The halo exchange again accounts for little of this (0.8 s at eight ranks). The computation time per rank, on the other hand, rises from 1.6 s alone to 3.7 s with four ranks and 6.6 s with eight, for exactly the same arithmetic.
+
+<p align="center">
+  <img src="/assets/img/posts/weak_scaling_measured_p7.svg" alt="Measured weak-scaling efficiency with 256 rows per rank" style="width: 100%; max-width: 70%; height: auto; display: block; margin: 0 auto;">
+</p>
+
+*Figure 6: Measured weak-scaling efficiency with 256 rows per rank. The ideal is flat at one; the measured efficiency falls to about 0.2 at eight ranks, mostly because each rank's local computation slows down, not because of communication.*
+
+### The bottleneck is memory bandwidth
+
+Identical work becoming slower as more cores join points to a shared resource, and on a single-socket laptop the obvious candidate is memory bandwidth. I tested this directly with a STREAM-style triad, [`bandwidth_p7.py`]({{ '/assets/code/bandwidth_p7.py' | relative_url }}), in which every rank streams through its own large arrays with no communication at all:
+
+| Ranks $P$ | 1 | 2 | 4 | 8 | 16 |
+|---|---|---|---|---|---|
+| Aggregate bandwidth (GB/s) | 19.7 | 25.4 | 26.9 | 26.4 | 27.7 |
+
+A single core already draws about 20 GB/s, and the whole chip saturates near 27 GB/s with only two ranks. Beyond that point, additional ranks divide a fixed bandwidth among themselves.
+
+The wave-equation update is exactly the kind of kernel this penalizes. It performs about ten floating-point operations per grid point, but in NumPy every operation (each `np.roll`, each addition, each scalar multiplication) makes a full pass over an array in memory, so one time step moves many times more bytes than it performs floating-point operations. Such a kernel is **memory-bound**: its speed is set by how fast data reaches the cores, not by how fast they compute. Once two cores saturate the memory channels, the remaining six add almost nothing, which is why the strong-scaling speedup stalls near $2\times$.
+
+This result does not contradict the case for domain decomposition; it sharpens it. On a cluster, each node brings its own memory channels, so distributing a memory-bound stencil across nodes multiplies the available bandwidth along with the compute. Within a node, the remedies are to raise the kernel's arithmetic intensity: fuse the separate NumPy passes into a single loop (with Numba, Cython or C), tile the grid so that data are reused while still in cache, or move the kernel to a GPU, whose high-bandwidth memory can be roughly two orders of magnitude faster than a laptop's. The same laptop that shows a $2\times$ ceiling here would show a very different curve for a compute-bound kernel.
+
+The runs beyond eight ranks add a second, smaller effect. Ranks 9 to 16 share physical cores with ranks 1 to 8 through simultaneous multithreading, and the halo-exchange time grows from 0.8 s at eight ranks to 3.0 s at sixteen. On a machine with more cores than memory bandwidth, the scaling curve is set by memory long before communication or Amdahl's sequential fraction come into play.
+
+## A second axis of parallelism: inside each node
+
+Everything above concerns parallelism across processes that communicate by message passing. Modern supercomputers add a second, orthogonal axis inside each node. Each El Capitan node is built around AMD Instinct MI300A APUs, which combine CPU cores, GPU cores and a shared pool of high-bandwidth memory in one package. Using such a machine well requires two programming models at once:
+
+- **MPI (distributed-memory parallelism):** the domain decomposition treated throughout this post, splitting the problem across processes that hold private memory and communicate explicitly.
+- **GPU data parallelism (shared memory, SIMD-style):** within a node, a GPU applies the same arithmetic to thousands of data elements simultaneously. The local update above has exactly that structure; for example,
 
   ```python
   lap_x[1:-1, :] = local_curr[2:, :] + local_curr[:-2, :] - 2 * local_curr[1:-1, :]
   ```
 
-  every grid point's Laplacian is computed by an *identical* arithmetic expression, entirely independent of every other grid point's computation. That is exactly the structure a GPU is built to exploit: thousands of lightweight cores each executing the same instruction on a different element of data simultaneously. GPU threading is an entirely different mechanism from the independent-process-plus-message-passing model of MPI, but it serves the same underlying goal of exploiting mathematical independence to obtain wall-clock speed.
+  computes every grid point's contribution with an identical expression, independent of every other point. That independence is what thousands of lightweight GPU cores exploit, and the high-bandwidth memory beside them addresses precisely the bottleneck measured on my laptop.
 
-This combination of MPI *between* nodes and GPU data-parallelism *within* each node is termed a **hybrid parallel programming model**, and it is close to universal across current exascale-class machines rather than specific to El Capitan. Production HPC codes typically express both layers explicitly: MPI calls of the kind shown in the `mpi4py` example above for cross-node communication, together with a GPU programming interface such as CUDA, HIP, or a portable abstraction layer such as Kokkos or RAJA, both developed in part at LLNL for this purpose, for the node-local, data-parallel computation. Understanding both axes, and where the boundary between them should fall for a given problem, is a distinct skill from either one alone, and a common gap between writing a serial numerical method and writing one that uses an exascale machine effectively.
+Combining MPI between nodes with GPU parallelism within them is called a **hybrid programming model**, and it is close to universal on exascale machines. Production codes express both layers explicitly: MPI calls like those above for inter-node communication, and a GPU interface such as CUDA or HIP, or a portability layer such as Kokkos or RAJA (both developed in part at LLNL), for the node-local computation.
 
-## A recent breakthrough: exascale tsunami forecasting
+## Exascale tsunami forecasting
 
-A concrete indication of the practical limit of these ideas is instructive. The Gordon Bell Prize-winning tsunami system mentioned earlier used El Capitan to run the largest unstructured-mesh finite-element simulation to date, resolving 55.5 trillion degrees of freedom {% cite llnl2025gordonbell %}. That scale is inaccessible to any single processor and unreachable even with a modest cluster; it requires precisely the domain-decomposition-plus-halo-exchange pattern described here, scaled across the more than 46,000 accelerator processing units and more than 11 million CPU cores of the machine {% cite llnl2025gordonbell %}.
+The Gordon Bell Prize-winning tsunami system mentioned earlier shows these ideas at their practical limit. It used El Capitan to run the largest unstructured-mesh finite-element simulation to date, resolving 55.5 trillion degrees of freedom {% cite llnl2025gordonbell %}. That scale is out of reach for any single processor or modest cluster; it requires the decomposition-plus-halo-exchange pattern described here, spread across more than 46,000 accelerator processing units and more than 11 million CPU cores {% cite llnl2025gordonbell %}.
 
-What makes the system a genuine breakthrough, not just a scale demonstration, is the *inverse* half of the pipeline: rather than only running forward wave simulations, the team built a system that rapidly solves the inverse problem of inferring the seafloor displacement scenario that best matches real-time pressure sensor data {% cite llnl2025gordonbell %}, turning a physics simulation that would normally require hours into a forecast delivered approximately ten billion times faster than conventional approaches, on the order of a fraction of a second {% cite newswise2025gordonbell %}. That inverse step, proceeding from noisy sensor measurements back to the unknown source parameters that produced them, is the subject of the next post in this series, and the simplified wave-source problem in Figure 2 above is a reduced version of that inference task.
+What makes the system more than a demonstration of scale is its inverse half. Beyond running forward simulations, the team built a framework that rapidly infers the seafloor displacement most consistent with real-time pressure-sensor data {% cite llnl2025gordonbell %}, producing forecasts about ten billion times faster than conventional approaches, in a fraction of a second {% cite newswise2025gordonbell %}. Reasoning from noisy sensor measurements back to the unknown source is the subject of the [next post]({{ '/blog/2026/bayesian-inference-inverse-problems_p8/' | relative_url }}) in this series, and the wave-source problem in Figure 2 is a reduced version of that inference task.
 
-## Summary Notes and Highlights
+## Summary
 
-- **Locality is what makes parallelism possible.** The wave equation's finite-difference stencil touches only nearest neighbors, and this is the structural property that permits domain decomposition to split the problem without changing the answer.
-- **Halo exchange, then independent local computation** is the universal two-phase pattern behind essentially all distributed PDE solvers, regardless of the specific equation being solved.
-- **Verify correctness before optimizing for speed.** A decomposed solve that does not reproduce the monolithic answer, beyond floating-point round-off, contains a defect, almost always in the halo exchange. This should be checked explicitly on every run rather than assumed.
-- **Amdahl's Law is a hard ceiling rather than a heuristic.** A sequential bottleneck caps the maximum attainable speedup regardless of the hardware added, which should directly inform where optimization effort is directed.
-- **Communication overhead, rather than raw computation, is usually the binding constraint at scale.** This is why production codes favor two- and three-dimensional domain decompositions over simple one-dimensional splits, minimizing the surface-to-volume ratio of communication relative to useful work.
-- **The largest-scale scientific breakthroughs at national labs are built directly on these ideas**, scaled from a laptop-sized demo like the one in this post up to tens of millions of cores.
+- **Locality makes parallelism possible.** The finite-difference stencil touches only nearest neighbors, which is what allows domain decomposition to split the problem without changing the answer.
+- **Exchange halos, then compute locally.** This two-phase pattern underlies nearly all distributed PDE solvers, whatever the equation.
+- **Verify correctness before measuring speed.** Here the MPI solver reproduces the monolithic solution exactly; a decomposed solve that disagrees by more than round-off almost always has a halo-exchange bug.
+- **Amdahl's Law is a ceiling, not a diagnosis.** A fitted parallel fraction can match measured speedups while describing the wrong mechanism, as the $f \approx 0.60$ fit to my laptop runs does.
+- **On a single node, memory bandwidth often binds first.** A memory-bound stencil stopped scaling at about two ranks on my laptop because two cores already saturate the memory system; distributing across nodes, fusing operations, or moving to high-bandwidth GPU memory addresses this, while more cores on the same socket do not.
+- **At scale, communication and decomposition geometry matter.** Two- and three-dimensional decompositions reduce halo size relative to useful work, which is why production codes prefer them.
 
 ## References
 
-The core theoretical framework in this post follows {% cite amdahl1967validity %} for strong scaling and {% cite gustafson1988reevaluating %} for the complementary weak-scaling perspective. {% cite gropp2014using %} is the standard reference for MPI programming, including the domain-decomposition patterns used throughout, with {% cite dalcin2008mpi %} documenting the `mpi4py` package used in the reference implementation. {% cite leveque2002finite %} covers the wave equation discretization and stability analysis underlying the demo. The El Capitan system details are drawn from {% cite llnl2024elcapitan %} and {% cite hpcwire2024elcapitan %}, and the Gordon Bell Prize-winning tsunami-forecasting system referenced throughout is documented in {% cite llnl2025gordonbell %} and {% cite newswise2025gordonbell %}.
+The theoretical framework follows {% cite amdahl1967validity %} for strong scaling and {% cite gustafson1988reevaluating %} for weak scaling. {% cite gropp2014using %} is the standard reference for MPI programming and the domain-decomposition patterns used here, and {% cite dalcin2008mpi %} documents `mpi4py`. {% cite leveque2002finite %} covers the discretization and stability of the wave equation. The El Capitan details are drawn from {% cite llnl2024elcapitan %} and {% cite hpcwire2024elcapitan %}, and the Gordon Bell Prize-winning tsunami system from {% cite llnl2025gordonbell %} and {% cite newswise2025gordonbell %}.
 
 {% bibliography --cited --file blog_references %}
 
 ---
 
-*Full, executed code for the domain decomposition demo is available in [`hpc_domain_decomposition_p7.py`]({{ '/assets/code/hpc_domain_decomposition_p7.py' | relative_url }}). The `mpi4py` implementation is provided as a correct reference implementation for real distributed execution.*
+*Code for this post: the serial demonstration and Figures 1 to 4, [`hpc_domain_decomposition_p7.py`]({{ '/assets/code/hpc_domain_decomposition_p7.py' | relative_url }}); the MPI solver, [`wave_mpi_p7.py`]({{ '/assets/code/wave_mpi_p7.py' | relative_url }}); the benchmark driver and plotting script for Figures 5 and 6, [`bench_mpi_p7.py`]({{ '/assets/code/bench_mpi_p7.py' | relative_url }}) and [`plot_bench_p7.py`]({{ '/assets/code/plot_bench_p7.py' | relative_url }}); the bandwidth test, [`bandwidth_p7.py`]({{ '/assets/code/bandwidth_p7.py' | relative_url }}); and the raw measurements, [`bench_p7.json`]({{ '/assets/code/bench_p7.json' | relative_url }}) and [`bandwidth_p7.json`]({{ '/assets/code/bandwidth_p7.json' | relative_url }}).*

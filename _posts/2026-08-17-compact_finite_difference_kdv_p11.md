@@ -2,10 +2,13 @@
 layout: post
 title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation"
 date: 2026-08-17
+description:  
 tags: [numerical-methods, compact-finite-difference, dispersive-waves, KdV, reproducibility]
 giscus_comments: true
 published: true
+# edited: true
 ---
+
 
 ## Motivation
 
@@ -537,29 +540,49 @@ The structural feature governing the behavior is visible in the equations themse
 
 ## 6. Reproducing the paper's figures
 
-Three conventions had to be matched deliberately rather than left to matplotlib's defaults, since the paper's figures are MATLAB output.
+The paper's figures are MATLAB output, and several of their conventions had to be matched deliberately rather than left to matplotlib's defaults.
 
-The first is panel framing. Matplotlib pads every axis by five percent of the data range, which leaves a visible gap between the curve and the frame; the paper's axes have no such padding, and the data runs to the box. Both margins are therefore set to zero in the shared style module, and each script sets its own limits explicitly.
+The first is panel framing. Matplotlib pads every axis by five percent of the data range, which leaves a visible gap between the curve and the frame; the paper's axes have no such padding, and the data runs to the box. The horizontal margin is therefore set to zero in the shared style module, and each script sets its own limits explicitly.
 
-The second is the surface colormap. Every surface in the paper runs blue through cyan, green and yellow to red, for which matplotlib's `jet` is the direct equivalent. The default `viridis` used in an earlier version of this work is a different scale entirely.
+The second is the surface colormap. The paper's surfaces use MATLAB's `turbo` map, which runs from a dark indigo through blue, cyan, green and yellow to a dark maroon. Figure 13 is stored in the published PDF as an RGB image, and its colorbar matches matplotlib's `turbo` exactly; its solution surfaces are also drawn semi-transparent, and its error surfaces use `cool`. Figures 9, 10, 14 and 15, however, are stored as CMYK images, and the print conversion mutes turbo noticeably. To match those figures as they actually appear in the paper, their colormap is sampled directly from the paper's own colorbars. Surface shading is also switched off, because MATLAB's `surf` applies no lighting unless a light is added, whereas matplotlib's default shading darkens every slope.
 
-The third is the camera. All surface panels in the paper use MATLAB's default three-dimensional view, `view(-37.5, 30)`, which corresponds to an elevation of $30$ degrees and an azimuth of $-37.5$ degrees. The same values are applied to every surface panel here.
+The third is the camera, and here MATLAB's default `view(-37.5, 30)` turned out not to apply. The paper's panels are not all drawn from the same angle: the u and v surfaces of the Ito system in Figures 14 and 15, for instance, use different elevations. Each camera was therefore measured from the published panel itself. The on-screen direction and length of the three axes were read off the tick marks, and the orthographic projection equations were solved for the elevation and azimuth, with the axis lengths giving the proportions of the plot box. The resulting values, in matplotlib's convention (azimuth measured from the positive x axis, so MATLAB's azimuth is matplotlib's plus 90 degrees), are:
 
-Panel labels are placed below each axis rather than above it, again following the paper. All three conventions live in `pub_style.py` as `SURFACE_CMAP`, `matlab_view` and `subcaption`, so that no individual figure script sets them independently.
+| Figure | Panels | Elevation | Azimuth |
+|---|---|---|---|
+| 9 | surfaces | $28^\circ$ | $-112^\circ$ |
+| 10 | surfaces | $50^\circ$ | $-102^\circ$ |
+| 13 | all four | $13.7^\circ$ | $-64.5^\circ$ |
+| 14 | $u$ surfaces | $22.6^\circ$ | $-127.8^\circ$ |
+| 14 | $v$ surfaces | $10.6^\circ$ | $-122.2^\circ$ |
+| 15 | $u$ surfaces | $26.6^\circ$ | $-81.5^\circ$ |
+| 15 | $v$ surfaces | $12.7^\circ$ | $-75.5^\circ$ |
+
+The surfaces use MATLAB's orthographic projection in place of matplotlib's default perspective, the $z$ axis sits on the left edge of the box, and each colorbar is a narrow strip beside the box spanning the full data range. The $z$ limits follow MATLAB's automatic choice of the nearest tick beyond the data, except for the $u$ panels of Figure 15, which the paper draws with `axis tight`.
+
+One departure from the paper is deliberate: panel labels such as "(a) $t = 0$" sit above each axis, not below it, which reads better on a web page where the figure caption already sits underneath. All of these conventions live in `pub_style.py` (`SURFACE_CMAP`, the `VIEW_FIG*` camera table, `matlab_view`, `matlab_axes3d`, `matlab_colorbar` and `subcaption`), so that no individual figure script sets them independently.
 
 ## 7. Code
 
-All code is self-contained Python, requiring `numpy`, `scipy`, `sympy`, and `matplotlib`:
+The complete code is on GitHub: [**abelokoj.github.io/_projects/tdccs_project**](https://github.com/abelokoj/abelokoj.github.io/tree/main/_projects/tdccs_project). It is self-contained Python, requiring `numpy`, `scipy`, `sympy`, and `matplotlib`, and the example scripts are written to be read as a tutorial, each opening with an explanation of the physical problem and how it maps onto the solver.
+
+Computation and plotting are separate. The example scripts solve once and save their results to `data/`, and a single plotting script, `make_figures.py`, redraws every surface and snapshot figure from those files. The reason is cost: the stable time step scales like $\Delta x^3$, so the finest runs need hundreds of thousands of Runge-Kutta steps, and recomputing a solution merely to adjust a colour or a camera angle would waste hours. The saved data are included in the repository, so every figure can be redrawn without re-running any solve.
 
 - **`tdccs_lib.py`**: coefficient tables (Tables 1, 2, 3, 4, and 7), modified-wavenumber closures, the periodic circulant solvers for all three third-derivative operators, the first-derivative operators of Lele and of Liu et al., the twelfth-order filter, and TVDRK3.
-- **`pub_style.py`**: the shared publication-quality `matplotlib` style, using Computer Modern fonts at 600 dpi with tight bounding boxes, applied by every figure script.
+- **`nonlinear_kdv.py`**: the shared nonlinear solvers used by Examples 7.2, 7.3, 7.4 and 7.6.
 - **`derive_order_conditions.py`**: symbolic Taylor-series derivation of the order conditions for all three schemes.
 - **`verify_tables.py`**: verification of every published coefficient row against the derived order conditions, and extraction of the leading truncation-error constants.
 - **`fig_fourier_analysis.py`**: Figures 2 and 3, Tables 5, 6, and 7.
 - **`fig_stability.py`**: Figure 4 and the Eq. (6.3) CFL bounds.
-- **`example_7_1_linear_kdv.py`**: Tables 8 and 9, Figures 5 and 6.
-- **`example_7_5_2d_linear.py`**: Table 11 and Figure 13.
-- **`example_nonlinear_soliton.py`**: Figures 7 to 12, 14, and 15.
+- **`example_7_1_linear_kdv.py`**: Example 7.1, Tables 8 and 9 and the data for Figures 5 and 6.
+- **`example_7_2_soliton.py`**: Example 7.2, Table 10 and the data for Figure 7.
+- **`example_7_3_solitons.py`**: Example 7.3, the data for Figures 8, 9 and 10.
+- **`example_7_4_zero_dispersion.py`**: Example 7.4, the data for Figures 11 and 12.
+- **`example_7_5_2d_linear.py`**: Example 7.5, Table 11 and the data for Figure 13.
+- **`example_7_6_ito_system.py`**: Example 7.6, the data for Figures 14 and 15.
+- **`make_figures.py`**: draws Figures 5 to 15 from the saved data (`python make_figures.py`, or `python make_figures.py figure13` for one figure).
+- **`figdata.py`**: saving and loading of the per-figure `.npz` data files.
+- **`pub_style.py`**: the shared publication-quality `matplotlib` style (Computer Modern fonts, 600 dpi, PNG, PDF and SVG output) and the MATLAB conventions described in Section 6.
 
 ## 8. Summary of reproduction status
 
@@ -591,4 +614,4 @@ The compact finite-difference framework used throughout traces to {% cite lele19
 
 ---
 
-*Full code for this post is available in [`tdccs_lib.py`]({{ '/assets/code/tdccs_lib.py' | relative_url }}) and the accompanying scripts listed in Section 6.*
+*The full code for this post, including the saved data behind every figure, is available on [GitHub](https://github.com/abelokoj/abelokoj.github.io/tree/main/_projects/tdccs_project); the scripts are listed in Section 7.*

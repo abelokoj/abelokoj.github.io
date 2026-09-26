@@ -4,7 +4,7 @@ cv:
   email: abelokojunu@gmail.com
   location: Tallahassee, Florida
   image: ""
-  summary: An Applied & Computational Mathematician with interest in scientific computing, HPC, Machine Learning and AI.
+  summary: Applied and computational mathematician with interests in scientific computing, high-performance computing, machine learning, and AI.
 
   social_networks:
     - network: GitHub
@@ -31,7 +31,7 @@ cv:
         score: ""
         courses: ""
         highlights:
-          - "Thesis: Linear Stability Analysis of Rotating Flow using a non-Matrix-forming approach"
+          - "Dissertation: Global Linear Stability Analysis of Capillary-Driven Interfacial Instability: A Jacobian-Free Approach"
           - "Expected completion: Fall 2026"
 
       - institution: Florida State University
@@ -95,7 +95,7 @@ cv:
         location: Tallahassee, Florida, USA
         start_date: "2021-01-01"
         end_date: "2022-04-01"
-        summary: "Organized recitations, graded coursework, and provided feedback to improve students' overall learning experience."
+        summary: "Organized recitations, graded coursework, and provided feedback to students."
         highlights:
           - "Courses: Pre-Calculus, Business Calculus III"
 
@@ -237,7 +237,7 @@ cv:
         date: "2016-04-01"
         awarder: NAMCUS
         url: ""
-        summary: "Awarded at the 300 level, competing against seniors in the 400 level."
+        summary: "Awarded at the 300 level, competing against final-year (400-level) students."
 
       - title: MTN Foundation Scholarship
         authors:

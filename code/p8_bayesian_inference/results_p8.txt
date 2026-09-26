@@ -1,0 +1,15 @@
+Part A acceptance rate: 0.446
+amp_mean=2.9476 amp_ci=[2.69210803 3.2129664 ]
+x0_mean=0.2242 x0_ci=[0.0853523  0.36200995]
+
+Part B acceptance rate: 0.261
+age: ols=-0.0062 bayes_mean=-0.0053 exact_mean=-0.0061 ess=962
+sex: ols=-0.1481 bayes_mean=-0.1490 exact_mean=-0.1480 ess=1095
+bmi: ols=0.3211 bayes_mean=0.3212 exact_mean=0.3212 ess=1037
+bp: ols=0.2004 bayes_mean=0.2007 exact_mean=0.2003 ess=890
+s1: ols=-0.4893 bayes_mean=-0.4722 exact_mean=-0.4744 ess=964
+s2: ols=0.2945 bayes_mean=0.2806 exact_mean=0.2827 ess=991
+s3: ols=0.0624 bayes_mean=0.0542 exact_mean=0.0558 ess=944
+s4: ols=0.1094 bayes_mean=0.1099 exact_mean=0.1076 ess=1104
+s5: ols=0.4640 bayes_mean=0.4556 exact_mean=0.4584 ess=1001
+s6: ols=0.0418 bayes_mean=0.0420 exact_mean=0.0419 ess=950

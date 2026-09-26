@@ -1,0 +1,243 @@
+{
+  "system": {
+    "cpu": "AMD Ryzen 7 6800H with Radeon Graphics",
+    "physical_cores": 8,
+    "logical_cpus": 16,
+    "memory": "7.4Gi",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "os": "Ubuntu 26.04.1 LTS",
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "mpi4py": "4.1.2",
+    "mpi": "mpirun (Open MPI) 5.0.11"
+  },
+  "settings": {
+    "strong_grid": 2048,
+    "steps": 200,
+    "rows_per_rank": 256,
+    "weak_ny": 2048,
+    "repeats": 3
+  },
+  "correctness": [
+    {
+      "ranks": 1,
+      "nx": 240,
+      "ny": 240,
+      "steps": 300,
+      "wall_s": 0.25230776499999985,
+      "comm_s_max": 0.0012410019999991029,
+      "comp_s_max": 0.2508286120000014,
+      "max_abs_diff_vs_serial": 0.0,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 2,
+      "nx": 240,
+      "ny": 240,
+      "steps": 300,
+      "wall_s": 0.12529472099999994,
+      "comm_s_max": 0.011115167000000925,
+      "comp_s_max": 0.11649654699999767,
+      "max_abs_diff_vs_serial": 0.0,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 4,
+      "nx": 240,
+      "ny": 240,
+      "steps": 300,
+      "wall_s": 0.075134759,
+      "comm_s_max": 0.019790751999998246,
+      "comp_s_max": 0.060209707000003165,
+      "max_abs_diff_vs_serial": 0.0,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 8,
+      "nx": 240,
+      "ny": 240,
+      "steps": 300,
+      "wall_s": 0.06188914400000023,
+      "comm_s_max": 0.02646052599999993,
+      "comp_s_max": 0.04299366399999771,
+      "max_abs_diff_vs_serial": 0.0,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 12,
+      "nx": 240,
+      "ny": 240,
+      "steps": 300,
+      "wall_s": 0.06338395299999999,
+      "comm_s_max": 0.030780816999999017,
+      "comp_s_max": 0.04096499700000411,
+      "max_abs_diff_vs_serial": 0.0,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "hwthread"
+    },
+    {
+      "ranks": 16,
+      "nx": 240,
+      "ny": 240,
+      "steps": 300,
+      "wall_s": 0.08140220599999992,
+      "comm_s_max": 0.046807572999999714,
+      "comp_s_max": 0.04117376900000291,
+      "max_abs_diff_vs_serial": 0.0,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "hwthread"
+    }
+  ],
+  "strong": [
+    {
+      "ranks": 1,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 15.545549633,
+      "comm_s_max": 0.0031555240000076257,
+      "comp_s_max": 15.54172909,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 2,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 8.608678921,
+      "comm_s_max": 0.17473219200000556,
+      "comp_s_max": 8.488495263000006,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 4,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 7.770505807,
+      "comm_s_max": 0.5987836570000116,
+      "comp_s_max": 7.485353790999986,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 8,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 7.1844454639999995,
+      "comm_s_max": 0.7551490479999938,
+      "comp_s_max": 6.596306428999989,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 12,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 7.472838391,
+      "comm_s_max": 2.372144415999998,
+      "comp_s_max": 6.342551205000001,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "hwthread"
+    },
+    {
+      "ranks": 16,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 6.965967736,
+      "comm_s_max": 3.020279537999982,
+      "comp_s_max": 4.980747468000022,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "hwthread"
+    }
+  ],
+  "weak": [
+    {
+      "ranks": 1,
+      "nx": 256,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 1.5995699399999999,
+      "comm_s_max": 0.002379063999997433,
+      "comp_s_max": 1.5966067669999997,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 2,
+      "nx": 512,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 2.4866860949999996,
+      "comm_s_max": 0.11380670499999757,
+      "comp_s_max": 2.4013125869999983,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 4,
+      "nx": 1024,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 3.843031977,
+      "comm_s_max": 0.4087110559999956,
+      "comp_s_max": 3.669782479000002,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 8,
+      "nx": 2048,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 7.120714895999999,
+      "comm_s_max": 0.8210796249999888,
+      "comp_s_max": 6.562024889000006,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "core"
+    },
+    {
+      "ranks": 12,
+      "nx": 3072,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 10.815901103000002,
+      "comm_s_max": 2.0404316839999925,
+      "comp_s_max": 9.607919616000006,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "hwthread"
+    },
+    {
+      "ranks": 16,
+      "nx": 4096,
+      "ny": 2048,
+      "steps": 200,
+      "wall_s": 14.247086037999999,
+      "comm_s_max": 6.693007581999993,
+      "comp_s_max": 11.335032016999994,
+      "max_abs_diff_vs_serial": null,
+      "mpi": "Open MPI 5.0.11",
+      "placement": "hwthread"
+    }
+  ]
+}

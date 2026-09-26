@@ -1,0 +1,8 @@
+mu=1 nfev_explicit=302 nfev_implicit=793
+mu=10 nfev_explicit=1196 nfev_implicit=2895
+mu=50 nfev_explicit=2942 nfev_implicit=5230
+mu=100 nfev_explicit=4508 nfev_implicit=6916
+mu=300 nfev_explicit=8138 nfev_implicit=8102
+mu=600 nfev_explicit=12524 nfev_implicit=8779
+mu=1000 nfev_explicit=18638 nfev_implicit=9206
+mu=2000 nfev_explicit=34208 nfev_implicit=9874

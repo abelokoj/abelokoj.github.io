@@ -1,7 +1,7 @@
 ---
 layout: course
 title: "MAC 1140 : Precalculus Algebra"
-description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modelling, matrices and determinants, and sequences and series."
+description: "Preparation for the calculus sequence: analysis of functions and their graphs, polynomial and rational functions, exponential and logarithmic modeling, matrices and determinants, and sequences and series."
 instructor: Abel Okojunu
 year: 2023
 term: "Fall 2023"
@@ -90,19 +90,18 @@ schedule:
 
 ## Role
 
-Instructor of record, **Fall 2023** — classroom instruction, student mentoring,
-and assessment feedback.
+Instructor of record, **Fall 2023**, responsible for classroom instruction, student mentoring, and assessment feedback.
 
 ## Course Overview
 
-A precalculus course building the algebraic foundation students need for the calculus sequence. The emphasis is on functions as objects to be analysed, transformed, and used as models, rather than on symbolic manipulation alone. The section ran in a lab-based format built around adaptive courseware.
+A precalculus course building the algebraic foundation students need for the calculus sequence. The emphasis is on functions as objects to be analyzed, transformed, and used as models, not on symbolic manipulation alone. The section ran in a lab-based format built around adaptive courseware.
 
 ## Topics
 
 - Complex numbers and piecewise functions
 - Quadratic, polynomial, and rational functions; polynomial division and zeros
 - Polynomial and rational inequalities
-- Inverse, exponential, and logarithmic functions; growth and decay modelling
+- Inverse, exponential, and logarithmic functions; growth and decay modeling
 - Matrix algebra and determinants
 - Conic sections
 - Sequences, series, mathematical induction, and the binomial theorem
@@ -120,4 +119,4 @@ A precalculus course building the algebraic foundation students need for the cal
 
 ## Course Materials
 
-This section used ALEKS adaptive courseware (McGraw Hill) in a lab-based format rather than a printed textbook.
+This section used ALEKS adaptive courseware (McGraw Hill) in a lab-based format in place of a printed textbook.

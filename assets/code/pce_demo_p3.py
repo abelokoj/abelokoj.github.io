@@ -129,15 +129,18 @@ plt.close(fig)
 # =======================================================================
 # 2) Mean/variance convergence: PCE vs. Monte Carlo
 # =======================================================================
-# "Exact" reference via a very high-order quadrature-based PCE.
-coeffs_ref = pce_coefficients(40, f)
-mean_ref = coeffs_ref[0]  # E[f] = c_0 for the Legendre basis on Uniform(-1,1)
-var_ref = np.sum((coeffs_ref[1:]**2) * (2.0 / (2 * np.arange(1, len(coeffs_ref)) + 1)) / 2.0)
+# Exact reference values. For f(x) = 1/(1 + 25 x^2) and x ~ Uniform(-1, 1),
+#   E[f]   = (1/2) int_{-1}^{1} dx/(1+25x^2)     = arctan(5)/5,
+#   E[f^2] = (1/2) int_{-1}^{1} dx/(1+25x^2)^2   = (1/2) (1/26 + arctan(5)/5).
+# Using the closed forms (not a high-order PCE, which is itself only accurate
+# to about 1e-8 here) lets the error plots go all the way down to round-off.
+mean_ref = np.arctan(5.0) / 5.0
+var_ref = 0.5 * (1.0 / 26.0 + np.arctan(5.0) / 5.0) - mean_ref**2
 print(f"Reference mean = {mean_ref:.6f}, reference variance = {var_ref:.6f}")
 
 # PCE convergence: mean/variance estimate vs. polynomial order; cost =
 # (order + 5) quadrature evaluations.
-pce_orders = list(range(1, 16))
+pce_orders = list(range(1, 61))
 pce_mean_err, pce_var_err, pce_neval = [], [], []
 for order in pce_orders:
     c = pce_coefficients(order, f)
@@ -149,7 +152,7 @@ for order in pce_orders:
 
 # Monte Carlo convergence: mean/variance estimate vs. sample size, averaged
 # over repeated draws to smooth out sampling noise in the reported error.
-mc_sizes = [10, 30, 100, 300, 1000, 3000, 10000, 30000]
+mc_sizes = [10, 30, 100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
 mc_mean_err, mc_var_err = [], []
 n_repeats = 30
 for N in mc_sizes:
