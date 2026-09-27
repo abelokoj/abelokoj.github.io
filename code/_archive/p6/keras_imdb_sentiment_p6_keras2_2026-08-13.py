@@ -97,24 +97,14 @@ labels = (df["sentiment"] == "positive").astype(int).values
 # Build the vocabulary the same way Keras's own imdb loader does: the top
 # VOCAB_SIZE most frequent words, reserving indices 0-3 for
 # pad/start/unknown/unused.
-#
-# Keras 3 removed keras.preprocessing.text.Tokenizer. The few lines below
-# reproduce its ranking exactly: words ordered by frequency, ties broken by
-# first appearance, ranks starting at 1. (keras.layers.TextVectorization is
-# the Keras 3 layer for this, but it truncates long reviews from the end,
-# while the IMDB convention used here keeps the last MAX_LEN tokens.)
-word_counts = {}
-for t in texts:
-    for w in t.split():
-        word_counts[w] = word_counts.get(w, 0) + 1
-ranked = sorted(word_counts, key=lambda w: word_counts[w], reverse=True)  # stable
-word_index = {w: i + 1 for i, w in enumerate(ranked)}
+tokenizer = keras.preprocessing.text.Tokenizer(num_words=VOCAB_SIZE - 3)
+tokenizer.fit_on_texts(texts)
 
 
 def encode(text):
     seq = [1]  # <start>
     for w in text.split():
-        idx = word_index.get(w)
+        idx = tokenizer.word_index.get(w)
         seq.append(idx + 3 if (idx is not None and idx < VOCAB_SIZE - 3) else 2)  # 2 = <unk>
     return seq
 
@@ -131,10 +121,8 @@ X_test_seq = [sequences[i] for i in test_idx]
 y_train = labels[train_idx]
 y_test = labels[test_idx]
 
-# keras.utils.pad_sequences is the Keras 3 location; defaults (pre-padding,
-# pre-truncation) match the old keras.preprocessing.sequence version.
-X_train = keras.utils.pad_sequences(X_train_seq, maxlen=MAX_LEN)
-X_test = keras.utils.pad_sequences(X_test_seq, maxlen=MAX_LEN)
+X_train = keras.preprocessing.sequence.pad_sequences(X_train_seq, maxlen=MAX_LEN)
+X_test = keras.preprocessing.sequence.pad_sequences(X_test_seq, maxlen=MAX_LEN)
 
 print(f"Train: {len(X_train)} reviews, Test: {len(X_test)} reviews")
 print(f"Train label balance: {y_train.mean():.3f} positive")
@@ -143,7 +131,6 @@ print(f"Example review (as word indices): {X_train[0][:10]}...")
 # ---------------------------------------------------------------------
 # Model
 # ---------------------------------------------------------------------
-keras.utils.set_random_seed(42)   # reproducible weights, dropout and shuffling
 model = keras.Sequential([
     keras.layers.Input(shape=(MAX_LEN,)),
     keras.layers.Embedding(input_dim=VOCAB_SIZE, output_dim=32),
@@ -197,8 +184,9 @@ test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
 print(f"Test accuracy: {test_acc:.4f}, test loss: {test_loss:.4f}")
 
 # ---------------------------------------------------------------------
-# Evaluate on new text
+# Evaluate on genuinely new text
 # ---------------------------------------------------------------------
+word_index = tokenizer.word_index
 
 
 def predict_sentiment(text, tokenizer_word_index=word_index):
@@ -209,7 +197,7 @@ def predict_sentiment(text, tokenizer_word_index=word_index):
         else 2
         for w in tokens
     ]
-    padded = keras.utils.pad_sequences([encoded], maxlen=MAX_LEN)
+    padded = keras.preprocessing.sequence.pad_sequences([encoded], maxlen=MAX_LEN)
     prob = model.predict(padded, verbose=0)[0, 0]
     return ("positive" if prob > 0.5 else "negative"), prob
 

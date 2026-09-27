@@ -1,0 +1,3 @@
+test_acc=0.8733 test_loss=0.2986
+sample1: 'waste of time' -> negative (0.085)
+sample2: 'brilliant film' -> positive (0.907)

@@ -8,16 +8,17 @@ category: research
 giscus_comments: false
 ---
 
-Third-order spatial derivatives appear in every dispersive wave model, and the Korteweg-de Vries (KdV) equation is the canonical example. Salian, Samala and Ghosh (_Numerical Methods for Partial Differential Equations_, 2026, 42:e70060, [doi:10.1002/num.70060](https://doi.org/10.1002/num.70060)) proposed the **third-derivative central compact scheme (TDCCS)**, which evolves node values and cell-center values as independent variables and computes derivatives at each set of points from _both_ grids, with no interpolation at any stage.
+Third-order spatial derivatives appear in every dispersive wave model, and the Korteweg-de Vries (KdV) equation is the canonical example. Salian, Samala and Ghosh (_Numerical Methods for Partial Differential Equations_, 2026, 42:e70060, [doi:10.1002/num.70060](https://doi.org/10.1002/num.70060); openly available as a [PDF](https://debog.github.io/Files/2026_Salian_EtAl_NMPDE.pdf) from the author's [website](https://debog.github.io/publications.html)) proposed the **third-derivative central compact scheme (TDCCS)**, which evolves node values and cell-center values as independent variables and computes derivatives at each set of points from _both_ grids, with no interpolation at any stage.
 
 The original work uses MATLAB and its code is not publicly available. This project is an independent, open-source Python implementation: it derives the scheme's coefficients from the order conditions rather than transcribing the published tables, verifies them against the paper, and reproduces every figure and table of the paper's numerical section at the paper's own parameters.
 
 ## Highlights
 
-- **Coefficients derived symbolically.** 25 of the 26 published coefficient rows satisfy every order condition they claim; the derivation also identified discrepancies in the printed Table 1 and Eqs. (3.5) to (3.7).
+- **Coefficients derived symbolically.** 25 of the 26 published coefficient rows satisfy every order condition they claim; the remaining row (Table 1, TDCNCS-P8) is a sign typo, $\beta = +1/166$ where $-1/166$ is printed. The derivation also shows that the printed Eqs. (3.5) to (3.7) are the order conditions of the cell-centered scheme, not of TDCCS; no numerical results are affected.
 - **Truncation-error constants** agree with the paper in every published digit.
 - **Spectral and stability analysis** (modified wavenumber, resolving efficiency, CFL bounds) agrees to within $10^{-4}$ or to three or four significant figures.
-- **Two-dimensional test (Example 7.5):** TDCCS matches the published errors in every digit at $N = 10$, $15$ and $20$.
+- **Linear convergence tests (Example 7.1):** Table 9 is reproduced over the paper's full range $N = 20$ to $160$ to four significant figures, with convergence rates within $0.06$ of the paper's.
+- **Two-dimensional test (Example 7.5):** reproduced over the paper's full range $N = 10$ to $40$; both schemes match the published errors in every digit at $N = 10$ and $15$ and agree to within 0.8 percent through $N = 30$, beyond which both runs are limited by round-off.
 - **Nonlinear problems** (soliton collisions and splitting, the zero-dispersion limit, the coupled Ito system) are run at the paper's grids and integration windows and reproduce the structures the paper describes.
 
 ## Selected results
@@ -34,7 +35,7 @@ The original work uses MATLAB and its code is not publicly available. This proje
     {% include figure.liquid loading="lazy" path="assets/img/projects/figure13_example75.png" title="Two-dimensional linear dispersion" class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
-<div class="caption">Example 7.5: two-dimensional linear dispersion. Solution surfaces (top) and pointwise errors (bottom); TDCCS reproduces the published errors exactly.</div>
+<div class="caption">Example 7.5: two-dimensional linear dispersion. Solution surfaces (top) and pointwise errors (bottom); both schemes reproduce the published errors closely.</div>
 
 <div class="row">
   <div class="col-sm mt-3 mt-md-0">
