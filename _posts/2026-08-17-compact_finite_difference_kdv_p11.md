@@ -2,7 +2,7 @@
 layout: post
 title: "Reproducing a Central Compact Finite-Difference Scheme for the Korteweg-de Vries Equation"
 date: 2026-08-17
-description:  
+description: An open-source Python reproduction of the TDCCS compact scheme for KdV by Salian, Samala and Ghosh, from coefficient derivation to all six examples.
 tags: [numerical-methods, compact-finite-difference, dispersive-waves, KdV, reproducibility]
 giscus_comments: true
 published: true
@@ -16,11 +16,11 @@ Third-order spatial derivatives appear in every dispersive wave model, of which 
 
 Classical compact (Padé-type) schemes, following Lele {% cite lele1992compact %}, obtain spectral-like resolution from narrow stencils at the cost of a matrix inversion at each evaluation. Node-based compact schemes are accurate but lose resolution at short wavelengths. Cell-centered compact schemes improve resolution but require an interpolation step onto the staggered grid, and that interpolation introduces transfer errors which offset part of the resolution gain.
 
-This post reproduces, derives, and validates the scheme proposed by Salian, Samala, and Ghosh {% cite salian2026central %}, published in *Numerical Methods for Partial Differential Equations* (2026, 42:e70060), whose contribution is a third option: retain **both** the node values and the cell-center values as independently evolved variables, and compute derivatives at each set of points using values from *both* grids, with no interpolation at any stage. The authors designate this the **third-derivative central compact scheme (TDCCS)**.
+This post reproduces, derives, and validates the scheme proposed by Salian, Samala, and Ghosh {% cite salian2026central %}, published in *Numerical Methods for Partial Differential Equations* (2026, 42:e70060). The paper is openly available from the author's website, through the [publications page](https://debog.github.io/publications.html) or as a direct [PDF](https://debog.github.io/Files/2026_Salian_EtAl_NMPDE.pdf). Its contribution is a third option: retain **both** the node values and the cell-center values as independently evolved variables, and compute derivatives at each set of points using values from *both* grids, with no interpolation at any stage. The authors designate this the **third-derivative central compact scheme (TDCCS)**.
 
-The original work uses MATLAB, and its code is not publicly available. The implementation presented here is therefore an open-source alternative, intended additionally as an entry point for readers approaching compact finite differences for the first time.
+The original work uses MATLAB, and its code is not publicly available. The implementation presented here is therefore an open-source alternative, intended also as an entry point for readers approaching compact finite differences for the first time.
 
-Three objectives structure what follows: to derive the coefficients of the scheme rather than transcribe the published tables, to implement the scheme and verify it against the paper's own reported values, and to state explicitly where the reproduction is exact and where it necessarily diverges. The third objective is not incidental. Four of the paper's six numerical examples use first-derivative operators cited from other sources but not written out numerically in the paper itself, so any independent reproduction encounters the same difficulty documented in Section 4 below.
+Three objectives structure what follows: to derive the coefficients of the scheme instead of transcribing the published tables, to implement the scheme and verify it against the paper's own reported values, and to state explicitly where the reproduction is exact and where it necessarily diverges. The third objective is not incidental. Four of the paper's six numerical examples use first-derivative operators cited from other sources but not written out numerically in the paper itself, so any independent reproduction encounters the difficulty documented in Section 4 below.
 
 ## 1. The three schemes and the basis of comparison
 
@@ -38,7 +38,7 @@ They differ only in **the grid from which the explicit right-hand side draws its
 | **TDCCCS** (cell-centered, Eq. 2.5) | cell centers only | yes, to obtain the centers |
 | **TDCCS** (the paper's new scheme, Eq. 3.1-3.2) | both nodes and centers, evolved together | **no** |
 
-The principle underlying TDCCS is straightforward once stated. Rather than interpolating $f$ onto the half-grid points and then differentiating, which is the step at which TDCCCS forfeits accuracy, the same form of compact-derivative formula is applied to obtain $f'''$ directly at the half-grid points, treating the half-grid values as their own evolved unknowns coupled to the node values. Memory cost approximately doubles. The paper's efficiency argument is that an interpolation solve is replaced by a derivative solve of comparable cost, so the additional expense is in memory rather than computation.
+The principle underlying TDCCS is simple once stated. TDCCCS interpolates $f$ onto the half-grid points and then differentiates, and the interpolation is the step at which it forfeits accuracy. TDCCS instead applies the same form of compact-derivative formula to obtain $f'''$ directly at the half-grid points, treating the half-grid values as their own evolved unknowns coupled to the node values. Memory cost approximately doubles. The paper's efficiency argument is that an interpolation solve is replaced by a derivative solve of comparable cost, so the additional expense lies in memory, not in computation.
 
 ## 2. Deriving the coefficients
 
@@ -48,7 +48,7 @@ $$
 f_{j+m} = \sum_{k} D_k \frac{(mh)^k}{k!}, \qquad D_k \equiv f^{(k)}(x_j),
 $$
 
-substitute into the difference of the left- and right-hand sides of the scheme, and collect powers of $h$ against each symbolic derivative $D_3, D_4, D_5, \dots$. The coefficient of $D_3$ yields the order-2 condition, which requires only that the scheme approximate $f'''$ consistently. The coefficient of $D_5$ yields the order-4 condition, $D_4$ vanishing automatically by antisymmetry, and so on for higher orders. The derivation was carried out symbolically in `sympy` rather than by hand; see `derive_order_conditions.py`.
+substitute into the difference of the left- and right-hand sides of the scheme, and collect powers of $h$ against each symbolic derivative $D_3, D_4, D_5, \dots$. The coefficient of $D_3$ yields the order-2 condition, which requires only that the scheme approximate $f'''$ consistently. The coefficient of $D_5$ yields the order-4 condition, $D_4$ vanishing automatically by antisymmetry, and so on for higher orders. The derivation was carried out symbolically in `sympy`; see `derive_order_conditions.py`.
 
 ```python
 h, m = sp.symbols('h m', positive=True)
@@ -70,9 +70,9 @@ coefficient of D[3] : -a + 2*alpha - b + 2*beta - c + 1        # matches Eq. 3.3
 coefficient of D[5] : -a/16 + alpha - 13*b/80 + 4*beta - 29*c/80  # matches Eq. 3.4
 ```
 
-### A discrepancy in the published order conditions above fourth order
+### The printed order conditions above fourth order
 
-Continuing the derivation to sixth order and beyond produces conditions that do not match the paper's printed Eqs. (3.5), (3.6), and (3.7). The derived conditions are
+Continuing the derivation to sixth order and beyond produces conditions that do not match the paper's printed Eqs. (3.5), (3.6), and (3.7). The derived TDCCS conditions are
 
 $$
 \begin{aligned}
@@ -82,11 +82,17 @@ $$
 \end{aligned}
 $$
 
-against printed right-hand sides of $13a/160 + 93b/160 + 2451c/1120$, $205a/2688 + 4069b/2688 + 30025c/2688$, and $671a/7680 + 36991b/7680 + 534991c/7680$ respectively. The left-hand sides agree in every case: the discrepancy lies entirely in the coefficients of $a$, $b$, and $c$ on the right. The order-2 and order-4 conditions, Eqs. (3.3) and (3.4), agree exactly.
+against printed right-hand sides of $13a/160 + 93b/160 + 2451c/1120$, $205a/2688 + 4069b/2688 + 30025c/2688$, and $671a/7680 + 36991b/7680 + 534991c/7680$ respectively. The left-hand sides agree in every case, and the order-2 and order-4 conditions, Eqs. (3.3) and (3.4), agree exactly.
 
-Two independent checks indicate that the derivation above is correct and the printed equations are not. First, substituting the paper's own Table 4 coefficients into its own printed Eqs. (3.5) to (3.7) leaves non-zero residuals for every row of order six or higher: TDCCS-E6 gives $1181/7680$, TDCCS-T6 gives $2$, TDCCS-T8 gives $831841/564800$ at order six, and so on. Second, substituting the same coefficients into the derived conditions gives exactly zero for all eight rows of Table 4, at every order each row claims. The coefficients the paper actually uses are therefore consistent with the derivation presented here and inconsistent with the equations printed alongside them.
+The printed right-hand sides are exactly the sixth-, eighth- and tenth-order conditions of the cell-centered scheme TDCCCS (Eq. 2.5), not those of TDCCS. For example, the TDCCCS order-6 condition,
 
-The most probable explanation is a transcription error affecting the three higher-order equations as printed, rather than an error in the coefficients themselves. Since Table 4 supplies the values used in every figure and reported result, the error does not propagate into any of the paper's numerical output. It is recorded here because a reader attempting to reconstruct the coefficients from Eqs. (3.5) to (3.7) will not obtain Table 4.
+$$
+-\frac{13a}{1920} + \frac{\alpha}{12} - \frac{31b}{640} + \frac{4\beta}{3} - \frac{817c}{4480} = 0,
+$$
+
+multiplied by 12 gives $\alpha + 16\beta = 13a/160 + 93b/160 + 2451c/1120$, which is the printed Eq. (3.5); the same holds for Eqs. (3.6) and (3.7). Two further checks confirm that the coefficients themselves are correct. Substituting the paper's Table 4 coefficients into the printed Eqs. (3.5) to (3.7) leaves non-zero residuals for every row of order six or higher: TDCCS-E6 gives $1181/7680$, TDCCS-T6 gives $2$, TDCCS-T8 gives $831841/564800$ at order six, and so on. Substituting the same coefficients into the derived conditions gives exactly zero for all eight rows of Table 4, at every order each row claims.
+
+The printed equations therefore appear to have been copied from the TDCCCS derivation, while Table 4 was computed from the correct TDCCS conditions. Since Table 4 supplies the values used in every figure and reported result, no numerical result in the paper is affected. The point matters only to a reader who reconstructs the coefficients from Eqs. (3.5) to (3.7), who will not obtain Table 4.
 
 ### Verification against the published coefficient tables
 
@@ -98,15 +104,15 @@ As a stronger check, all 26 published coefficient rows (Tables 1, 2, and 4) were
 | TDCCCS (Eq. 2.5) | $6.572523\times10^{-5}$ | $6.57252\times10^{-5}$ |
 | TDCCS (Eq. 3.1) | $-2.188201\times10^{-6}$ | $2.1882\times10^{-6}$ (magnitude only) |
 
-The magnitudes agree to every published digit. This constitutes the strongest available evidence that both the derivation and the interpretation of the coefficient tables are correct. The sign of the TDCCS constant is negative in the derivation; the paper reports magnitude alone, so the two are not in conflict.
+The magnitudes agree to every published digit, which is the strongest available evidence that both the derivation and the interpretation of the coefficient tables are correct. The derived TDCCS constant is negative; the paper reports the magnitude alone, so the two are not in conflict.
 
-Of the 26 rows, 25 satisfy every order condition they claim, exactly. The single exception is **TDCNCS-P8** (Table 1), which fails all four of its conditions rather than only the leading one. Substituting $a=160/83$, $b=-5/166$, $c=0$, $\alpha=147/332$, and $\beta=-1/166$ into the order-2 condition gives
+Of the 26 rows, 25 satisfy every order condition they claim, exactly. The single exception is **TDCNCS-P8** (Table 1), which fails all four of its conditions. Substituting the printed values $a=160/83$, $b=-5/166$, $c=0$, $\alpha=147/332$, and $\beta=-1/166$ into the order-2 condition gives
 
 $$
 1 + 2\alpha + 2\beta - (a+b+c) = \frac{311}{166} - \frac{315}{166} = -\frac{2}{83} \neq 0 ,
 $$
 
-with residuals of $-4/83$, $-4/249$, and $-8/3735$ at orders four, six, and eight respectively. A row failing its consistency condition at every order is more consistent with a misprinted coefficient than with a scheme of reduced accuracy, though which coefficient is at fault cannot be determined from the published values alone. The row is not used in any of the paper's computations, which employ the T8 tridiagonal variant throughout Section 7, so the consequence is limited.
+with residuals of $-4/83$, $-4/249$, and $-8/3735$ at orders four, six, and eight respectively. With $c=0$ the row has four unknowns ($a$, $b$, $\alpha$, $\beta$) and four order conditions, so its coefficients are determined uniquely. The unique solution is $a=160/83$, $b=-5/166$, $\alpha=147/332$, and $\beta=+1/166$: every printed value matches except the sign of $\beta$. The row is not used in any of the paper's computations, which employ the T8 tridiagonal variant throughout Section 7, so no result is affected.
 
 ## 3. Implementing the operators
 
@@ -121,23 +127,27 @@ def third_derivative_TDCNCS(f, dx, coeffs):
     return pentadiagonal_solve(rhs, alpha, beta)
 ```
 
-TDCCS is the more demanding case, because Eq. (3.1), which gives derivatives at nodes, and Eq. (3.2), which gives derivatives at centers, are coupled: neither can be solved independently of the other. Establishing which node and center indices correspond in Eq. (3.2) requires care. The equation as printed is centered at the half-grid point $x_{j-1/2}$, so relabelling with $k = j-1$ is necessary before it aligns with a clean circulant pentadiagonal pattern in the array of center values. An initial implementation used the wrong relabelling, with the diagnostic symptom that the third-derivative operator diverged under grid refinement rather than converging, which is characteristic of an index-shift error. After correcting the relabelling, the operator was validated on $f = \sin(kx)$ over a periodic domain:
+TDCCS is the more demanding case, because Eq. (3.1), which gives derivatives at nodes, and Eq. (3.2), which gives derivatives at centers, are coupled: neither can be solved independently of the other. Establishing which node and center indices correspond in Eq. (3.2) requires care. The equation as printed is centered at the half-grid point $x_{j-1/2}$, so relabelling with $k = j-1$ is necessary before it aligns with a clean circulant pentadiagonal pattern in the array of center values. An initial implementation used the wrong relabelling, with the diagnostic symptom that the third-derivative operator diverged under grid refinement instead of converging, which is characteristic of an index-shift error.
 
-```
-N     max error (TDCCS, 8th order)
-20    5.80e-05
-40    3.87e-07
-80    2.05e-09
-160   2.05e-09
-```
+With the relabelling corrected, both eighth-order operators were validated by `validate_operators.py` on $f = \sin(kx)$ over the periodic domain $[0, 2\pi)$, measuring the maximum error in $f'''$ over nodes and centers. For $k=4$, which spans the convergent range best:
 
-The error reduction factors between successive refinements are approximately 150 and 189, against the factor of $2^8 = 256$ expected for a formally eighth-order scheme. The observed rates are therefore consistent with eighth-order convergence in the sense that they are of the correct order of magnitude, though they fall somewhat short of the asymptotic factor; the discrepancy is not accounted for here. The error does not decrease between $N=80$ and $N=160$, indicating that some floor has been reached. That floor is not machine precision, which for double-precision arithmetic is of order $10^{-16}$, roughly seven orders of magnitude below the observed value. The more likely explanation is the conditioning of the coupled circulant solve, but this was not investigated further, and the identical values at the two finest grids leave open the possibility of a tabulation error. **Flagged for verification.**
+| $N$ | TDCNCS-T8 error | rate | TDCCS-T8 error | rate |
+|---|---|---|---|---|
+| 10 | 6.518e+00 | | 7.279e-02 | |
+| 20 | 8.761e-03 | 9.54 | 9.533e-04 | 6.25 |
+| 40 | 2.775e-05 | 8.30 | 7.750e-06 | 6.94 |
+| 80 | 1.031e-07 | 8.07 | 4.122e-08 | 7.55 |
+| 160 | 5.270e-10 | 7.61 | 1.449e-09 | 4.83 |
+| 320 | 1.095e-09 | -1.06 | 1.867e-08 | -3.69 |
+| 640 | 2.324e-08 | -4.41 | 8.100e-08 | -2.12 |
+
+Both operators converge at close to eighth order until the error reaches about $10^{-9}$ for $k=4$, roughly $10^{-11}$ relative to the magnitude $k^3 = 64$ of $f'''$. For $k=1$ the same minimum is reached at $N=40$, where TDCNCS gives $6.2\times10^{-12}$ and TDCCS $5.9\times10^{-12}$, after which the errors grow. Beyond that point refinement makes the error larger, by a factor of between 4 and 21 per doubling of $N$, broadly in line with the factor of 8 that $N^3$ growth predicts. This is the standard round-off amplification of a third-derivative approximation: a rounding error of order machine epsilon in $f$ is divided by $\Delta x^3$. The minimum error of a third-derivative operator in double precision therefore lies far above machine epsilon itself. TDCCS approaches its asymptotic rate from below (6.25, 6.94, 7.55), consistent with the TDCCS rates of the paper's Table 9, which rise from 6.3 to 7.8.
 
 ## 4. Operators the paper cites but does not tabulate
 
 The paper's Section 7 presents six numerical examples, each stated in full in Section 5 below. Two of them, **Example 7.1** (one-dimensional linear KdV, $u_t + c^{-2}u_{xxx}=0$) and **Example 7.5** (two-dimensional linear dispersion, $u_t+u_{xxx}+u_{yyy}=0$), involve only the third-derivative operator; no convective first-derivative term is required. These two are reproducible without ambiguity, because every coefficient involved is tabulated in the paper. This section addresses the obstacle the other four present.
 
-The remaining four examples (7.2, 7.3, 7.4, and 7.6) are nonlinear and require a first-derivative compact scheme for the flux term $g(u)_x$. One point of navigation is worth recording for anyone working from the paper directly: several of its captions carry example numbers that do not match the surrounding text. Table 11 and Figure 13 are labelled as belonging to Example 7.6 although they present the two-dimensional linear results of Example 7.5, and Figures 11 and 12 are labelled Example 7.3 although they present the zero-dispersion and top-hat results of Example 7.4. The text itself is consistent; only the captions are affected. The paper states that it uses the existing eighth-order cell-node compact scheme of Lele {% cite lele1992compact %} for TDCNCS, and the existing eighth-order central compact scheme of Liu et al. {% cite liu2013central %} for TDCCS. Neither operator's numerical coefficients are tabulated in the paper. An earlier version of this post substituted a spectral (FFT) first derivative at this point and flagged the substitution explicitly. The coefficients have since been taken directly from the two cited sources and implemented:
+The remaining four examples (7.2, 7.3, 7.4, and 7.6) are nonlinear and require a first-derivative compact scheme for the flux term $g(u)_x$. The paper states that it uses the existing eighth-order cell-node compact scheme of Lele {% cite lele1992compact %} for TDCNCS, and the existing eighth-order central compact scheme of Liu et al. {% cite liu2013central %} for TDCCS. Neither operator's numerical coefficients are tabulated in the paper, so both were taken directly from the two cited sources and implemented:
 
 - **Lele (1992).** The classical node-only compact first-derivative family. The eighth-order tridiagonal member, used for the TDCNCS convective term, has $\alpha=3/8$, $a=25/16$, $b=1/5$, and $c=-1/80$. These values were verified against Lele's own ladder of Taylor order conditions before use; all four conditions hold exactly, including the order-2 condition $a+b+c = 1+2\alpha = 7/4$.
 - **Liu, Zhang, Zhang, and Shu (2013).** Their central compact scheme couples node and cell-center values in the same manner as the present paper's TDCCS couples them for the third derivative, with no interpolation and both grids evolved together. Row CCS-T8 of their Table 2.2, used for the TDCCS convective term, gives $\alpha=-3/20$, $a=2$, $b=-61/50$, $c=-2/25$, and $d=e=0$. These were verified against their Eq. (2.8) order-2 condition before use.
@@ -152,9 +162,9 @@ N     Lele CNCS8 error    Liu CCS8 error (coupled node+center)
 160   6.35e-12            3.42e-13
 ```
 
-The Lele operator reduces error by factors of 271, 260, and 255 across successive refinements, in close agreement with the expected factor of 256. The Liu operator gives factors of 222, 246, and 182, which are of the right order but noticeably more variable; the value at the finest grid in particular is well below $2^8$, plausibly because the error has begun to approach a conditioning-limited floor of the kind observed in Section 3. This variability is reported rather than averaged away.
+The Lele operator reduces error by factors of 271, 260, and 255 across successive refinements, in close agreement with the expected factor of 256. The Liu operator gives factors of 222, 246, and 182, which are of the right order but noticeably more variable; the value at the finest grid in particular is well below $2^8$, plausibly because the error has begun to approach the round-off level. This variability is reported, not averaged away.
 
-With both operators in place, every nonlinear example in Section 5 uses the first-derivative operator the paper cites, on the TDCNCS side using node values only and on the TDCCS side using node and center values evolved together, matching the paper's internal consistency between its third- and first-derivative treatments. Each example is now run at the paper's own grid sizes and integration windows. The restriction $\Delta t \sim \mathrm{CFL}\cdot\Delta x^3$ remains the binding cost throughout, and it is severe: halving $\Delta x$ divides the admissible time step by eight, so a run on a grid twice as fine costs roughly sixteen times as much in total. Example 7.4 is the extreme case, with its finest configuration requiring on the order of $2\times10^5$ TVDRK3 steps.
+With both operators in place, every nonlinear example in Section 5 uses the first-derivative operator the paper cites, on the TDCNCS side using node values only and on the TDCCS side using node and center values evolved together, matching the paper's internal consistency between its third- and first-derivative treatments. Each example is run at the paper's own grid sizes and integration windows. The restriction $\Delta t \sim \mathrm{CFL}\cdot\Delta x^3$ remains the binding cost throughout, and it is severe: halving $\Delta x$ divides the admissible time step by eight, so a run on a grid twice as fine costs roughly sixteen times as much in total. Example 7.4 is the extreme case, with its finest configuration requiring on the order of $2\times10^5$ TVDRK3 steps.
 
 ### Fourier and spectral-resolution results: exact
 
@@ -164,7 +174,7 @@ Figures 2 and 3 and Tables 5 and 6 depend only on the modified-wavenumber formul
   <img src="/assets/img/projects/figure2_TDCNCS_TDCCCS.svg" alt="Modified wavenumber against wavenumber for TDCNCS, TDCCCS, and TDCCCS-CI" style="width: 100%; max-width: 95%; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 2: Modified wavenumber against wavenumber for (a) TDCNCS, (b) TDCCCS, and (c) TDCCCS-CI, the last using tenth-order compact interpolation onto the half grid. The divergence of the T4 curve near $\omega \approx 2$ in panel (a) is a genuine property of the scheme rather than an implementation error: its implicit denominator $1+\cos\omega$ vanishes at $\omega=\pi$.*
+*Figure 2: Modified wavenumber against wavenumber for (a) TDCNCS, (b) TDCCCS, and (c) TDCCCS-CI, the last using tenth-order compact interpolation onto the half grid. The T4 curve in panel (a) rises steeply and leaves the plotted range well before $\omega = \pi$; this is a property of the scheme, not an implementation error, since its implicit denominator $1+\cos\omega$ vanishes at $\omega=\pi$.*
 
 <p align="center">
   <img src="/assets/img/projects/figure3_TDCCS.svg" alt="Modified wavenumber for TDCCS and TDCCS-CI" style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;">
@@ -190,11 +200,11 @@ The computed bandwidth-resolving efficiencies reproduce the paper's Tables 5 and
 | TDCCCS | 0.1291 | 0.1290 | 0.2545 | 0.2545 | 0.3519 | 0.3518 | 0.4754 | 0.4753 |
 | TDCCS | 0.1294 | 0.1294 | 0.2498 | 0.2497 | 0.5376 | 0.5376 | 0.7284 | 0.7284 |
 
-The residual differences of $10^{-4}$ are consistent with the resolution of the wavenumber grid on which $\omega_f$ is located, rather than with any disagreement in the underlying formulas.
+The residual differences of $10^{-4}$ are consistent with the resolution of the wavenumber grid on which $\omega_f$ is located and do not indicate any disagreement in the underlying formulas.
 
 ### Stability analysis: agreement within grid-resolution noise
 
-The maximum eigenvalue magnitude of each spatial operator was computed directly. For TDCCS this was done by constructing the full $2N\times2N$ coupled operator numerically and calling `numpy.linalg.eigvals`, rather than deriving its $2\times2$ Fourier symbol by hand. The result was then combined with the TVDRK3 stability polynomial $R(z) = 1+z+z^2/2+z^3/6$.
+The maximum eigenvalue magnitude of each spatial operator was computed directly. For TDCCS this was done by constructing the full $2N\times2N$ coupled operator numerically and calling `numpy.linalg.eigvals`, without deriving its $2\times2$ Fourier symbol by hand. The result was then combined with the TVDRK3 stability polynomial $R(z) = 1+z+z^2/2+z^3/6$.
 
 <p align="center">
   <img src="/assets/img/projects/figure4_stability.svg" alt="Eigenvalues of the spatial operators and the TVDRK3 stability region" style="width: 100%; max-width: 90%; height: auto; display: block; margin: 0 auto;">
@@ -213,9 +223,11 @@ The maximum eigenvalue magnitude of each spatial operator was computed directly.
 
 ## 5. The six numerical examples
 
-The paper's Section 7 presents six numerical experiments. Each is stated below in full: the governing equation, the domain and boundary conditions, the initial condition, and the exact solution where one exists. Equation numbers refer to the paper throughout. Every case uses periodic boundary conditions and the TVDRK3 time integrator of Eq. (6.2), with the time step set by Eq. (7.1).
+The paper's Section 7 presents six numerical experiments. Each is stated below in full: the governing equation, the domain and boundary conditions, the initial condition, and the exact solution where one exists. Equation, figure and table numbers follow the paper's numbering throughout. Every case uses periodic boundary conditions and the TVDRK3 time integrator of Eq. (6.2), with the time step set by Eq. (7.1).
 
-Three of the six admit closed-form solutions, which permits quantitative error measurement. The remaining three do not, and for those the comparison rests on reproducing the structures the paper describes.
+The error norms follow the paper's stated definitions, $L^1 = \frac{1}{N+1}\sum_i |u_e - u_a|$ and $L^2 = \big(\frac{1}{N+1}\sum_i |u_e - u_a|^2\big)^{1/2}$. The tables below show $L^\infty$ only; the reproduction's $L^1$ values differ from the paper's by a constant factor, for the reason given in the notes at the end of this post. All 138 convergence rates printed in the paper's Tables 8 to 11 were also recomputed from the paper's own printed errors, and every one is consistent with them to within $0.002$.
+
+Three of the six examples admit closed-form solutions, which permits quantitative error measurement. The remaining three do not, and for those the comparison rests on reproducing the structures the paper describes.
 
 | Example | Governing equation | Exact solution | Figures | Tables |
 |---|---|---|---|---|
@@ -254,7 +266,7 @@ This example contains no convective term, so it exercises only the third-derivat
   <img src="/assets/img/projects/figure5_example71_c1.svg" alt="Example 7.1 with c equal to 1" style="width: 100%; max-width: 100%; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 5: Low-wavenumber case ($c=1$, $N=40$). Top: numerical solution (markers) against the exact traveling wave (lines) at five times. Bottom: pointwise error, on a scale of $10^{-12}$, which is near machine precision. TDCCS (right) is approximately twice as accurate as TDCNCS (left) at this resolution, in agreement with the paper's comparison.*
+*Figure 5: Low-wavenumber case ($c=1$, $N=40$). Top: numerical solution (markers) against the exact traveling wave (lines) at five times. Bottom: pointwise error, on a scale of $10^{-12}$, which is close to the round-off limit of a third-derivative approximation on this grid (Section 3), though still well above machine precision. TDCCS (right) is approximately twice as accurate as TDCNCS (left) at this resolution, in agreement with the paper's comparison.*
 
 <p align="center">
   <img src="/assets/img/projects/figure6_example71_c8.svg" alt="Example 7.1 with c equal to 8" style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;">
@@ -262,29 +274,33 @@ This example contains no convective term, so it exercises only the third-derivat
 
 *Figure 6: Higher-wavenumber case ($c=8$, $N=40$). The error scale is now $10^{-3}$ to $10^{-4}$, since the grid barely resolves this wavenumber. The superior resolving power of TDCCS evident in Figure 3 appears here directly as an error roughly ten times smaller.*
 
-*Table 8 ($c=1$), $L^\infty$ error at $t=1$:*
+*Table 8 ($c=1$), $L^\infty$ error at $t=1$, with convergence rate in parentheses:*
 
 | $N$ | TDCNCS (computed) | TDCNCS (paper) | TDCCS (computed) | TDCCS (paper) |
 |---|---|---|---|---|
 | 10 | 4.1920e-07 | 4.1920e-07 | 1.1729e-07 | 1.1729e-07 |
-| 20 | 1.6088e-09 | 1.6089e-09 | 6.4031e-10 | 6.4028e-10 |
-| 30 | 6.2201e-11 | 6.2438e-11 | 2.6783e-11 | 2.6557e-11 |
-| 40 | 6.4003e-12 | 6.6573e-12 | 3.1344e-12 | 2.9112e-12 |
+| 20 | 1.6088e-09 (8.0255) | 1.6089e-09 (8.0254) | 6.4031e-10 (7.5170) | 6.4028e-10 (7.5172) |
+| 30 | 6.2206e-11 (8.0224) | 6.2438e-11 (8.0133) | 2.6788e-11 (7.8280) | 2.6557e-11 (7.8493) |
+| 40 | 6.4105e-12 (7.8994) | 6.6573e-12 (7.7810) | 3.1374e-12 (7.4547) | 2.9112e-12 (7.6846) |
 
-Agreement is to four significant figures at $N=10$ and $N=20$, loosening to two or three at $N=30$ and $N=40$. The measured convergence rates account for this: they hold near the theoretical eight through $N=20$ (8.03 for TDCNCS, 7.52 for TDCCS) and then fall away sharply, to 4.69 and then 3.28 for TDCNCS. Such a decline is the expected signature of an error approaching the floor set by finite-precision arithmetic. At $N=40$ the errors are of order $10^{-12}$, so only three or four significant digits of the error itself remain meaningful, and residual differences at that level reflect accumulated round-off rather than any disagreement of method. The paper reports the same behavior, noting that beyond $N=40$ the error stagnates at machine precision.
+Agreement is to four or five significant figures at $N=10$ and $N=20$. At $N=30$ and $N=40$ the errors approach the round-off-limited regime of $10^{-11}$ to $10^{-12}$ identified in Section 3, and the computed and published values differ by 0.4 to 8 percent. The rates remain close to eight for both schemes and agree with the paper's to within about 0.1 to 0.2 at the finest grids. The paper's rates are correct; an earlier discrepancy in this table was a bug in this reproduction, which computed the rates with $\log_2$ although $N = 10, 20, 30, 40$ does not double. The paper notes that beyond $N=40$ the error stagnates at machine precision.
 
-*Table 9 ($c=8$), $L^\infty$ error at $t=1$:*
+*Table 9 ($c=8$), $L^\infty$ error at $t=1$ (observed rates in parentheses):*
 
 | $N$ | TDCNCS (computed) | TDCNCS (paper) | TDCCS (computed) | TDCCS (paper) |
 |---|---|---|---|---|
 | 20 | 7.9125e-01 | 7.9090e-01 | 8.9768e-03 | 9.4000e-03 |
-| 40 | 1.0796e-03 | 1.1000e-03 | 1.1749e-04 | 1.1796e-04 |
-| 60 | 3.6487e-05 | 3.6490e-05 | 7.5798e-06 | 7.5773e-06 |
-| 80 | 3.4196e-06 | 3.4187e-06 | 9.5506e-07 | 9.5592e-07 |
+| 40 | 1.0796e-03 (9.518) | 1.1000e-03 (9.490) | 1.1749e-04 (6.256) | 1.1796e-04 (6.316) |
+| 60 | 3.6487e-05 (8.354) | 3.6490e-05 (8.400) | 7.5798e-06 (6.760) | 7.5773e-06 (6.771) |
+| 80 | 3.4196e-06 (8.229) | 3.4187e-06 (8.231) | 9.5506e-07 (7.201) | 9.5592e-07 (7.196) |
+| 100 | 5.6760e-07 (8.048) | 5.6757e-07 (8.047) | 1.8588e-07 (7.335) | 1.8591e-07 (7.338) |
+| 120 | 1.3032e-07 (8.071) | 1.3032e-07 (8.070) | 4.6901e-08 (7.553) | 4.6895e-08 (7.555) |
+| 140 | 3.7705e-08 (8.045) | 3.7705e-08 (8.045) | 1.4412e-08 (7.655) | 1.4411e-08 (7.654) |
+| 160 | 1.2768e-08 (8.109) | 1.2758e-08 (8.115) | 5.0752e-09 (7.816) | 5.0733e-09 (7.818) |
 
-This is the more informative of the two cases, because at $c=8$ the grid is genuinely stressed: $N=40$ gives roughly five points per wavelength. Agreement is to three or four significant figures at every resolution, and the ratio between the two schemes reproduces the paper's central claim directly. At $N=40$ the TDCCS error is smaller by a factor of $9.2$, and at $N=80$ by a factor of $3.6$, bracketing the paper's summary that TDCCS errors are approximately one tenth of TDCNCS errors at higher wavenumbers.
+This is the more informative of the two cases, because at $c=8$ the grid is stressed: $N=40$ gives roughly five points per wavelength. The reproduction covers the paper's full range, $N=20$ to $160$, which at $N=160$ takes about $1.6\times10^6$ RK3 steps because the time step scales as $\Delta x^3$ (the independent solves were run in parallel, `table9_parallel.py`). Agreement is to four significant figures from $N=60$ onward and to three at the coarser grids, and the observed rates match the paper's to within $0.06$ everywhere; at $N=160$ they are $8.109$ against $8.115$ for TDCNCS and $7.816$ against $7.818$ for TDCCS. TDCCS approaches its asymptotic eighth-order rate from below, as the operator test of Section 3 also shows.
 
-The computation was run to $N=80$ rather than the paper's $N=160$. Because the CFL restriction scales as $\Delta x^3$, $N=160$ requires approximately $1.6\times10^6$ RK3 steps. The code accepts arbitrary $N$; the limit is a runtime budget rather than a property of the scheme.
+The ratio of the two schemes' errors reproduces the paper's comparison, with one qualification. TDCCS is more accurate at every resolution, by a factor of $88$ at $N=20$ and $9.2$ at $N=40$, but the factor falls to $3.6$ at $N=80$ and $2.5$ at $N=160$, because TDCNCS converges at the faster rate. The paper's summary that TDCCS "consistently yields an order of magnitude lower absolute error" holds at the coarse grids, where the grid resolves the wave poorly, and overstates the gain at the fine ones.
 
 ### Example 7.2, the classical KdV soliton
 
@@ -322,7 +338,7 @@ The soliton is the standard benchmark for a dispersive solver precisely because 
 
 | $N$ | TDCNCS (computed) | TDCNCS (paper) | Rate | TDCCS (computed) | TDCCS (paper) | Rate |
 |---|---|---|---|---|---|---|
-| 20 | 5.4859e-01 | 5.4860e-01 | — | 2.0464e-02 | 2.0500e-02 | — |
+| 20 | 5.4859e-01 | 5.4860e-01 | | 2.0464e-02 | 2.0500e-02 | |
 | 40 | 1.2990e-02 | 1.3000e-02 | 5.400 | 2.6299e-04 | 2.6299e-04 | 6.282 |
 | 60 | 3.2815e-04 | 3.2815e-04 | 9.072 | 1.7387e-05 | 1.7387e-05 | 6.700 |
 | 80 | 3.3170e-05 | 3.3170e-05 | 7.967 | 2.3502e-06 | 2.3505e-06 | 6.956 |
@@ -331,11 +347,11 @@ The soliton is the standard benchmark for a dispersive solver precisely because 
 | 140 | 3.7699e-07 | 3.7699e-07 | 8.157 | 4.2077e-08 | 4.2387e-08 | 7.390 |
 | 160 | 1.2705e-07 | 1.2705e-07 | 8.146 | 1.6954e-08 | 1.7577e-08 | 6.807 |
 
-This is the closest agreement obtained anywhere in the reproduction. Six of the eight TDCNCS rows match the published value in every digit reported, and the remaining two differ only in the fifth significant figure. The TDCCS column agrees to five significant figures through $N=80$ and to three at the finest grids.
+This is the closest agreement obtained anywhere in the reproduction. Six of the eight TDCNCS rows match the published value in every digit reported, and the remaining two differ only in the fifth significant figure. The TDCCS column agrees in every digit at $N=40$ and $N=60$ and to four significant figures at $N=80$ and $N=100$; the differences are 0.2 percent at $N=20$ and grow from 0.6 to 3.5 percent between $N=120$ and $N=160$.
 
-The measured rates reproduce a subtler feature of the paper as well. TDCNCS holds close to its theoretical eighth order across the sweep, settling near $8.0$ to $8.2$, whereas TDCCS stabilizes nearer seven, between $6.9$ and $7.4$. The paper records exactly this asymmetry, observing that TDCCS approaches seventh-order accuracy for larger $N$ while TDCNCS maintains a rate close to the theoretical eighth order. Recovering an unexpected and unexplained feature of the original, rather than only its headline numbers, is stronger evidence of a faithful implementation than matching the errors alone would be.
+The measured rates reproduce a subtler feature of the paper as well. TDCNCS holds close to its theoretical eighth order across the sweep, settling near $8.0$ to $8.2$, whereas TDCCS stabilizes nearer seven, between $6.8$ and $7.4$ from $N=80$ onward. The paper records the same asymmetry, observing that TDCCS approaches seventh-order accuracy for larger $N$ while TDCNCS maintains a rate close to the theoretical eighth order. Recovering an unexpected and unexplained feature of the original, in addition to its headline numbers, is stronger evidence of a faithful implementation than matching the errors alone would be.
 
-The two schemes are not therefore equivalent in practice. Despite converging at a lower rate, TDCCS is more accurate than TDCNCS at every grid size tested, by a factor between $7$ and $27$. The paper's own reading is that TDCCS delivers higher accuracy while TDCNCS remains more efficient per unit of computational cost, since the coupled node-and-center solve roughly doubles the work per step.
+The two schemes are therefore not equivalent in practice. Despite converging at a lower rate, TDCCS is more accurate than TDCNCS at every grid size tested, by a factor between about $7.5$ (at $N=160$) and $49$ (at $N=40$). The paper's own reading is that TDCCS delivers higher accuracy while TDCNCS remains more efficient per unit of computational cost, since the coupled node-and-center solve roughly doubles the work per step.
 
 ### Example 7.3, nonlinear KdV with a small dispersion coefficient
 
@@ -371,7 +387,7 @@ $$
   <img src="/assets/img/projects/figure8_soliton_illustrative.svg" alt="Single soliton at small epsilon, TDCNCS compared with TDCCS" style="width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 8: Single soliton propagation at $\epsilon=5\times10^{-4}$, $N=80$, at $t=0$, $1$, $2$ and $3$, matching the paper's Section 7.1 exactly. TDCNCS (left) uses Lele's node-only convective scheme; TDCCS (right) uses Liu et al.'s node-and-center scheme, evolved alongside the TDCCS dispersive scheme, consistent with the paper's stated pairing. With $k = 0.5\sqrt{c/\epsilon} \approx 12.2$ the soliton is a narrow spike, so this is a test of short-wavelength resolution rather than of formal order alone, and the TDCCS error is smaller by roughly an order of magnitude, as the paper reports.*
+*Figure 8: Single soliton propagation at $\epsilon=5\times10^{-4}$, $N=80$, at $t=0$, $1$, $2$ and $3$, matching the paper's Section 7.1 exactly. TDCNCS (left) uses Lele's node-only convective scheme; TDCCS (right) uses Liu et al.'s node-and-center scheme, evolved alongside the TDCCS dispersive scheme, consistent with the paper's stated pairing. With $k = 0.5\sqrt{c/\epsilon} \approx 12.2$ the soliton is a narrow spike, so this tests short-wavelength resolution as much as formal order, and the TDCCS error is smaller by roughly an order of magnitude, as the paper reports.*
 
 #### Double soliton collision
 
@@ -417,9 +433,9 @@ with $\epsilon = 10^{-4}$.
 
 **Problem.** The same nonlinear equation as Example 7.3, Eq. (7.5), examined as $\epsilon \to 0^{+}$.
 
-The paper's text introduces this example as using "the KdV equation (7.3)". Eq. (7.3), however, is the linear problem of Example 7.1, which has no convective term and therefore admits no zero-dispersion limit. The equation intended is Eq. (7.5), and that is what is solved here. The captions of Figures 11 and 12 also read "Example 7.3" although the initial conditions they cite, Eqs. (7.9) and (7.10), belong to Example 7.4.
+The paper's text introduces this example as using "the KdV equation (7.3)". Eq. (7.3), however, is the linear problem of Example 7.1, which has no convective term and therefore admits no zero-dispersion limit. The equation intended is Eq. (7.5), and that is what is solved here. The captions of Figures 11 and 12 similarly read "Example 7.3", although the initial conditions they cite, Eqs. (7.9) and (7.10), belong to Example 7.4.
 
-Setting $\epsilon = 0$ exactly reduces the equation to inviscid Burgers, whose solutions form genuine discontinuities in finite time. For small but non-zero $\epsilon$ the dispersive term forbids a jump, and a packet of rapid oscillations appears in its place. As $\epsilon$ decreases these become faster and more numerous without disappearing, so the solution does not converge pointwise to the shock. The oscillations are physical rather than numerical artifacts, which is why the paper observes that low-pass filtering does not affect these results, and why the mesh must be refined as $\epsilon$ falls.
+Setting $\epsilon = 0$ exactly reduces the equation to inviscid Burgers, whose solutions form true discontinuities in finite time. For small but non-zero $\epsilon$ the dispersive term forbids a jump, and a packet of rapid oscillations appears in its place. As $\epsilon$ decreases these become faster and more numerous without disappearing, so the solution does not converge pointwise to the shock. The oscillations are physical, not numerical artifacts, which is why the paper observes that low-pass filtering does not affect these results, and why the mesh must be refined as $\epsilon$ falls.
 
 **Continuous initial condition, Eq. (7.9).**
 
@@ -430,24 +446,24 @@ $$
 **Discontinuous initial condition, Eq. (7.10).**
 
 $$
-u(x,0) = \begin{cases} 1, & 0.25 < x < 4, \\ 0, & \text{otherwise.} \end{cases}
+u(x,0) = \begin{cases} 1, & 0.25 < x < 4, \\ 0, & \text{otherwise,} \end{cases} \qquad x \in [0,5].
 $$
 
 **Exact solution.** None available in either case. For the continuous problem the paper generates a reference solution with TDCNCS on a refined mesh of $N=1000$.
 
-**Parameters.** Continuous case, evaluated at $t=0.5$: $\epsilon = 10^{-4}$ with $N=100$, $\epsilon = 10^{-5}$ with $N=200$, $\epsilon = 10^{-6}$ with $N=800$, and $\epsilon = 10^{-7}$ with $N=1600$. Top-hat case: $N=1000$, $\epsilon = 10^{-4}$, evaluated at $t=0.01$ and $t=0.05$.
+**Parameters.** Continuous case, evaluated at $t=0.5$: $\epsilon = 10^{-4}$ with $N=100$, $\epsilon = 10^{-5}$ with $N=200$, $\epsilon = 10^{-6}$ with $N=800$, and $\epsilon = 10^{-7}$ with $N=1600$. Top-hat case: $N=1000$ on $x \in [0,5]$, $\epsilon = 10^{-4}$, evaluated at $t=0.01$ and $t=0.05$.
 
 <p align="center">
-  <img src="/assets/img/projects/figure11_zero_dispersion_illustrative.svg" alt="Zero-dispersion limit, framework demonstration only" style="width: 100%; max-width: 100%; height: auto; display: block; margin: 0 auto;">
+  <img src="/assets/img/projects/figure11_zero_dispersion_illustrative.svg" alt="Zero-dispersion limit at the paper's parameters, TDCNCS and TDCCS against a reference solution" style="width: 100%; max-width: 100%; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 11: The zero-dispersion limit at $t=0.5$, now computed at the paper's own parameters: $\epsilon$ swept from $10^{-4}$ down to $10^{-7}$ with correspondingly refined grids from $N=100$ to $N=1600$, against a TDCNCS reference at $N=1000$. Panels (a) and (b) place both schemes alongside that reference; panels (c) to (f) show the two finest cases, one scheme per panel, since the oscillations become too dense for overlaid curves to be legible. The rapid oscillations are physical rather than numerical, which is why the paper notes that filtering does not alter these results, and why the mesh must be refined as $\epsilon$ decreases. An earlier version of this post substituted $\epsilon=0.05$ here and stated plainly that it did not reach this regime; that substitution has since been removed.*
+*Figure 11: The zero-dispersion limit at $t=0.5$, computed at the paper's own parameters: $\epsilon$ swept from $10^{-4}$ down to $10^{-7}$ with correspondingly refined grids from $N=100$ to $N=1600$, against a TDCNCS reference at $N=1000$. Panels (a) and (b) place both schemes alongside that reference; panels (c) to (f) show the two finest cases, one scheme per panel, since the oscillations become too dense for overlaid curves to be legible. The rapid oscillations are physical, which is why the paper notes that filtering does not alter these results, and why the mesh must be refined as $\epsilon$ decreases.*
 
 <p align="center">
   <img src="/assets/img/projects/figure12_tophat_illustrative.svg" alt="Top-hat breakup with and without filtering" style="width: 100%; max-width: 100%; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 12: Top-hat breakup at the paper's parameters ($N=1000$, $\epsilon=10^{-4}$). Two rows, TDCNCS above and TDCCS below; within each row the columns run unfiltered and filtered at $t=0.01$, then unfiltered and filtered at $t=0.05$. A discontinuous initial condition contains every wavelength at once, including many the grid cannot represent, so each edge immediately breaks into a train of dispersive waves. Here, unlike in Figure 11, the filter does help: what it removes are grid-scale numerical artifacts rather than physical structure, and applying it reduces both the amplitude and the roughness of the train while leaving the propagating packet intact.*
+*Figure 12: Top-hat breakup at the paper's parameters ($N=1000$, $\epsilon=10^{-4}$, $x \in [0,5]$). Two rows, TDCNCS above and TDCCS below; within each row the columns run unfiltered and filtered at $t=0.01$, then unfiltered and filtered at $t=0.05$. A discontinuous initial condition contains every wavelength at once, including many the grid cannot represent, so each edge immediately breaks into a train of dispersive waves. Here, unlike in Figure 11, the filter does help: what it removes are grid-scale numerical artifacts, not physical structure, and applying it reduces both the amplitude and the roughness of the train while leaving the propagating packet intact.*
 
 ### Example 7.5, two-dimensional linear dispersion
 
@@ -469,13 +485,13 @@ $$
 u(x,y,t) = \sin(x + y + 2t).
 $$
 
-**Parameters.** $N=40$ for the figure, evaluated at $t=1$; $N = 10$ to $30$ for the convergence table.
+**Parameters.** $N=40$ for the figure, evaluated at $t=1$; $N = 10$ to $40$ in steps of 5 for the convergence table, as in the paper.
 
 Like Example 7.1 this problem has no convective term. For TDCNCS, each third-derivative term is treated by applying the same one-dimensional operator along the corresponding grid direction, so no new construction is required.
 
-TDCCS is a different matter, and the paper does not spell out how its node-and-center pairing extends to two dimensions. In one dimension the state is a pair, values at the nodes and values at the cell centers. On a tensor-product grid each axis carries its own node-center split, so the state becomes four fields rather than two, one for each combination of $(x\text{ node or center}, y\text{ node or center})$. Which fields are paired then matters. Differentiating in $x$ requires node and center values in $x$ taken at the same $y$; differentiating in $y$ requires node and center values in $y$ taken at the same $x$. Pairing fields that sit on different grid lines produces a scheme that remains bounded but loses essentially all accuracy, a failure that presents as poor convergence rather than as the indexing error it is.
+TDCCS is a different matter, and the paper does not spell out how its node-and-center pairing extends to two dimensions. In one dimension the state is a pair, values at the nodes and values at the cell centers. On a tensor-product grid each axis carries its own node-center split, so the state becomes four fields instead of two, one for each combination of $(x\text{ node or center}, y\text{ node or center})$. Which fields are paired then matters. Differentiating in $x$ requires node and center values in $x$ taken at the same $y$; differentiating in $y$ requires node and center values in $y$ taken at the same $x$. Pairing fields that sit on different grid lines produces a scheme that remains bounded but loses essentially all accuracy, a failure that presents as poor convergence and not as the indexing error it is.
 
-Two observations support the four-field construction as the one the paper used. First, an initial two-field implementation, pairing values that lay on different $y$ lines, gave an $L^\infty$ error of $1.3\times10^{-1}$ at $N=12$, with no sign of convergence. Second, the four-field version reproduces the paper's published TDCCS errors exactly: $2.4044\times10^{-7}$ at $N=10$ and $1.1687\times10^{-8}$ at $N=15$, matching every digit reported.
+Two observations support the four-field construction as the one the paper used. First, an initial two-field implementation, pairing values that lay on different $y$ lines, gave an $L^\infty$ error of $1.3\times10^{-1}$ at $N=12$, with no sign of convergence. Second, the four-field version reproduces the paper's published TDCCS errors exactly at the coarsest grids: $2.4044\times10^{-7}$ at $N=10$ and $1.1687\times10^{-8}$ at $N=15$, matching every digit reported.
 
 A second detail is easy to overlook. Equation (7.2) sets the two-dimensional time step by summing the contributions of both directions, so the admissible step is half what the one-dimensional formula gives on the same grid. Omitting that factor leaves TDCCS unstable here, since Eq. (6.3) already restricts it to $\Delta t/\Delta x^3 \le 0.011$, an order of magnitude tighter than TDCNCS.
 
@@ -485,15 +501,21 @@ A second detail is easy to overlook. Equation (7.2) sets the two-dimensional tim
 
 *Figure 13: Four surfaces at $t=1$, $N=40$, in the paper's arrangement. The first column is TDCNCS and the second TDCCS; the top row shows the numerical solution and the bottom row the pointwise error. The diagonal ridges in the error surfaces are not a defect: the exact solution depends on $x$ and $y$ only through $x+y$, so it is constant along lines of constant $x+y$, and the error inherits that structure from the way such a wave meets a square grid.*
 
-*Table 11, $L^\infty$ error at $t=1$, both schemes:*
+*Table 11, $L^\infty$ error at $t=1$, both schemes (observed rates in parentheses):*
 
 | $N$ | TDCNCS (computed) | TDCNCS (paper) | TDCCS (computed) | TDCCS (paper) |
 |---|---|---|---|---|
-| 10 | 8.6251e-07 | 8.6153e-07 | 2.4044e-07 | 2.4044e-07 |
-| 15 | 3.2436e-08 | 3.2458e-08 | 1.1687e-08 | 1.1687e-08 |
-| 20 | 3.2038e-09 | 3.2016e-09 | 1.2744e-09 | 1.2744e-09 |
+| 10 | 8.6153e-07 | 8.6153e-07 | 2.4044e-07 | 2.4044e-07 |
+| 15 | 3.2458e-08 (8.086) | 3.2458e-08 (8.086) | 1.1687e-08 (7.458) | 1.1687e-08 (7.458) |
+| 20 | 3.2018e-09 (8.051) | 3.2016e-09 (8.052) | 1.2741e-09 (7.704) | 1.2744e-09 (7.703) |
+| 25 | 5.3748e-10 (7.998) | 5.3720e-10 (8.000) | 2.2478e-10 (7.775) | 2.2507e-10 (7.770) |
+| 30 | 1.2396e-10 (8.046) | 1.2351e-10 (8.063) | 5.3458e-11 (7.877) | 5.3902e-11 (7.839) |
+| 35 | 3.6298e-11 (7.967) | 3.4686e-11 (8.239) | 1.5979e-11 (7.834) | 1.7566e-11 (7.273) |
+| 40 | 1.2816e-11 (7.797) | 1.0682e-11 (8.820) | 6.2809e-12 (6.993) | 8.2851e-12 (5.628) |
 
-Every row agrees to three or four significant figures, and the measured rates sit within $0.02$ of the paper's across the whole sweep, holding close to the theoretical eighth order rather than degrading. The two-dimensional case is therefore reproduced more cleanly than the one-dimensional Example 7.1, for a straightforward reason: the errors here remain between $10^{-7}$ and $10^{-10}$, comfortably above the round-off floor that truncates the $c=1$ results of Table 8.
+The reproduction covers the paper's full range, $N=10$ to $40$. The TDCCS solves at the finest grids are expensive, because the time step scales as $\Delta x^3$ and each step updates four coupled fields on $N^2$ points, so they were run in parallel (`table11_parallel.py`); $N=40$ took about three hours on a laptop. Both schemes match the published errors in every digit at $N=10$ and $N=15$ and agree to within 0.8 percent through $N=30$, where the rates sit within $0.02$ of the paper's for TDCNCS and within $0.04$ for TDCCS.
+
+At $N=35$ and $N=40$ the errors reach $10^{-11}$ to $10^{-12}$, the round-off-limited regime of Section 3, and the two sets of numbers separate: the reproduction differs from the paper by 5 to 20 percent for TDCNCS and 9 to 24 percent for TDCCS. The rates show the same thing. The reproduced rates stay close to the scheme's order (7.97 and 7.80 for TDCNCS, 7.83 and 6.99 for TDCCS), while the paper's move further from it in both directions (8.24 and 8.82, above the formal order, for TDCNCS; 7.27 and 5.63 for TDCCS). Rates above eight, or falling sharply, in this regime reflect round-off in the particular floating-point operations of each implementation, not the discretization, so neither set of finest-grid rates should be read as a property of the schemes.
 
 ### Example 7.6, the Ito-type coupled system
 
@@ -540,27 +562,7 @@ The structural feature governing the behavior is visible in the equations themse
 
 ## 6. Reproducing the paper's figures
 
-The paper's figures are MATLAB output, and several of their conventions had to be matched deliberately rather than left to matplotlib's defaults.
-
-The first is panel framing. Matplotlib pads every axis by five percent of the data range, which leaves a visible gap between the curve and the frame; the paper's axes have no such padding, and the data runs to the box. The horizontal margin is therefore set to zero in the shared style module, and each script sets its own limits explicitly.
-
-The second is the surface colormap. The paper's surfaces use MATLAB's `turbo` map, which runs from a dark indigo through blue, cyan, green and yellow to a dark maroon. Figure 13 is stored in the published PDF as an RGB image, and its colorbar matches matplotlib's `turbo` exactly; its solution surfaces are also drawn semi-transparent, and its error surfaces use `cool`. Figures 9, 10, 14 and 15, however, are stored as CMYK images, and the print conversion mutes turbo noticeably. To match those figures as they actually appear in the paper, their colormap is sampled directly from the paper's own colorbars. Surface shading is also switched off, because MATLAB's `surf` applies no lighting unless a light is added, whereas matplotlib's default shading darkens every slope.
-
-The third is the camera, and here MATLAB's default `view(-37.5, 30)` turned out not to apply. The paper's panels are not all drawn from the same angle: the u and v surfaces of the Ito system in Figures 14 and 15, for instance, use different elevations. Each camera was therefore measured from the published panel itself. The on-screen direction and length of the three axes were read off the tick marks, and the orthographic projection equations were solved for the elevation and azimuth, with the axis lengths giving the proportions of the plot box. The resulting values, in matplotlib's convention (azimuth measured from the positive x axis, so MATLAB's azimuth is matplotlib's plus 90 degrees), are:
-
-| Figure | Panels | Elevation | Azimuth |
-|---|---|---|---|
-| 9 | surfaces | $28^\circ$ | $-112^\circ$ |
-| 10 | surfaces | $50^\circ$ | $-102^\circ$ |
-| 13 | all four | $13.7^\circ$ | $-64.5^\circ$ |
-| 14 | $u$ surfaces | $22.6^\circ$ | $-127.8^\circ$ |
-| 14 | $v$ surfaces | $10.6^\circ$ | $-122.2^\circ$ |
-| 15 | $u$ surfaces | $26.6^\circ$ | $-81.5^\circ$ |
-| 15 | $v$ surfaces | $12.7^\circ$ | $-75.5^\circ$ |
-
-The surfaces use MATLAB's orthographic projection in place of matplotlib's default perspective, the $z$ axis sits on the left edge of the box, and each colorbar is a narrow strip beside the box spanning the full data range. The $z$ limits follow MATLAB's automatic choice of the nearest tick beyond the data, except for the $u$ panels of Figure 15, which the paper draws with `axis tight`.
-
-One departure from the paper is deliberate: panel labels such as "(a) $t = 0$" sit above each axis, not below it, which reads better on a web page where the figure caption already sits underneath. All of these conventions live in `pub_style.py` (`SURFACE_CMAP`, the `VIEW_FIG*` camera table, `matlab_view`, `matlab_axes3d`, `matlab_colorbar` and `subcaption`), so that no individual figure script sets them independently.
+The paper's figures are MATLAB output, and the plots here follow its conventions: axes without padding, surfaces drawn with orthographic projection and without lighting, and the `turbo` colormap, sampled directly from the paper's own colorbars where the published figures are stored as CMYK images. The camera angle of each surface panel was measured from the published panel itself, by reading the on-screen directions and lengths of the three axes and solving the orthographic projection equations for elevation and azimuth. All of these conventions, including the camera table, live in `pub_style.py`, so that no individual figure script sets them independently; the one deliberate departure is that panel labels sit above each axis, which reads better on a web page.
 
 ## 7. Code
 
@@ -572,13 +574,14 @@ Computation and plotting are separate. The example scripts solve once and save t
 - **`nonlinear_kdv.py`**: the shared nonlinear solvers used by Examples 7.2, 7.3, 7.4 and 7.6.
 - **`derive_order_conditions.py`**: symbolic Taylor-series derivation of the order conditions for all three schemes.
 - **`verify_tables.py`**: verification of every published coefficient row against the derived order conditions, and extraction of the leading truncation-error constants.
+- **`validate_operators.py`**: the grid-refinement tests of the third-derivative operators in Section 3.
 - **`fig_fourier_analysis.py`**: Figures 2 and 3, Tables 5, 6, and 7.
 - **`fig_stability.py`**: Figure 4 and the Eq. (6.3) CFL bounds.
-- **`example_7_1_linear_kdv.py`**: Example 7.1, Tables 8 and 9 and the data for Figures 5 and 6.
+- **`example_7_1_linear_kdv.py`**: Example 7.1, Tables 8 and 9 and the data for Figures 5 and 6. `table9_parallel.py` runs the Table 9 sweep to $N=160$ in parallel.
 - **`example_7_2_soliton.py`**: Example 7.2, Table 10 and the data for Figure 7.
 - **`example_7_3_solitons.py`**: Example 7.3, the data for Figures 8, 9 and 10.
 - **`example_7_4_zero_dispersion.py`**: Example 7.4, the data for Figures 11 and 12.
-- **`example_7_5_2d_linear.py`**: Example 7.5, Table 11 and the data for Figure 13.
+- **`example_7_5_2d_linear.py`**: Example 7.5, Table 11 and the data for Figure 13 (`table11_parallel.py` runs the expensive TDCCS rows in parallel).
 - **`example_7_6_ito_system.py`**: Example 7.6, the data for Figures 14 and 15.
 - **`make_figures.py`**: draws Figures 5 to 15 from the saved data (`python make_figures.py`, or `python make_figures.py figure13` for one figure).
 - **`figdata.py`**: saving and loading of the per-figure `.npz` data files.
@@ -588,27 +591,40 @@ Computation and plotting are separate. The example scripts solve once and save t
 
 | Result | Status |
 |---|---|
-| Order-condition derivation (Tables 1, 2, 4) | Exact, verified symbolically: 25 of 26 published rows satisfy every condition they claim. Discrepancies identified in printed Table 1 (TDCNCS-P8, fails at all four orders) and in printed Eqs. (3.5) to (3.7) |
+| Order-condition derivation (Tables 1, 2, 4) | Exact, verified symbolically: 25 of 26 published rows satisfy every condition they claim. Printed Table 1 (TDCNCS-P8) has the sign of $\beta$ reversed, and printed Eqs. (3.5) to (3.7) are the TDCCCS conditions |
 | Truncation-error constants | Exact agreement to all published digits: $3.121917\times10^{-5}$, $6.572523\times10^{-5}$, $-2.188201\times10^{-6}$ |
 | Figures 2, 3 (modified wavenumber) | Exact |
 | Tables 5, 6 (resolving efficiency) | Agreement to within $10^{-4}$ across all four operator lengths and all three schemes |
 | Figure 4, Eq. (6.3) (stability and CFL) | Agreement to three or four significant figures |
-| Tables 8, 9, Figures 5, 6 (Example 7.1) | Four significant figures where the error exceeds the round-off floor; two or three at $N \ge 30$ for $c=1$, where the error reaches $10^{-12}$ |
+| Tables 8, 9, Figures 5, 6 (Example 7.1) | Table 9 ($c=8$) over the paper's full $N=20$ to $160$: four significant figures from $N=60$, rates within $0.06$. Table 8 ($c=1$): four or five figures at $N=10, 20$, within 0.4 to 8 percent at $N=30, 40$ where the error reaches the $10^{-11}$ to $10^{-12}$ round-off regime, rates within about 0.2 |
 | Table 10, Figure 7 (Example 7.2) | Six of eight TDCNCS rows match in every published digit; the rate asymmetry between the schemes is reproduced as well |
 | Figures 8, 9, 10 (Example 7.3) | Run at the paper's grid sizes and integration windows, with the cited convective operators and stated filter intervals |
 | Figures 11, 12 (Example 7.4) | Run at the paper's full $\epsilon$ sweep to $10^{-7}$ and grids to $N=1600$; the oscillatory regime is reached |
-| **Table 11, Figure 13 (Example 7.5)** | **TDCCS matches the published errors in every digit at $N=10$, $15$ and $20$ once the four-field two-dimensional pairing is used; TDCNCS to three or four significant figures** |
+| **Table 11, Figure 13 (Example 7.5)** | **Full range $N=10$ to $40$. Both schemes match the published errors in every digit at $N=10$ and $15$ once the four-field two-dimensional pairing is used, and agree to within 0.8 percent through $N=30$; at $N=35, 40$ both are in the round-off regime and differ by 5 to 24 percent** |
 | Figures 14, 15 (Example 7.6) | Run at the paper's parameters; the smooth-$u$ against steepening-$v$ asymmetry is reproduced |
 
-Every figure and table in the paper's Section 7 has been reproduced at the paper's own parameters, using the first-derivative operators it cites rather than any substitute, and drawn in the paper's own panel arrangements.
+Every figure and table in the paper's Section 7 is reproduced at the paper's own parameters and over the paper's full grid ranges, using the first-derivative operators it cites and drawn in the paper's own panel arrangements.
 
-Where an exact solution exists the agreement is quantitative. Example 7.2 matches the published errors in nearly every reported digit, the two-dimensional TDCCS results of Example 7.5 match exactly, and Examples 7.1 and 7.5 agree to three or four significant figures wherever the error stays above the round-off floor. Where no exact solution exists, in Examples 7.3, 7.4 and 7.6, the comparison is necessarily qualitative and rests on the structures the paper describes: soliton collisions that preserve amplitude, oscillation trains in the zero-dispersion limit, the differing filter intervals the two schemes require, and the smooth-$u$ against steepening-$v$ asymmetry of the Ito system. All are present.
+Where an exact solution exists the agreement is quantitative. Example 7.2 matches the published errors in nearly every reported digit, the two-dimensional results of Example 7.5 match exactly at the coarsest grids, and Examples 7.1 and 7.5 agree to three or four significant figures wherever the error stays above the round-off floor. Where no exact solution exists, in Examples 7.3, 7.4 and 7.6, the comparison is necessarily qualitative and rests on the structures the paper describes: soliton collisions that preserve amplitude, oscillation trains in the zero-dispersion limit, the differing filter intervals the two schemes require, and the smooth-$u$ against steepening-$v$ asymmetry of the Ito system. All are present.
 
-Two limitations remain worth stating. First, the residual differences in the fourth or fifth significant figure at the finest grids of Tables 8 and 10 have not been traced; they are consistent with round-off accumulating over the very large step counts those runs require, but that has not been demonstrated. Second, the TDCCS operator validation of Section 3 reaches an error floor near $2\times10^{-9}$ that is unexplained, and that observation is independent of the Section 7 agreement documented above.
+One limitation remains worth stating. The residual differences in the fourth or fifth significant figure at the finest grids of Table 10, and the larger differences at $N \ge 30$ in Table 8, have not been traced individually. They are consistent with round-off accumulating over the very large step counts those runs require, and with the round-off amplification of third-derivative operators shown in Section 3, but that has not been demonstrated.
+
+## Notes for readers of the paper
+
+The paper is careful and its numerical conclusions stand; the coefficient tables, truncation-error constants and quantitative examples all reproduce closely. The following small errata may nonetheless help anyone working from it directly:
+
+- **Eqs. (3.5) to (3.7).** The printed right-hand sides are the TDCCCS (Eq. 2.5) order conditions; the TDCCS conditions derived from Eq. (3.1) are given in Section 2. Table 4 satisfies the derived conditions exactly, so no results are affected.
+- **Table 1, TDCNCS-P8.** The four order conditions determine the row uniquely and give $\beta = +1/166$; the table prints $-1/166$. All other values match, and the row is not used in Section 7.
+- **$L^1$ norm in Tables 8 to 10.** The printed $L^1$ values correspond to dividing by $N$, while the $L^2$ values follow the stated $1/(N+1)$: the reproduction's $L^1$ differs from the paper's by exactly $(N+1)/N$ in all 40 rows of Tables 8 to 10, while $L^\infty$ and $L^2$ agree to four digits. Table 11 is consistent, and the effect on the rates is negligible. The reproduction follows the stated definition, which is why its $L^1$ column differs.
+- **Example 7.5 text.** The TDCNCS error at $N=40$ is quoted as $1.0682\times10^{-12}$; Table 11 gives $1.0682\times10^{-11}$.
+- **"Machine precision."** The error floors near $10^{-12}$ in Examples 7.1, 7.2 and 7.5 are attributed to machine precision, but double-precision epsilon is about $2\times10^{-16}$. The floor is round-off amplified by the third-derivative stencil, as the operator test in Section 3 shows: below about $10^{-11}$ the error grows with $N$ instead of falling.
+- **Captions and cross-references.** Figures 11 and 12 are labelled Example 7.3 (Example 7.4 intended); Figure 13 and Table 11 are labelled Example 7.6 (Example 7.5 intended); Figures 14 and 15 cite "Example (7.12)" (Example 7.6, whose system is Eq. 7.12); and the text of Example 7.4 refers to "the KdV equation (7.3)" where Eq. (7.5) is meant.
+
+As a positive check, all 138 convergence rates printed in Tables 8 to 11 are consistent with the paper's own printed errors, and every other number quoted in the text matches its table.
 
 ## References
 
-The compact finite-difference framework used throughout traces to {% cite lele1992compact %}, which also supplies the eighth-order node-only first-derivative operator used for the TDCNCS convective term. The central compact scheme coupling node and cell-center values is due to {% cite liu2013central %}, whose CCS-T8 row provides the TDCCS convective operator. The scheme reproduced in this post, together with the numerical examples of its Section 7, is that of {% cite salian2026central %}.
+The compact finite-difference framework used throughout traces to {% cite lele1992compact %}, which also supplies the eighth-order node-only first-derivative operator used for the TDCNCS convective term. The central compact scheme coupling node and cell-center values is due to {% cite liu2013central %}, whose CCS-T8 row provides the TDCCS convective operator. The scheme reproduced in this post, together with the numerical examples of its Section 7, is that of {% cite salian2026central %}, available as a [PDF](https://debog.github.io/Files/2026_Salian_EtAl_NMPDE.pdf) from the author's website.
 
 {% bibliography --cited --file blog_references %}
 

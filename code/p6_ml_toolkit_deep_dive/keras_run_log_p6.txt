@@ -1,0 +1,32 @@
+Train: 25000 reviews, Test: 25000 reviews
+Train label balance: 0.498 positive
+Example review (as word indices): [   4  372    7    4  176   10  828   18  107 3250]...
+Model: "sequential"
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+│ embedding (Embedding)           │ (None, 200, 32)        │       320,000 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ bidirectional (Bidirectional)   │ (None, 64)             │        16,640 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense (Dense)                   │ (None, 32)             │         2,080 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout (Dropout)               │ (None, 32)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 1)              │            33 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 338,753 (1.29 MB)
+ Trainable params: 338,753 (1.29 MB)
+ Non-trainable params: 0 (0.00 B)
+Epoch 1/20
+
+Epoch 2/20
+
+Epoch 3/20
+
+Epoch 4/20
+
+Epoch 5/20
+
+Test accuracy: 0.8733, test loss: 0.2986
+Predicted: negative (p=0.085)
+Predicted: positive (p=0.907)
+done

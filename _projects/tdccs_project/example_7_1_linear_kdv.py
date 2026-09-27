@@ -182,15 +182,19 @@ def convergence_table(c, T, Ns):
                 # Nothing coarser to compare against on the first grid.
                 rI = rL1 = rL2 = float("nan")
             else:
-                # These grids double, so log base 2 gives the order directly.
-                rI = np.log2(prev[0] / Linf)
-                rL1 = np.log2(prev[1] / L1)
-                rL2 = np.log2(prev[2] / L2)
+                # Observed order p from e1/e2 = (N2/N1)^p. The grids here do
+                # not always double (Table 8 uses N = 10, 20, 30, 40), so the
+                # ratio of grid sizes must appear in the denominator; log2 is
+                # only correct when N2 = 2 N1.
+                denom = np.log(N / prev[3])
+                rI = np.log(prev[0] / Linf) / denom
+                rL1 = np.log(prev[1] / L1) / denom
+                rL2 = np.log(prev[2] / L2) / denom
 
             print(f"{scheme:10s}{N:6d}{Linf:14.4e}{rI:8.4f}"
                   f"{L1:14.4e}{rL1:8.4f}{L2:14.4e}{rL2:8.4f}", flush=True)
             rows.append((scheme, N, Linf, L1, L2, rI, rL1, rL2))
-            prev = (Linf, L1, L2)
+            prev = (Linf, L1, L2, N)
 
     return rows
 
@@ -249,7 +253,7 @@ def main():
     # about 1.6 million time steps, far more than is practical here, so
     # we stop at N = 80. The convergence RATE is already clear by then,
     # and the same code reproduces the full table given more time.
-    rows_c8 = convergence_table(c=8, T=1.0, Ns=[20, 40, 60, 80])
+    rows_c8 = convergence_table(c=8, T=1.0, Ns=[20, 40, 60, 80, 100, 120, 140, 160])
 
     # Tables are saved as plain arrays of numbers, one row per grid, so
     # they can be reformatted later without re-solving anything.

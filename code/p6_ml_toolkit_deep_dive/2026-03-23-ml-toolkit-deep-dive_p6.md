@@ -678,7 +678,7 @@ Part 3 used TensorFlow's low-level API to show the mechanics; this part presents
 
 ## The dataset: IMDB Movie Reviews
 
-The **IMDB dataset** {% cite maas2011learning %} consists of 50,000 movie reviews labeled positive or negative, a standard benchmark for binary sentiment classification. Keras ships a pre-tokenized version (`keras.datasets.imdb.load_data`), but its host was unreachable when the script was run, so the script downloads the raw review text from a public CSV mirror and tokenizes it itself, following the same scheme: a 10,000-word vocabulary of the most frequent words, with indices 0 to 3 reserved for padding, start, unknown, and unused tokens. The reviews are then shuffled and split 25,000/25,000:
+The **IMDB dataset** {% cite maas2011learning %} consists of 50,000 movie reviews labeled positive or negative, a standard benchmark for binary sentiment classification. Keras ships a pre-tokenized version (`keras.datasets.imdb.load_data`), but here the script downloads the raw review text from a public CSV mirror and tokenizes it itself, so the whole preprocessing pipeline is visible. It follows the same scheme as the Keras version: a 10,000-word vocabulary of the most frequent words, with indices 0 to 3 reserved for padding, start, unknown, and unused tokens. The reviews are then shuffled and split 25,000/25,000:
 
 ```python
 import re
@@ -700,13 +700,19 @@ texts = df["review"].apply(clean).tolist()
 labels = (df["sentiment"] == "positive").astype(int).values
 
 # Top VOCAB_SIZE words; indices 0-3 reserved for pad/start/unknown/unused.
-tokenizer = keras.preprocessing.text.Tokenizer(num_words=VOCAB_SIZE - 3)
-tokenizer.fit_on_texts(texts)
+# Rank words by frequency, ties broken by first appearance (Keras 3 has no
+# Tokenizer class, so the vocabulary is built directly).
+word_counts = {}
+for t in texts:
+    for w in t.split():
+        word_counts[w] = word_counts.get(w, 0) + 1
+ranked = sorted(word_counts, key=lambda w: word_counts[w], reverse=True)
+word_index = {w: i + 1 for i, w in enumerate(ranked)}
 
 def encode(text):
     seq = [1]  # <start>
     for w in text.split():
-        idx = tokenizer.word_index.get(w)
+        idx = word_index.get(w)
         seq.append(idx + 3 if (idx is not None and idx < VOCAB_SIZE - 3) else 2)  # 2 = <unk>
     return seq
 
@@ -732,7 +738,10 @@ print(f"Example review (as word indices): {X_train[0][:10]}...")
 ```
 Train: 25000 reviews, Test: 25000 reviews
 Train label balance: 0.498 positive
+Example review (as word indices): [   4  372    7    4  176   10  828   18  107 3250]...
 ```
+
+The vocabulary is built in plain Python because Keras 3 removed the old `keras.preprocessing.text.Tokenizer`. `keras.layers.TextVectorization` is the Keras 3 layer for this job, but it truncates long reviews from the end, whereas the IMDB convention used here keeps the last 200 tokens, so the hand-built version keeps the preprocessing identical. `keras.utils.pad_sequences` is the Keras 3 location of the padding function, with the same defaults.
 
 ## Building the model with the Keras `Sequential` API
 
@@ -781,11 +790,11 @@ history = model.fit(
 ```
 
 ```
-Epoch 1/20  loss=0.5015 acc=0.7401 val_loss=0.3481 val_acc=0.8532
-Epoch 2/20  loss=0.2870 acc=0.8894 val_loss=0.3062 val_acc=0.8770  (best epoch)
-Epoch 3/20  loss=0.2060 acc=0.9254 val_loss=0.3246 val_acc=0.8772
-Epoch 4/20  loss=0.1569 acc=0.9435 val_loss=0.3437 val_acc=0.8720  (LR reduced: 1e-3 -> 5e-4)
-Epoch 5/20  loss=0.0955 acc=0.9706 val_loss=0.4539 val_acc=0.8744
+Epoch 1/20  loss=0.4893 acc=0.7541 val_loss=0.3394 val_acc=0.8630
+Epoch 2/20  loss=0.2718 acc=0.8940 val_loss=0.2996 val_acc=0.8742  (best epoch)
+Epoch 3/20  loss=0.2164 acc=0.9184 val_loss=0.3214 val_acc=0.8720
+Epoch 4/20  loss=0.1916 acc=0.9291 val_loss=0.3685 val_acc=0.8686  (LR reduced after this epoch: 1e-3 -> 5e-4)
+Epoch 5/20  loss=0.1234 acc=0.9567 val_loss=0.4299 val_acc=0.8756
 Training halted by early stopping (patience=3); weights restored from epoch 2
 ```
 
@@ -822,29 +831,27 @@ print(f"Test accuracy: {test_acc:.4f}, test loss: {test_loss:.4f}")
   <img src="/assets/img/posts/keras_training_curves_p6.svg" alt="Keras bidirectional LSTM training and validation loss and accuracy on IMDB, with best epoch marked" style="width: 100%; max-width: 90%; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 10: Binary cross-entropy loss (left) and classification accuracy (right) for the bidirectional LSTM, with the best epoch (2) marked. Validation loss reaches its minimum at epoch 2 and rises thereafter, while training loss continues to fall.*
+*Figure 10: Binary cross-entropy loss (left) and classification accuracy (right) for the bidirectional LSTM over the five epochs run. Validation loss reaches its minimum at epoch 2 and rises thereafter, while training loss continues to fall.*
 
 ```
-Test accuracy: 0.8746, test loss: 0.3011
+Test accuracy: 0.8733, test loss: 0.2986
 ```
 
-The restored epoch-2 model reaches 87.46% test accuracy. That is respectable, though below what modern transformer-based models {% cite vaswani2017attention %} achieve on the same task, which reflects the limitations of recurrent models on long-range text dependencies relative to attention-based approaches.
+The restored epoch-2 model reaches 87.33% test accuracy. That is respectable, though below what modern transformer-based models {% cite vaswani2017attention %} achieve on the same task, which reflects the limitations of recurrent models on long-range text dependencies relative to attention-based approaches.
 
 This run is the most instructive of the four for a reason unrelated to its accuracy: it is the only one in which overfitting is unambiguous.
 
-**Validation loss rises while validation accuracy does not fall.** Between epochs 2 and 5, validation loss increases from 0.3062 to 0.4539, roughly 48%, while validation accuracy stays in a narrow band, moving from 87.70% to 87.44% with an intermediate maximum of 87.72% at epoch 3. The additional training changed less *which* reviews the model classifies correctly than how confidently it commits to its predictions. Because cross-entropy penalizes confident errors far more heavily than tentative ones, a model growing more certain about a fixed set of mistakes shows sharply rising loss with essentially unchanged accuracy. This is why `EarlyStopping` monitors `val_loss` here: loss registered the degradation from epoch 3 onward, while accuracy barely moved over the five epochs run.
+**Validation loss rises while validation accuracy does not fall.** Between epochs 2 and 5, validation loss increases from 0.2996 to 0.4299, roughly 43%, while validation accuracy stays in a narrow band between 86.86% and 87.56%, ending slightly higher than at epoch 2. The additional training changed less *which* reviews the model classifies correctly than how confidently it commits to its predictions. Because cross-entropy penalizes confident errors far more heavily than tentative ones, a model growing more certain about a fixed set of mistakes shows sharply rising loss with essentially unchanged accuracy. This is why `EarlyStopping` monitors `val_loss` here: loss registered the degradation from epoch 3 onward, while accuracy barely moved over the five epochs run.
 
 **The reduced learning rate did not arrest the divergence.** `ReduceLROnPlateau` halved the learning rate from $10^{-3}$ to $5 \times 10^{-4}$ after epoch 4, and validation loss nonetheless rose further at epoch 5. A smaller step size lets the optimizer settle more precisely into a minimum it is approaching; it does not stop the optimizer from converging toward a minimum of the *training* objective that differs from the minimum of the generalization error. The model was not oscillating around a good solution, the pathology a schedule addresses; it was converging accurately toward an overfit one.
 
-**Training accuracy reaches 97.06% against a validation ceiling near 87.7%.** The gap of about ten percentage points by epoch 5 quantifies how much of the training set the model has memorized instead of generalized from. With a 10,000-word vocabulary embedded in 32 dimensions and 25,000 training reviews, a model of this capacity can easily memorize idiosyncrasies of individual reviews. `Dropout(0.4)` and early stopping oppose this, and early stopping did most of the work here, since dropout alone did not prevent training accuracy from climbing steeply after epoch 2.
+**Training accuracy reaches 95.67% against a validation ceiling near 87.6%.** The gap of about eight percentage points by epoch 5 quantifies how much of the training set the model has memorized instead of generalized from. With a 10,000-word vocabulary embedded in 32 dimensions and 25,000 training reviews, a model of this capacity can easily memorize idiosyncrasies of individual reviews. `Dropout(0.4)` and early stopping oppose this, and early stopping did most of the work here, since dropout alone did not prevent training accuracy from climbing steeply after epoch 2.
 
-These observations qualify the headline figure. The 87.46% is the test accuracy of the *epoch-2* model, recovered by `restore_best_weights=True`. Without that setting, the reported figure would have come from the epoch-5 weights, with 48% higher validation loss and worse calibration at roughly the same accuracy, and the headline metric would have concealed the difference almost entirely.
+These observations qualify the headline figure. The 87.33% is the test accuracy of the *epoch-2* model, recovered by `restore_best_weights=True`. Without that setting, the reported figure would have come from the epoch-5 weights, with 43% higher validation loss and worse calibration at roughly the same accuracy, and the headline metric would have concealed the difference almost entirely.
 
 ## Evaluating on new text
 
 ```python
-word_index = tokenizer.word_index
-
 def predict_sentiment(text, tokenizer_word_index=word_index):
     tokens = text.lower().split()
     encoded = [1] + [
@@ -862,10 +869,10 @@ print(f"Predicted: {sentiment} (p={prob:.3f})")
 ```
 
 ```
-Predicted: negative (p=0.061)
+Predicted: negative (p=0.085)
 ```
 
-A second, oppositely valenced example, "an absolutely brilliant and moving film", was classified as positive with p=0.881. Both hand-written examples were classified correctly, with probabilities well away from the decision boundary.
+A second, oppositely valenced example, "an absolutely brilliant and moving film", was classified as positive with p=0.907. Both hand-written examples were classified correctly, with probabilities well away from the decision boundary.
 
 Testing on hand-written examples is sound practice for probing failure modes the test distribution may not surface, such as sarcasm, mixed sentiment, or words outside the 10,000-word vocabulary. The fallback to index 2 maps such words to the `<unk>` token and silently discards their information, a real limitation of this preprocessing pipeline.
 
@@ -1102,12 +1109,12 @@ Several patterns across Parts 2 to 5 become visible only in comparison.
 |---|---|---|---|
 | Part 2: XGBoost | California Housing regression | $R^2 = 0.8509$, RMSE $= 0.4515$ | Train RMSE 0.19 vs. validation 0.44 |
 | Part 3: TensorFlow | MNIST digit classification | 99.15% held-out (test-set) accuracy | 0.16 points |
-| Part 4: Keras | IMDB sentiment classification | 87.46% test accuracy | ≈10 points |
+| Part 4: Keras | IMDB sentiment classification | 87.33% test accuracy | ≈8 points |
 | Part 5: PyTorch | Fashion-MNIST classification | 92.40% test accuracy | 2.28 points |
 
 **The size of the overfitting gap varied widely across the deep-learning runs.** The three deep-learning parts use comparable regularization (dropout at 0.3 to 0.4) and the same optimizer (Adam {% cite kingma2015adam %} at $10^{-3}$), yet the train-test gap spans two orders of magnitude: 0.16 points on MNIST, 2.28 on Fashion-MNIST, and approximately 10 on IMDB. This ordering matches the intuitive difficulty of the three tasks, which is consistent with the idea that a model memorizes more when generalizable structure is scarce relative to its capacity. The comparison is confounded, however: the architectures, data modalities, and dataset sizes all differ, so it is an observation, not evidence that task difficulty alone drives the gap. A practical corollary is still useful: whether a train-test gap exists matters less than whether it is proportionate to the difficulty of what is being learned.
 
-**Loss and accuracy (or training and validation error) diverged in every run, and monitoring the wrong one has consequences.** In Part 2, validation RMSE flattened while training RMSE continued to fall. In Part 3, training loss fell by an order of magnitude while held-out accuracy moved by less than one percentage point. In Part 4, validation loss rose by 48% while validation accuracy remained essentially constant. Loss is the quantity being optimized and responds to changes in confidence; accuracy is typically the quantity of interest and responds only to changes in the argmax. In Part 4, `val_loss` exposed the degradation clearly while `val_accuracy` barely moved, which is why the early-stopping callback monitors loss.
+**Loss and accuracy (or training and validation error) diverged in every run, and monitoring the wrong one has consequences.** In Part 2, validation RMSE flattened while training RMSE continued to fall. In Part 3, training loss fell by an order of magnitude while held-out accuracy moved by less than one percentage point. In Part 4, validation loss rose by 43% while validation accuracy remained essentially constant. Loss is the quantity being optimized and responds to changes in confidence; accuracy is typically the quantity of interest and responds only to changes in the argmax. In Part 4, `val_loss` exposed the degradation clearly while `val_accuracy` barely moved, which is why the early-stopping callback monitors loss.
 
 **Early stopping was decisive in one of the four runs and inconsequential in the others.** The XGBoost run halted at iteration 892 of 1000, long after the validation curve had flattened, which cost training time without affecting accuracy. The Keras run halted at epoch 5 of 20 and restored the epoch-2 weights, which materially changed the reported model. The TensorFlow and PyTorch runs had no early-stopping mechanism and simply completed ten epochs. Early stopping is essential when the validation metric deteriorates and largely decorative when it merely plateaus.
 

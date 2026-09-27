@@ -128,7 +128,7 @@ def errors(u_num, u_exact):
     return Linf, L1, L2
 
 
-def table11(Ns=(10, 15, 20, 25, 30), T=1.0):
+def table11(Ns=(10, 15, 20, 25, 30, 35, 40), T=1.0):
     """Print Table 11: errors and convergence rates for BOTH schemes.
 
     The grids here are not successive doublings, so the rate uses the
