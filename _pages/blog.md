@@ -27,11 +27,25 @@ pagination:
   </div>
   {% endif %}
 
-{% if site.display_tags and site.display_tags.size > 0 or site.display_categories and site.display_categories.size > 0 %}
+{% comment %}Only link to archives that contain posts, including after posts are renamed or removed.{% endcomment %}
+{% assign displayed_tags = '' | split: ',' %}
+{% for tag in site.display_tags %}
+  {% if site.tags[tag].size > 0 %}
+    {% assign displayed_tags = displayed_tags | push: tag %}
+  {% endif %}
+{% endfor %}
+{% assign displayed_categories = '' | split: ',' %}
+{% for category in site.display_categories %}
+  {% if site.categories[category].size > 0 %}
+    {% assign displayed_categories = displayed_categories | push: category %}
+  {% endif %}
+{% endfor %}
+
+{% if displayed_tags.size > 0 or displayed_categories.size > 0 %}
 
   <div class="tag-category-list">
     <ul class="p-0 m-0">
-      {% for tag in site.display_tags %}
+      {% for tag in displayed_tags %}
         <li>
           <i class="fa-solid fa-hashtag fa-sm"></i> <a href="{{ tag | slugify | prepend: '/blog/tag/' | relative_url }}">{{ tag }}</a>
         </li>
@@ -39,10 +53,10 @@ pagination:
           <p>&bull;</p>
         {% endunless %}
       {% endfor %}
-      {% if site.display_categories.size > 0 and site.display_tags.size > 0 %}
+      {% if displayed_categories.size > 0 and displayed_tags.size > 0 %}
         <p>&bull;</p>
       {% endif %}
-      {% for category in site.display_categories %}
+      {% for category in displayed_categories %}
         <li>
           <i class="fa-solid fa-tag fa-sm"></i> <a href="{{ category | slugify | prepend: '/blog/category/' | relative_url }}">{{ category }}</a>
         </li>

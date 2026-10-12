@@ -19,13 +19,13 @@ All five scripts share a short plotting preamble (serif fonts and a `savefig_all
 
 ---
 
-# Part 1: scikit-learn for Handwritten Digit Recognition
+## Part 1: scikit-learn for Handwritten Digit Recognition
 
-## What scikit-learn is, and why it is usually the appropriate starting point
+### What scikit-learn is, and why it is usually the appropriate starting point
 
 scikit-learn is Python's general-purpose classical machine learning library, providing linear models, kernel methods, tree ensembles, clustering, and dimensionality reduction. It also provides a **consistent API** across all of them and first-class support for the essential parts of a real workflow: cross-validation, preprocessing pipelines, hyperparameter search, and evaluation metrics. For structured or tabular data with a moderate number of samples, scikit-learn is usually the best starting point, not because it is simpler than deep learning, but because it is often the *correct tool*, as the tabular example of the [previous post]({{ '/blog/2026/ml-toolkit-tour_p5/' | relative_url }}) showed.
 
-## The dataset: UCI Optical Recognition of Handwritten Digits
+### The dataset: UCI Optical Recognition of Handwritten Digits
 
 This part uses **1,797 scanned handwritten digits**, each digitized as an 8×8 grid of integer pixel intensities (0 to 16). `load_digits` returns the test portion of the UCI Optical Recognition of Handwritten Digits dataset {% cite alpaydin1998optical %}, whose images were written by 43 people. It is a smaller, cleaner counterpart to the MNIST dataset used in Part 3, and it ships bundled with scikit-learn, requiring no download, so every line below can be run immediately.
 
@@ -47,7 +47,7 @@ Class balance: [178 182 177 183 181 182 181 179 174 180]
 
 Each of the 64 columns in `X` is one pixel's intensity, flattened from the original 8×8 image, so the model never observes the two-dimensional spatial structure directly. That gap is precisely what a convolutional network, covered in Parts 3 and 5, is designed to exploit. The classes are also close to perfectly balanced, at roughly 180 examples of each digit, which makes plain accuracy a trustworthy metric, in contrast to the imbalanced breast-cancer dataset of the [previous post]({{ '/blog/2026/ml-toolkit-tour_p5/' | relative_url }}).
 
-### Step 1: Examine the data before any modeling
+#### Step 1: Examine the data before any modeling
 
 This step is easy to skip, and it should not be: model performance cannot be reasoned about later without a concrete sense of what the raw examples look like.
 
@@ -73,7 +73,7 @@ savefig_all(fig, "sample_digits_p6")
 
 *Figure 1: Twenty real examples from the dataset, with their true labels. The handwriting variability is what makes the problem non-trivial despite the small 8×8 resolution.*
 
-### Step 2: Split into training and test sets before anything else touches the data
+#### Step 2: Split into training and test sets before anything else touches the data
 
 ```python
 from sklearn.model_selection import train_test_split
@@ -93,7 +93,7 @@ Two details deserve attention, because getting them wrong is among the most comm
 - **`stratify=y`** ensures the train and test sets preserve the class proportions of the full dataset. Without it, a random split could, by chance, under-represent a digit such as "8" in the training set and degrade the model's ability to learn it.
 - **The split happens before any preprocessing is fit.** Any transformation learned from data, such as the mean and variance of a `StandardScaler` or the principal components of a `PCA`, must be fit *only* on the training set and then *applied* to the test set. Fitting preprocessing on the full dataset before splitting leaks test-set information into training. scikit-learn's `Pipeline` object (used below) exists largely to make this correct by construction.
 
-### Step 3: Baseline models via cross-validation
+#### Step 3: Baseline models via cross-validation
 
 Instead of selecting one algorithm by instinct, four different model families are compared under identical cross-validation conditions, the same discipline used in the [previous post]({{ '/blog/2026/ml-toolkit-tour_p5/' | relative_url }}), now applied to a 10-class problem.
 
@@ -146,7 +146,7 @@ Random Forest          0.9749 ± 0.0078
 
 Unlike the linearly separable breast-cancer data of the [previous post]({{ '/blog/2026/ml-toolkit-tour_p5/' | relative_url }}), here the **RBF-kernel SVM outperforms** plain logistic regression. Raw pixel intensities are not linearly separable: a "3" and an "8", for example, are distinguished by a curved decision boundary, not a hyperplane, and this is the structure a kernel method is designed to capture. That is the purpose of running the comparison instead of assuming an answer: the appropriate model depends on the structure of the data, and that structure differs from one dataset to another.
 
-### Step 4: Hyperparameter tuning with `GridSearchCV`
+#### Step 4: Hyperparameter tuning with `GridSearchCV`
 
 The SVM's two key hyperparameters, `C` (inverse regularization strength) and `gamma` (kernel bandwidth), are tuned by exhaustive grid search, still using cross-validation so that the test set remains untouched:
 
@@ -175,7 +175,7 @@ Best CV accuracy: 0.9812
 
 The default hyperparameters (`C=1, gamma='scale'`) turned out to be optimal on this grid. This happens more often than newcomers expect, and the search was not wasted: the adequacy of the defaults is established only *after* checking. Trusting defaults without verification and grid-searching everything indiscriminately are both weaker practices than checking.
 
-### Step 5: Visualizing the feature space with PCA
+#### Step 5: Visualizing the feature space with PCA
 
 Before finalizing the model, it is useful to see how separable the classes are, using Principal Component Analysis to project the 64-dimensional pixel space onto two dimensions:
 
@@ -197,7 +197,7 @@ First 2 components explain 21.6% of variance
 
 *Figure 3: 2D PCA projection of all 1,797 digits, colored by true label. Although these two components capture only 21.6% of the total variance, several digit classes (0, 4, 6) already form visually distinct clusters. This confirms that the problem is learnable, and it indicates why even a linear model, logistic regression, achieved 96.8% above.*
 
-### Step 6: Learning curves, and whether more data or a better model is required
+#### Step 6: Learning curves, and whether more data or a better model is required
 
 A learning curve answers a practical question: if this model is underperforming, would more training data help, or is the model itself the bottleneck?
 
@@ -218,7 +218,7 @@ train_sizes, train_scores, val_scores = learning_curve(
 
 A large, persistent gap between the training and validation curves indicates **high variance** (overfitting), for which more data or stronger regularization would help. Curves that converge to a low plateau indicate **high bias** (underfitting), which calls for a more flexible model, not more data. Here the gap is narrowing while the validation curve is still climbing at the right edge, which suggests the model has **not yet saturated**: more training data would likely still help, although with visibly diminishing returns.
 
-### Step 7: Final evaluation on the held-out test set
+#### Step 7: Final evaluation on the held-out test set
 
 This is the only point at which the test set is used, after every modeling decision has been made by cross-validation alone.
 
@@ -263,7 +263,7 @@ weighted avg       0.98      0.97      0.97       360
 
 *Figure 6: All misclassified test examples (9 out of 360), labeled with True (T) and Predicted (P) digit. Several are ambiguous handwriting even to a human reader, which provides useful context for the 97.5% test accuracy.*
 
-## scikit-learn: what to take away
+### scikit-learn: what to take away
 
 - The **estimator API** (`fit`/`predict`/`transform`, all composing inside `Pipeline`) is what makes rigorous comparison across models inexpensive: the four-model comparison above takes a few dozen lines because every model exposes the same interface.
 - **Cross-validate before touching the test set**, for both model selection and hyperparameter tuning, and never fit preprocessing before splitting. The test set is used exactly once, at the end.
@@ -271,13 +271,13 @@ weighted avg       0.98      0.97      0.97       360
 
 ---
 
-# Part 2: XGBoost for California Housing Price Prediction
+## Part 2: XGBoost for California Housing Price Prediction
 
-## What XGBoost is, and its intended use
+### What XGBoost is, and its intended use
 
 XGBoost ("Extreme Gradient Boosting") is a highly optimized implementation of gradient-boosted decision trees {% cite chen2016xgboost %}, and for several years it was close to the standard winning approach in tabular-data competitions. Compared with scikit-learn's tree ensembles (Random Forest, Gradient Boosting), XGBoost adds second-order (Newton-style) boosting, explicit L1 and L2 regularization in the training objective, native handling of missing values, and a histogram-based split-finding algorithm that makes it substantially faster on large datasets. The [previous post]({{ '/blog/2026/ml-toolkit-tour_p5/' | relative_url }}) treats these differences mathematically.
 
-## The dataset: California Housing
+### The dataset: California Housing
 
 The **California Housing dataset** {% cite pace1997sparse %} contains 1990 US Census data on median house values across California census block groups, with features including median income, house age, average rooms per household, and geographic coordinates. It replaced the older and ethically problematic Boston Housing dataset as scikit-learn's standard regression example, and it normally loads with `fetch_california_housing(as_frame=True)`. Because that host was unreachable when the script was run, the script rebuilds the same eight features from the raw census extract distributed with the companion repository of Géron's *Hands-On Machine Learning*, dropping the 207 of 20,640 rows with a missing `total_bedrooms` value:
 
@@ -312,7 +312,7 @@ print(f"\nTarget (median house value, $100k units): "
 
 The eight features are `MedInc` (median income in the block group), `HouseAge`, `AveRooms`, `AveBedrms`, `Population`, `AveOccup`, `Latitude`, and `Longitude`. After dropping missing values, 20,433 rows remain. This combination of socioeconomic, structural, and geographic features makes a realistic regression problem: noisy, only partially explained by the available features, and with non-linear and geographic interaction effects, since house prices depend on location in ways a linear model captures only crudely.
 
-### Step 1: Baseline with a linear model
+#### Step 1: Baseline with a linear model
 
 As in Part 1, a baseline comes first:
 
@@ -335,7 +335,7 @@ Linear Regression  RMSE=0.7514  MAE=0.5400  R2=0.5871
 
 The linear model ($R^2 = 0.5871$) captures the broad income-to-price relationship but misses the non-linear, geographic, and interaction effects that account for much of the remaining variance. That gap is what a tree-based model is positioned to close, since trees naturally represent non-linear thresholds and interactions, such as high income combined with coastal latitude, without manual feature engineering.
 
-### Step 2: XGBoost with a validation split and early stopping
+#### Step 2: XGBoost with a validation split and early stopping
 
 ```python
 X_tr, X_val, y_tr, y_val = train_test_split(
@@ -401,7 +401,7 @@ First, the gap between the curves is substantial by the end of training. Trainin
 
 Second, early stopping halted at iteration 892 of a permitted 1000, not at some far earlier round. Given that validation RMSE was essentially flat from round 100 onward, rounds 100 through 892 added negligible accuracy while costing approximately eight times the training time and producing a model roughly eight times larger. The `early_stopping_rounds` criterion halts when the metric stops improving *at all*, not when improvement stops being worth its cost. Where inference latency or model size is constrained, a tolerance-based criterion, halting once improvement over a window falls below a threshold, would deliver nearly identical predictive performance at a fraction of the model complexity.
 
-### Step 3: Hyperparameter tuning via randomized search
+#### Step 3: Hyperparameter tuning via randomized search
 
 A full grid search over XGBoost's many hyperparameters is often wasteful. `RandomizedSearchCV` samples a fixed number of random combinations, which tends to be considerably more efficient in high-dimensional hyperparameter spaces {% cite bergstra2012random %}:
 
@@ -438,7 +438,7 @@ Best params: {'colsample_bytree': 0.812, 'learning_rate': 0.080,
 Best CV RMSE: 0.4445
 ```
 
-### Step 4: Feature importance and interpretation
+#### Step 4: Feature importance and interpretation
 
 The importances below are computed from the early-stopped `model` of Step 2, not from the tuned model of Step 3:
 
@@ -467,7 +467,7 @@ The geographic coordinates rank second and third, jointly contributing more gain
 
 `Population` ranks last with a gain of 0.57, approximately one-thirteenth that of `MedInc`. One might expect block-group population to carry information about urban density and therefore price. The likely explanation is redundancy, not irrelevance: `AveOccup` is population divided by households, so the two features share a numerator, and `AveOccup` additionally normalizes for household count. Where two features overlap, a boosted ensemble splits preferentially on whichever yields the larger loss reduction, and the gain attributed to the other falls. Low gain therefore means a feature adds little *beyond what the other features already supply*, which differs from being uninformative in isolation. Discarding `Population` on this basis would be defensible here, but the same reasoning applied to a feature whose apparent redundancy is an artifact of the particular training sample would not be.
 
-### Step 5: Final test-set evaluation
+#### Step 5: Final test-set evaluation
 
 ```python
 best_model = search.best_estimator_
@@ -483,7 +483,7 @@ XGBoost (tuned)  RMSE=0.4515  MAE=0.2918  R2=0.8509
 
 The tuned model reaches $R^2 = 0.8509$ and RMSE $= 0.4515$ (in units of \$100,000, a typical error of about \$45,000), a substantial improvement over the $R^2 = 0.5871$ of the linear baseline and consistent with the non-linear, interaction-heavy structure discussed above.
 
-## XGBoost: what to take away
+### XGBoost: what to take away
 
 - **Early stopping on a held-out validation set** is the standard, automatic guard against overfitting a boosted ensemble. The diagnostic is the validation curve ceasing to improve, or turning upward, while the training curve continues to fall; here it flattened, and early stopping mostly cost training time.
 - **`RandomizedSearchCV`** is usually a better use of compute than exhaustive grid search once more than two or three hyperparameters must be tuned together.
@@ -491,13 +491,13 @@ The tuned model reaches $R^2 = 0.8509$ and RMSE $= 0.4515$ (in units of \$100,00
 
 ---
 
-# Part 3: TensorFlow for Handwritten Digit Recognition with a Custom Training Loop
+## Part 3: TensorFlow for Handwritten Digit Recognition with a Custom Training Loop
 
-## Why this part looks different from the Keras part
+### Why this part looks different from the Keras part
 
 Keras is the official high-level API of TensorFlow. To avoid duplicating Part 4, this part uses TensorFlow's **lower-level API**: the network's layers come from `tf.keras.layers`, but the training loop is written by hand with `tf.GradientTape` instead of calling `model.fit()`. This is worth learning even for routine Keras users, because it is what `model.fit()` does internally, and it becomes necessary whenever a requirement exceeds what the high-level API can express, such as custom losses combining several objectives, non-standard gradient manipulation, or research-style training procedures.
 
-## The dataset: MNIST
+### The dataset: MNIST
 
 **MNIST** {% cite lecun1998gradient %} comprises 70,000 handwritten digit images (60,000 for training and 10,000 for testing) at 28×28 grayscale pixels, assembled by Yann LeCun and collaborators from NIST handwriting samples. TensorFlow provides a one-line loader; the script instead downloads the original IDX files from a public mirror, for which `tf.keras.datasets.mnist.load_data()` is a drop-in replacement:
 
@@ -533,7 +533,7 @@ test_ds = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(BATCH_SIZE)
 
 With 60,000 training images at 28×28 resolution, this is a substantially larger problem than the 1,797 8×8 digits of Part 1, and it is the regime in which the deep learning tools of this and the next two parts begin to justify their additional complexity.
 
-## Building a convolutional network from explicit layers
+### Building a convolutional network from explicit layers
 
 ```python
 def build_model():
@@ -552,7 +552,7 @@ def build_model():
 model = build_model()
 ```
 
-### Why convolutions, mathematically
+#### Why convolutions, mathematically
 
 A `Dense` layer connects every input pixel to every output unit with an independent weight: for a 28×28 image, that is 784 weights *per unit* in the first layer, with no representation of the fact that nearby pixels are related. A **convolutional** layer instead slides a small shared filter, for example 3×3, across the image, computing
 
@@ -562,7 +562,7 @@ $$
 
 at every spatial location, with the **same** weights $w_{u,v}$ everywhere. This weight sharing encodes two assumptions that hold for images and that the flattened-pixel approach of Part 1 ignores: **locality** (nearby pixels are more related than distant ones) and **translation equivariance** (shifting the input shifts the feature map by the same amount). Pooling then adds approximate **translation invariance**, so that a "3" remains a "3" whether centered or shifted slightly. These inductive biases are why CNNs substantially outperform flat feedforward networks on image data.
 
-## Writing the training loop by hand with `GradientTape`
+### Writing the training loop by hand with `GradientTape`
 
 In this script the 10,000-image test set is evaluated after every epoch and logged as `val_acc`. It is therefore test-set monitoring, not a separate validation set; no model selection is done with it here, but the per-epoch figures below should be read with that in mind.
 
@@ -631,7 +631,7 @@ Each component of this loop does a specific job that `model.fit()` would otherwi
 - **`@tf.function`** traces the Python function once and compiles it into a static graph, which runs considerably faster than eager, line-by-line execution.
 - **Separate `train_acc_metric` and `val_acc_metric` objects**, each reset per epoch, are the idiomatic way to accumulate statistics over a `tf.data` pipeline, so each reports an epoch-level average instead of a noisy single-batch value.
 
-## Plotting the training history
+### Plotting the training history
 
 ```python
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
@@ -662,7 +662,7 @@ After ten epochs the network reaches 99.31% training and 99.15% held-out accurac
 
 **Training loss keeps falling while accuracy plateaus.** Loss decreases from 0.2807 to 0.0217, more than an order of magnitude, over the same interval in which held-out accuracy improves by less than one percentage point. The network is becoming more *confident* in predictions that were already correct, since cross-entropy rewards more probability mass on the true class whether or not the argmax was already right. Loss is the quantity being optimized, accuracy is usually the quantity of interest, and the two can diverge substantially.
 
-## TensorFlow (low-level API): what to take away
+### TensorFlow (low-level API): what to take away
 
 - **`GradientTape`** is TensorFlow's explicit automatic-differentiation mechanism; understanding it means understanding what every `.fit()` call does internally.
 - **Convolutional layers encode locality and translation equivariance** directly into the architecture, which is why they outperform flattened-pixel dense networks on images: a better-matched inductive bias, not an opaque gain.
@@ -670,13 +670,13 @@ After ten epochs the network reaches 99.31% training and 99.15% held-out accurac
 
 ---
 
-# Part 4: Keras for Movie Review Sentiment Classification
+## Part 4: Keras for Movie Review Sentiment Classification
 
-## Why this part looks different from the TensorFlow part
+### Why this part looks different from the TensorFlow part
 
 Part 3 used TensorFlow's low-level API to show the mechanics; this part presents the other end of the spectrum, the high-level `Sequential`/`fit()` workflow of Keras {% cite chollet2015keras %}, where most everyday deep learning work should be done. The domain also changes, from images to **text**, to introduce a different kind of architecture: embeddings and recurrent layers instead of convolutions.
 
-## The dataset: IMDB Movie Reviews
+### The dataset: IMDB Movie Reviews
 
 The **IMDB dataset** {% cite maas2011learning %} consists of 50,000 movie reviews labeled positive or negative, a standard benchmark for binary sentiment classification. Keras ships a pre-tokenized version (`keras.datasets.imdb.load_data`), but here the script downloads the raw review text from a public CSV mirror and tokenizes it itself, so the whole preprocessing pipeline is visible. It follows the same scheme as the Keras version: a 10,000-word vocabulary of the most frequent words, with indices 0 to 3 reserved for padding, start, unknown, and unused tokens. The reviews are then shuffled and split 25,000/25,000:
 
@@ -743,7 +743,7 @@ Example review (as word indices): [   4  372    7    4  176   10  828   18  107 
 
 The vocabulary is built in plain Python because Keras 3 removed the old `keras.preprocessing.text.Tokenizer`. `keras.layers.TextVectorization` is the Keras 3 layer for this job, but it truncates long reviews from the end, whereas the IMDB convention used here keeps the last 200 tokens, so the hand-built version keeps the preprocessing identical. `keras.utils.pad_sequences` is the Keras 3 location of the padding function, with the same defaults.
 
-## Building the model with the Keras `Sequential` API
+### Building the model with the Keras `Sequential` API
 
 ```python
 model = keras.Sequential([
@@ -763,7 +763,7 @@ Two architectural choices are worth understanding:
 - **`Embedding(VOCAB_SIZE, 32)`** replaces one-hot encoding of each word (a 10,000-dimensional sparse vector) with a **learned, dense 32-dimensional representation**. It is a linear projection trained jointly with the rest of the network, which places words that behave similarly for the task near one another. The idea resembles the PCA of Part 1, except that the projection is *learned end-to-end for the task* instead of fit without supervision to maximize variance.
 - **`Bidirectional(LSTM(32))`** reads the review forward and backward and concatenates the two representations. An LSTM (Long Short-Term Memory) cell {% cite hochreiter1997long %} maintains an internal memory state, updated at each word by learned gates that control what to retain, forget, and output. It is designed to capture long-range dependencies, such as a negation early in a review reversing the sentiment of praise stated later, which a bag-of-words model would miss.
 
-## Compiling and training with `model.fit()`
+### Compiling and training with `model.fit()`
 
 Here `validation_split=0.2` holds out the last 20% of the training reviews, so the validation figures below come from a genuine validation set, separate from the test set.
 
@@ -805,7 +805,7 @@ This single call replaces the entire training loop of Part 3: the `GradientTape`
 - **`ReduceLROnPlateau`** shrinks the learning rate when validation loss stops improving, a simple adaptive schedule that lets the optimizer take large steps early and smaller ones later without a hand-tuned decay schedule.
 - **`EarlyStopping(restore_best_weights=True)`** is the neural-network analog of XGBoost's `early_stopping_rounds` in Part 2: the same purpose, the same mechanism (monitoring validation performance), and an entirely different model class.
 
-## Plotting and interpreting the training curves
+### Plotting and interpreting the training curves
 
 ```python
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
@@ -849,7 +849,7 @@ This run is the most instructive of the four for a reason unrelated to its accur
 
 These observations qualify the headline figure. The 87.33% is the test accuracy of the *epoch-2* model, recovered by `restore_best_weights=True`. Without that setting, the reported figure would have come from the epoch-5 weights, with 43% higher validation loss and worse calibration at roughly the same accuracy, and the headline metric would have concealed the difference almost entirely.
 
-## Evaluating on new text
+### Evaluating on new text
 
 ```python
 def predict_sentiment(text, tokenizer_word_index=word_index):
@@ -876,7 +876,7 @@ A second, oppositely valenced example, "an absolutely brilliant and moving film"
 
 Testing on hand-written examples is sound practice for probing failure modes the test distribution may not surface, such as sarcasm, mixed sentiment, or words outside the 10,000-word vocabulary. The fallback to index 2 maps such words to the `<unk>` token and silently discards their information, a real limitation of this preprocessing pipeline.
 
-## Keras: what to take away
+### Keras: what to take away
 
 - **`model.fit()`** does everything the `GradientTape` loop of Part 3 does explicitly; the benefit is fewer lines and fewer opportunities for bugs, not different mathematics.
 - **Recurrent architectures** such as the LSTM exist to capture order-dependent, long-range structure in sequences, but attention-based (transformer) models generally outperform them on this class of task.
@@ -884,13 +884,13 @@ Testing on hand-written examples is sound practice for probing failure modes the
 
 ---
 
-# Part 5: PyTorch for Clothing Image Classification with a Custom CNN
+## Part 5: PyTorch for Clothing Image Classification with a Custom CNN
 
-## What PyTorch is, and how it differs philosophically
+### What PyTorch is, and how it differs philosophically
 
 PyTorch's {% cite paszke2019pytorch %} defining design choice is **imperative, eager execution**: every operation runs immediately, as plain Python/NumPy code would, and the computational graph used for backpropagation is built dynamically on each forward pass. This distinguishes it from the declarative `Sequential` style of Keras and makes it well suited to architectures with data-dependent control flow, such as a variable number of layers depending on the input, recursive structures, or custom training procedures, which accounts in large part for its prevalence in research code.
 
-## The dataset: Fashion-MNIST
+### The dataset: Fashion-MNIST
 
 **Fashion-MNIST** {% cite xiao2017fashion %} is a drop-in replacement for MNIST: 70,000 28×28 grayscale images of clothing items (t-shirts, trousers, shoes, bags, and similar) in 10 categories, built by Zalando Research because plain MNIST had become too easy to differentiate modern methods. It ships in `torchvision`; the script downloads the same IDX files from Zalando Research's own repository, for which the `torchvision` loader below is a drop-in replacement:
 
@@ -933,7 +933,7 @@ Train: 60000, Test: 10000
 
 `DataLoader` is PyTorch's counterpart to the `tf.data.Dataset` pipeline of Part 3. It handles batching, shuffling, and, through `num_workers`, parallel loading in background processes, so the device doing the training rarely waits for the next batch.
 
-## Defining the network as an `nn.Module` subclass
+### Defining the network as an `nn.Module` subclass
 
 ```python
 class FashionCNN(nn.Module):
@@ -965,7 +965,7 @@ print(model)
 
 This network has the same overall structure as the TensorFlow CNN of Part 3, two convolution-and-pooling blocks followed by a dense head with dropout, but the two are not identical: here the convolutions use `padding=1`, so each pooling step halves the spatial size exactly (28 to 14 to 7), and the hidden dense layer has 128 units, whereas the TensorFlow model uses unpadded convolutions and a 64-unit hidden layer. The broader point stands: the mathematical model is framework-agnostic, and what differs between frameworks is the surrounding machinery (data pipelines, training loop, deployment path).
 
-## The training loop, written explicitly (PyTorch's default style)
+### The training loop, written explicitly (PyTorch's default style)
 
 As in Part 3, the test set is evaluated after every epoch (logged here, accurately, as `test_acc`); it is monitored but not used for any training decision.
 
@@ -1038,7 +1038,7 @@ This pattern, or a close variant, is what almost every PyTorch training script l
 - **`model.train()` / `model.eval()`** toggle layer-specific behavior. `Dropout` is active in `.train()` and passes data through unchanged in `.eval()`; `BatchNorm` layers (not used here) switch between batch statistics and stored running statistics. Forgetting `.eval()` before evaluation is one of the most common and hardest-to-notice PyTorch bugs, since the model still produces *plausible but silently degraded* predictions.
 - **`StepLR`** halves the learning rate every 5 epochs: a fixed schedule, where `ReduceLROnPlateau` in Part 4 reacts to validation performance.
 
-## Plotting results and inspecting predictions
+### Plotting results and inspecting predictions
 
 ```python
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
@@ -1093,7 +1093,7 @@ The network reaches 92.40% test accuracy after 10 epochs. The task is harder tha
 
 **The individual errors are semantically plausible.** In Figure 12, the single misclassification assigns a sneaker to the "Bag" class. At 28×28 grayscale resolution, a low side-on shoe and a flat handbag share a broadly similar outline, and the distinguishing evidence (a sole, laces, a strap) occupies few pixels. As in Part 1, inspecting the errors distinguishes a model that has failed to learn the task from one meeting the limits of its input representation. These errors look like the latter, which suggests that improving on 92.40% would require higher-resolution inputs or data augmentation more than a larger network.
 
-## PyTorch: what to take away
+### PyTorch: what to take away
 
 - **Eager execution** means PyTorch code can be debugged with standard Python tools (`print`, a debugger, stepping line by line), without a separate graph-compilation step such as `@tf.function`.
 - **`optimizer.zero_grad()` before every backward pass** is not boilerplate to skim: omitting it silently accumulates gradients across steps.
@@ -1101,7 +1101,7 @@ The network reaches 92.40% test accuracy after 10 epochs. The task is harder tha
 
 ---
 
-# What the four runs show when read together
+## What the four runs show when read together
 
 Several patterns across Parts 2 to 5 become visible only in comparison.
 
@@ -1120,7 +1120,7 @@ Several patterns across Parts 2 to 5 become visible only in comparison.
 
 ---
 
-# Choosing among the four libraries: an updated decision framework
+## Choosing among the four libraries: an updated decision framework
 
 Having built a complete pipeline in each library, the guidance of the [previous post]({{ '/blog/2026/ml-toolkit-tour_p5/' | relative_url }}) holds, now with more detail attached to each row:
 

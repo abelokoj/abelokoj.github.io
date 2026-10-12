@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { spawnSync } = require("node:child_process");
 
 const root = process.cwd();
 
@@ -61,7 +62,24 @@ if (/gem 'al_math',\s*:git =>/.test(gemfile)) {
   failures.push("`Gemfile` must not use git-branch pin for `al_math`; use released gem version.");
 }
 
-for (const forbiddenPath of ["_includes", "_layouts", "_sass", "_scripts", "assets/tailwind", "tailwind.config.js", "assets/webfonts"]) {
+// Site-specific includes, layouts, and Sass are supported by docs/BOUNDARIES.md.
+// Let the owning upgrade plugin validate acknowledgements instead of rejecting
+// these directories outright; it distinguishes new site files from overrides.
+if (["_includes", "_layouts", "_sass"].some(exists)) {
+  const overrideAudit = spawnSync("bundle exec al-folio upgrade overrides audit --fail-on-stale", {
+    cwd: root,
+    encoding: "utf8",
+    shell: true,
+    windowsHide: true,
+  });
+  if (overrideAudit.error || overrideAudit.status !== 0) {
+    failures.push(
+      `Local override audit failed; review and acknowledge intentional overrides. ${overrideAudit.error?.message || overrideAudit.stderr || overrideAudit.stdout}`
+    );
+  }
+}
+
+for (const forbiddenPath of ["_scripts", "assets/tailwind", "tailwind.config.js", "assets/webfonts"]) {
   if (exists(forbiddenPath)) {
     failures.push(`Starter must not own core component path \`${forbiddenPath}\`; move ownership to the corresponding gem.`);
   }

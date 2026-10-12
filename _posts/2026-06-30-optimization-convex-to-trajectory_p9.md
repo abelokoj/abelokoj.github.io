@@ -155,18 +155,18 @@ Convexity is valuable when available, but many physically interesting control an
 A vehicle with position $q(t)$ and velocity $v(t)$ is driven by a control input $u(t)$ (thrust) against quadratic drag,
 
 $$
-\dot{q} = v, \qquad \dot{v} = u - k\, v |v|,
+\dot{q} = v, \qquad \dot{v} = u - k\, v \lvert v\rvert,
 $$
 
 with $k = 0.02$ in the script. Starting from rest at $q(0)=0$, the goal is to reach $q(T) = q_f$ with zero final velocity at $T = 10$, with $q_f = 20$, while **minimizing fuel usage**. Fuel is approximated here by $\int_0^T u(t)^2\,dt$, a smooth proxy (strictly a control-energy cost) that keeps the problem gradient-friendly:
 
 $$
-\min_{u(\cdot)} \int_0^T u(t)^2\, dt \quad \text{subject to } \dot{q}=v,\ \dot{v}=u-kv|v|,\ q(0)=0,\ v(0)=0,\ q(T)=q_f,\ v(T)=0.
+\min_{u(\cdot)} \int_0^T u(t)^2\, dt \quad \text{subject to } \dot{q}=v,\ \dot{v}=u-kv\lvert v\rvert,\ q(0)=0,\ v(0)=0,\ q(T)=q_f,\ v(T)=0.
 $$
 
 ### How this differs from the logistic regression problem
 
-This is an **infinite-dimensional** optimization problem, since the unknown is an entire function $u(t)$ and not a finite vector. More importantly for convexity, the drag term $v|v|$ is nonlinear, so after discretization the dynamics become nonlinear *equality* constraints. A feasible set defined by nonlinear equalities is in general not convex, so the discretized problem is **not convex**: there is no guarantee that a local minimum found by a numerical solver is the global one, and different initial guesses can in principle converge to different local solutions.
+This is an **infinite-dimensional** optimization problem, since the unknown is an entire function $u(t)$ and not a finite vector. More importantly for convexity, the drag term $v\lvert v\rvert$ is nonlinear, so after discretization the dynamics become nonlinear *equality* constraints. A feasible set defined by nonlinear equalities is in general not convex, so the discretized problem is **not convex**: there is no guarantee that a local minimum found by a numerical solver is the global one, and different initial guesses can in principle converge to different local solutions.
 
 ### Direct collocation: from a function-optimization problem to a finite one
 

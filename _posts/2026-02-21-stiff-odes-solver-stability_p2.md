@@ -61,13 +61,13 @@ y_{k+1} = y_k + h\lambda y_k = (1 + h\lambda)\, y_k
 = (1 + z)\, y_k, \qquad z := h\lambda,
 $$
 
-the numerical solution stays bounded only if $|1 + z| \le 1$. This defines the method's **region of absolute stability**, the bounded disk of radius $1$ centered at $z = -1$ in the complex plane. For real negative $\lambda$, this requires
+the numerical solution stays bounded only if $\lvert 1 + z\rvert \le 1$. This defines the method's **region of absolute stability**, the bounded disk of radius $1$ centered at $z = -1$ in the complex plane. For real negative $\lambda$, this requires
 
 $$
-h \le \frac{2}{|\lambda|}.
+h \le \frac{2}{\lvert \lambda\rvert}.
 $$
 
-The constraint depends **only on $|\lambda|$**, the fastest decay rate present in the system. It does not depend on the required accuracy of the solution, nor on how long the fast mode remains dynamically relevant after it has decayed. If the system contains *any* eigenvalue with large $|\lambda|$, corresponding to a fast, heavily damped mode, forward Euler is restricted to small steps for the *entire* simulation, including the long, slow intervals in which the solution varies little.
+The constraint depends **only on $\lvert \lambda\rvert$**, the fastest decay rate present in the system. It does not depend on the required accuracy of the solution, nor on how long the fast mode remains dynamically relevant after it has decayed. If the system contains *any* eigenvalue with large $\lvert \lambda\rvert$, corresponding to a fast, heavily damped mode, forward Euler is restricted to small steps for the *entire* simulation, including the long, slow intervals in which the solution varies little.
 
 **Implicit (backward) Euler**, by contrast, solves
 
@@ -77,7 +77,7 @@ y_{k+1} = y_k + h\lambda y_{k+1}
 y_{k+1} = \frac{y_k}{1 - z}, \qquad z = h\lambda .
 $$
 
-For $\mathrm{Re}(\lambda) < 0$ and any $h > 0$, $|1 - z| > 1$ holds without exception, which implies $|y_{k+1}| < |y_k|$ for *every* step size. Backward Euler is **A-stable**: unconditionally stable for this test equation, regardless of the magnitude of $h$. The step size can therefore be chosen on accuracy grounds alone. This is the principal reason implicit methods exist despite their higher per-step cost, and it is that cost which the Sherman-Morrison acceleration of the [previous post]({{ '/blog/2026/sherman-morrison-ode_p1/' | relative_url }}) is designed to offset when the system matrix has exploitable low-rank structure.
+For $\mathrm{Re}(\lambda) < 0$ and any $h > 0$, $\lvert 1 - z\rvert > 1$ holds without exception, which implies $\lvert y_{k+1}\rvert < \lvert y_k\rvert$ for *every* step size. Backward Euler is **A-stable**: unconditionally stable for this test equation, regardless of the magnitude of $h$. The step size can therefore be chosen on accuracy grounds alone. This is the principal reason implicit methods exist despite their higher per-step cost, and it is that cost which the Sherman-Morrison acceleration of the [previous post]({{ '/blog/2026/sherman-morrison-ode_p1/' | relative_url }}) is designed to offset when the system matrix has exploitable low-rank structure.
 
 ## Comparing stability regions directly
 
@@ -87,10 +87,10 @@ The two regions are easiest to compare side by side in the complex plane $z = h\
   <img src="/assets/img/posts/stability_regions_p2.svg" alt="Absolute stability regions of forward and backward Euler" style="width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto;">
 </p>
 
-*Figure 3: Forward Euler's stable region is the shaded disk $|1+z|\le 1$ (orange); backward Euler is stable everywhere **outside** the disk $|1-z|\le 1$ (blue), which includes the entire left half-plane.*
+*Figure 3: Forward Euler's stable region is the shaded disk $\lvert 1+z\rvert\le 1$ (orange); backward Euler is stable everywhere **outside** the disk $\lvert 1-z\rvert\le 1$ (blue), which includes the entire left half-plane.*
 
-- **Forward Euler:** the disk $|1+z| \le 1$, radius $1$, centered at $z=-1$. Any eigenvalue for which $z = h\lambda$ falls outside this disk renders the method unstable, which is why a large $|\lambda|$ forces a small $h$.
-- **Backward Euler:** the *exterior* of the disk $|1-z| \le 1$, which includes the entire left half-plane $\mathrm{Re}(z) \le 0$. This is the concrete meaning of "A-stable": every eigenvalue with a negative real part is stable, for any step size.
+- **Forward Euler:** the disk $\lvert 1+z\rvert \le 1$, radius $1$, centered at $z=-1$. Any eigenvalue for which $z = h\lambda$ falls outside this disk renders the method unstable, which is why a large $\lvert \lambda\rvert$ forces a small $h$.
+- **Backward Euler:** the *exterior* of the disk $\lvert 1-z\rvert \le 1$, which includes the entire left half-plane $\mathrm{Re}(z) \le 0$. This is the concrete meaning of "A-stable": every eigenvalue with a negative real part is stable, for any step size.
 - **Trapezoidal rule (Crank-Nicolson):** also A-stable, and second-order accurate where backward Euler is first order. It is often the preferred default when both unconditional stability and higher accuracy are required, although it can exhibit mild oscillatory artifacts on very stiff problems that the stronger damping of backward Euler avoids.
 - **BDF methods** (the `BDF` option in `scipy.integrate.solve_ivp`): a family of higher-order implicit multistep methods, A-stable up to order $2$ and only *stiffly* stable, a slightly weaker but still practically useful property, at higher orders {% cite hairer1996solving %}.
 - **Radau IIA** (the `Radau` option in `solve_ivp`): not a multistep method but a fully implicit Runge-Kutta method. The three-stage variant used by SciPy is of order $5$ and L-stable, so it is A-stable and also strongly damps the fastest modes {% cite hairer1996solving %}.
@@ -154,10 +154,10 @@ Stiffness is not a property of an equation in isolation; it is a property of the
 In practice, the clean, isolated eigenvalue structure of Dahlquist's test equation is rarely visible directly. A practical diagnostic is the **stiffness ratio**: compute, or estimate, the eigenvalues of the system's local Jacobian $\partial f/\partial y$, and compare the largest and smallest rates of decay,
 
 $$
-S = \frac{\max_i |\mathrm{Re}(\lambda_i)|}{\min_i |\mathrm{Re}(\lambda_i)|}.
+S = \frac{\max_i \lvert \mathrm{Re}(\lambda_i)\rvert}{\min_i \lvert \mathrm{Re}(\lambda_i)\rvert}.
 $$
 
-The ratio is undefined when $\min_i |\mathrm{Re}(\lambda_i)| = 0$, for example at points where a Jacobian eigenvalue is purely imaginary, so it is best read as a local indicator. A large stiffness ratio ($S \gg 1$) indicates that fast and slow dynamics coexist, and that an explicit method will remain stability-constrained by the fast mode long after that mode has physically decayed to negligible magnitude. In the Van der Pol system, near the slow branch the fast eigenvalue scales roughly like $\mu$ and the slow one roughly like $1/\mu$, so $S$ grows approximately like $\mu^2$; this accounts for the predictable shift of the crossover in Figure 4 as $\mu$ increases. In production settings, most adaptive solver libraries expose the same information implicitly {% cite shampine1997matlab %}: if the automatic step-size controller of an explicit solver repeatedly reduces the step far below what accuracy alone would demand, that behavior is a strong practical indication of a stiff system, and a reason to change solver families instead of treating the symptom.
+The ratio is undefined when $\min_i \lvert \mathrm{Re}(\lambda_i)\rvert = 0$, for example at points where a Jacobian eigenvalue is purely imaginary, so it is best read as a local indicator. A large stiffness ratio ($S \gg 1$) indicates that fast and slow dynamics coexist, and that an explicit method will remain stability-constrained by the fast mode long after that mode has physically decayed to negligible magnitude. In the Van der Pol system, near the slow branch the fast eigenvalue scales roughly like $\mu$ and the slow one roughly like $1/\mu$, so $S$ grows approximately like $\mu^2$; this accounts for the predictable shift of the crossover in Figure 4 as $\mu$ increases. In production settings, most adaptive solver libraries expose the same information implicitly {% cite shampine1997matlab %}: if the automatic step-size controller of an explicit solver repeatedly reduces the step far below what accuracy alone would demand, that behavior is a strong practical indication of a stiff system, and a reason to change solver families instead of treating the symptom.
 
 ## Summary
 

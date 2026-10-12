@@ -341,7 +341,7 @@ jekyll-archives:
     enabled: [year, tags, categories] # enables year, tag and category archives (remove if you need to disable one of them).
 
 display_tags: ["uncertainty-quantification", "statistics", "numerical-methods", "CFD", "Navier-Stokes", "scientific-computing", "scientific-ml", "pinns", "stability-analysis", "machine-learning", "deep-learning", "hpc", "parallel-computing"] # these tags will be displayed on the front page of your blog
-display_categories: ["AI-ML", "CFD", "HPC", "Scientific-Computing", "Research", "Teaching"] # these categories will be displayed on the front page of your blog
+display_categories: ["research-notes"] # only categories with populated archives should be displayed
 
 # -----------------------------------------------------------------------------
 # Jekyll Scholar

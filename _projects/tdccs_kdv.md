@@ -25,21 +25,21 @@ The original work uses MATLAB and its code is not publicly available. This proje
 
 <div class="row">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid loading="eager" path="assets/img/projects/figure9_double_soliton.png" title="Double soliton collision" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid loading="eager" path="assets/img/projects/figure9_double_soliton.png" title="Double soliton collision" alt="Double-soliton collision computed with TDCNCS and TDCCS, with the space-time surface up to t = 4." class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">Example 7.3: a double-soliton collision computed with TDCNCS (top) and TDCCS (bottom), with the space-time surface up to t = 4.</div>
 
 <div class="row">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid loading="lazy" path="assets/img/projects/figure13_example75.png" title="Two-dimensional linear dispersion" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid loading="lazy" path="assets/img/projects/figure13_example75.png" title="Two-dimensional linear dispersion" alt="Two-dimensional linear dispersion: solution surfaces and pointwise errors for both compact schemes." class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">Example 7.5: two-dimensional linear dispersion. Solution surfaces (top) and pointwise errors (bottom); both schemes reproduce the published errors closely.</div>
 
 <div class="row">
   <div class="col-sm mt-3 mt-md-0">
-    {% include figure.liquid loading="lazy" path="assets/img/projects/figure15_ito_gaussian.png" title="Ito coupled system" class="img-fluid rounded z-depth-1" %}
+    {% include figure.liquid loading="lazy" path="assets/img/projects/figure15_ito_gaussian.png" title="Ito coupled system" alt="Coupled Ito system with a Gaussian initial condition: u remains smooth while v develops shock-like fronts." class="img-fluid rounded z-depth-1" %}
   </div>
 </div>
 <div class="caption">Example 7.6: the coupled Ito system with a Gaussian initial condition. Only the u equation carries a third derivative, so u stays smooth while v steepens into shock-like fronts.</div>
