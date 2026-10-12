@@ -160,3 +160,12 @@ html[data-theme="dark"] .contact-icons .fa-github::before {
 
 
 
+/* Let long CV locations wrap instead of widening the page on phones.
+   The CV plugin loads later, so keep this selector more specific than p.location. */
+@media (max-width: 767.98px) {
+  .cv p.location {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
