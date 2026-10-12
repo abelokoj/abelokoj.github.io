@@ -225,7 +225,7 @@ The maximum eigenvalue magnitude of each spatial operator was computed directly.
 
 The paper's Section 7 presents six numerical experiments. Each is stated below in full: the governing equation, the domain and boundary conditions, the initial condition, and the exact solution where one exists. Equation, figure and table numbers follow the paper's numbering throughout. Every case uses periodic boundary conditions and the TVDRK3 time integrator of Eq. (6.2), with the time step set by Eq. (7.1).
 
-The error norms follow the paper's stated definitions, $L^1 = \frac{1}{N+1}\sum_i |u_e - u_a|$ and $L^2 = \big(\frac{1}{N+1}\sum_i |u_e - u_a|^2\big)^{1/2}$. The tables below show $L^\infty$ only; the reproduction's $L^1$ values differ from the paper's by a constant factor, for the reason given in the notes at the end of this post. All 138 convergence rates printed in the paper's Tables 8 to 11 were also recomputed from the paper's own printed errors, and every one is consistent with them to within $0.002$.
+The error norms follow the paper's stated definitions, $L^1 = \frac{1}{N+1}\sum_i \lvert u_e - u_a \rvert$ and $L^2 = \big(\frac{1}{N+1}\sum_i \lvert u_e - u_a \rvert^2\big)^{1/2}$. The tables below show $L^\infty$ only; the reproduction's $L^1$ values differ from the paper's by a constant factor, for the reason given in the notes at the end of this post. All 138 convergence rates printed in the paper's Tables 8 to 11 were also recomputed from the paper's own printed errors, and every one is consistent with them to within $0.002$.
 
 Three of the six examples admit closed-form solutions, which permits quantitative error measurement. The remaining three do not, and for those the comparison rests on reproducing the structures the paper describes.
 
