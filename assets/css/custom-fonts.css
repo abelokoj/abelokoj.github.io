@@ -59,11 +59,12 @@ article .title,
   font-variant-caps: small-caps;
 }
 
-/* The default layout adds 3rem above every page. The About page's name is its
-   visual masthead, so bring it directly below the fixed navigation and restore
-   the prominence lost when lowercase letters are rendered as small caps. */
-.about-page {
-  margin-top: -3rem;
+/* The default layout adds 3rem above every page. Remove that margin from the
+   About page without pulling its masthead underneath the fixed navigation. */
+@layer theme {
+  body:has(.about-page) > .container.mt-5[role="main"] {
+    margin-top: 0 !important;
+  }
 }
 
 .about-page .post-header .site-name {
@@ -189,6 +190,44 @@ html[data-theme="dark"] .contact-icons .fa-github::before {
 
 .contact-icons .ai-cv::before {
   color: var(--global-theme-color) !important;
+}
+
+/* Compact duplicate of the contact links directly beneath the About portrait. */
+.profile-social {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.profile-social .profile-contact-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.profile-social .profile-contact-icons a {
+  display: inline-flex;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-social .profile-contact-icons a img,
+.profile-social .profile-contact-icons a svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin: 0;
+  object-fit: contain;
+}
+
+.profile-social .profile-contact-note {
+  margin: 0.35rem auto 0;
+  font-size: 0.8rem;
+  line-height: 1.25;
 }
 
 /* Compact fixed footer; let the copyright text wrap naturally on small screens. */

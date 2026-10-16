@@ -32,6 +32,12 @@ layout: default
             cache_bust=true
           %}
         {% endif %}
+        {% if page.social %}
+          <nav class="social profile-social" aria-label="Contact links">
+            <div class="contact-icons profile-contact-icons">{% social_links %}</div>
+            <div class="contact-note profile-contact-note">{{ site.contact_note }}</div>
+          </nav>
+        {% endif %}
         {% if page.profile.more_info %}
           <div class="more-info">{{ page.profile.more_info }}</div>
         {% endif %}
