@@ -28,6 +28,13 @@ assets/code/bench_p7_quick.json
 # Private notes (never pushed)
 _private/
 
+# Local AI-tool settings and skills (never pushed)
+/.claude/
+/.codex/
+/.gemini/
+/.agents/
+/.agnets/
+
 # Large regenerable animation frames (over GitHub's 100 MB file limit); rerun kh_rollup.py --frames to recreate
 code/p10_kelvin_helmholtz/data/kh_frames_main.npz
 # Over GitHub's 50 MB warning size (vorticity snapshots of the finest channel run); its benchmark numbers are in cyl_summary.json and the figure arrays in figures/*_plotdata.npz; rerun cyl_run.py --case st --N 60 --u 0.02 --tag cyl_st_N60_u002 to recreate
