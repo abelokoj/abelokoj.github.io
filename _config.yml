@@ -26,6 +26,9 @@ back_to_top: true # set to false to disable the back to top button
 # Theme
 # -----------------------------------------------------------------------------
 
+# Loads the dedicated ML Modern type scale; use theme to disable its overrides.
+text_font: mlmodern
+
 # repo color theme
 # repo_theme_light: default # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
 # repo_theme_dark: dark # https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
@@ -638,12 +641,12 @@ third_party_libraries:
       js: "https://cdn.jsdelivr.net/npm/mermaid@{{version}}/dist/mermaid.min.js"
     version: "10.7.0"
   mathjax:
-    # Site-specific MathJax 4 SVG build using the pinned MLModern OTF sources.
+    # TeX to native MathML text, rendered with the pinned MLModern OpenType font.
     # Provenance and licenses: assets/fonts/offline/mlmodern/README.md
     integrity:
-      js: "sha256-dQq3hgq+l8K/xV98ncVKqwWX1Nr40naA3TtKbuYbU1w="
+      js: "sha256-+OA/KEytY4+Iv0oMLNKQ8APkw0xPODAgzDBDz7SWHuQ="
     url:
-      js: "/assets/fonts/offline/mlmodern/mathjax/tex-mml-svg-mlmodern.min.js"
+      js: "/assets/fonts/offline/mlmodern/mathjax/tex-mml-native-mlmodern.min.js"
     version: "4.1.0"
   tikzjax:
     integrity:

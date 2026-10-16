@@ -87,17 +87,27 @@
 {% endif %}
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url | bust_css_cache }}">
 
-<!-- Custom font: locally hosted MLModern (headings + body) -->
+<!-- Site typography and code fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-{% if page.layout != 'resume' %}
-  <link rel="preload" href="{{ '/assets/fonts/offline/mlmodern/woff2/MLModern-Regular.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+{% if site.text_font == 'mlmodern' and page.layout != 'resume' %}
+  <link
+    rel="preload"
+    href="{{ '/assets/fonts/offline/mlmodern/woff2/MLModern-Regular.woff2' | relative_url }}"
+    as="font"
+    type="font/woff2"
+    crossorigin
+  >
 {% endif %}
 <link rel="stylesheet" href="{{ '/assets/css/custom-fonts.css' | relative_url | bust_file_cache }}">
 <link rel="stylesheet" href="{{ '/assets/css/markdown.css' | relative_url | bust_file_cache }}">
 {% if page.layout == 'cv' and site.plugins contains 'al_folio_cv' and site.al_folio.features.cv.enabled != false %}
   <link rel="stylesheet" href="{{ '/assets/css/al-folio-cv.css' | relative_url | bust_file_cache }}">
 {% endif %}
+{% if site.text_font == 'mlmodern' and page.layout != 'resume' %}
+  <link rel="stylesheet" href="{{ '/assets/css/mlmodern.css' | relative_url | bust_file_cache }}">
+{% endif %}
+<link rel="stylesheet" href="{{ '/assets/css/native-math.css' | relative_url | bust_file_cache }}">
 {% if page.layout == 'resume' %}
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ '/assets/css/resume.css' | relative_url | bust_file_cache }}">

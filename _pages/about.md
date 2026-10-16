@@ -42,7 +42,7 @@ My present interests include stiff ODE solvers, uncertainty quantification, doma
 
 Further material appears on the [projects]({{ '/projects/' | relative_url }}) and [publications]({{ '/publications/' | relative_url }}) pages. I welcome correspondence concerning numerical linear algebra, computational fluid dynamics, high-performance computing, and scientific computing more generally.
 
-<div role="note" style="margin-top: 2rem; padding: 0.75rem 1rem; border-left: 4px solid var(--global-theme-color); background-color: var(--global-card-bg-color); color: var(--global-text-color); font-size: 0.95rem;">
+<div role="note" class="site-note" style="margin-top: 2rem; padding: 0.75rem 1rem; border-left: 4px solid var(--global-theme-color); background-color: var(--global-card-bg-color); color: var(--global-text-color);">
   <strong>Note:</strong> This site is under active development. Some pages are incomplete, and content will continue to be added and revised.
 </div>
 

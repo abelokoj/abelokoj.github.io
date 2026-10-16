@@ -3,9 +3,11 @@
    layouts retain their own styling. */
 
 :is(.markdown-body, #markdown-content) {
-  --md-base-font-size: 13pt;
+  --md-base-font-size: 1.083333333rem;
   --md-line-height: 1.3;
-  --md-font-serif: var(--font-serif, "MLModern", Georgia, "Times New Roman", serif);
+  /* Preserve the previous 13pt × 0.8 code size when enlarging prose. */
+  --md-code-font-size: 0.866666667rem;
+  --md-font-serif: var(--font-serif, Georgia, "Times New Roman", serif);
   --md-font-mono: "Maple Mono NF", "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, "Courier New", monospace;
   --md-color-text: #333333;
   --md-color-heading: #000000;
@@ -302,7 +304,7 @@ html[data-theme="dark"] :is(.markdown-body, #markdown-content) a.absent {
   border-radius: 3px;
   background-color: var(--md-color-surface);
   font-family: var(--md-font-mono);
-  font-size: 0.8em;
+  font-size: var(--md-code-font-size);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -315,7 +317,7 @@ html[data-theme="dark"] :is(.markdown-body, #markdown-content) a.absent {
   border-radius: 3px;
   background-color: var(--md-color-surface);
   font-family: var(--md-font-mono);
-  font-size: 0.8em;
+  font-size: var(--md-code-font-size);
   line-height: 1.45;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -469,7 +471,7 @@ html[data-theme="dark"] .post.code-theme-codex #markdown-content .highlight pre 
 
 @media (max-width: 420px) {
   :is(.markdown-body, #markdown-content) {
-    --md-base-font-size: 12pt;
+    --md-code-font-size: 0.8rem;
   }
 
   :is(.markdown-body, #markdown-content) table th,

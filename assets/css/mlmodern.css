@@ -1,0 +1,345 @@
+/* ML Modern only: loaded by head.liquid when text_font: mlmodern.
+   Keep the root size, code fonts, icon fonts, and résumé independent. */
+
+/* Normalize MLModern's unusually tall hhea metrics without changing glyphs.
+   Keep enough room for accents/descenders; prose controls its own leading. */
+@font-face {
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-Regular.woff2") format("woff2");
+  ascent-override: 90%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-Italic.woff2") format("woff2");
+  ascent-override: 90%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-Bold.woff2") format("woff2");
+  ascent-override: 90%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-BoldItalic.woff2") format("woff2");
+  ascent-override: 90%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --font-serif: "MLModern", Georgia, "Times New Roman", serif;
+  --font-prose-size: 1.15625rem;
+  --font-prose-leading: 1.22;
+  --font-meta-size: 1rem;
+}
+
+body {
+  font-size: var(--font-prose-size);
+  line-height: var(--font-prose-leading);
+}
+
+:is(.markdown-body, #markdown-content) {
+  --md-base-font-size: var(--font-prose-size);
+  --md-line-height: var(--font-prose-leading);
+}
+
+/* Keep lists on the prose scale, without justification's stretched word gaps.
+   Use inherited sizes so nested lists never compound font-size multipliers. */
+:is(.markdown-body, #markdown-content) :is(ul, ol, dl, li, dt, dd) {
+  font-size: inherit;
+  line-height: var(--font-prose-leading);
+  text-align: left;
+}
+
+:is(.markdown-body, #markdown-content) :is(ul, ol) {
+  margin-block: 0.4em;
+}
+
+:is(.markdown-body, #markdown-content) li {
+  margin-block: 0;
+}
+
+:is(.markdown-body, #markdown-content) li + li {
+  margin-top: 0.2em;
+}
+
+:is(.markdown-body, #markdown-content) li > p {
+  margin-block: 0.3em;
+}
+
+:is(.markdown-body, #markdown-content) li > :first-child {
+  margin-top: 0;
+}
+
+:is(.markdown-body, #markdown-content) li > :last-child {
+  margin-bottom: 0;
+}
+
+:is(.markdown-body, #markdown-content) dd {
+  margin-bottom: 0.4em;
+}
+
+:is(.markdown-body, #markdown-content) blockquote {
+  font-size: inherit;
+  line-height: var(--font-prose-leading);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.75rem;
+}
+h3 {
+  font-size: 1.375rem;
+}
+h4 {
+  font-size: 1.15625rem;
+}
+h5,
+h6 {
+  font-size: 1rem;
+}
+
+:is(.markdown-body, #markdown-content) :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.15;
+}
+
+.post-header {
+  margin-bottom: 1.5rem;
+}
+
+.post-header .post-title {
+  margin-bottom: 0.6rem;
+  line-height: 1.12;
+  overflow-wrap: break-word;
+}
+
+.post-header :is(.post-description, .desc) {
+  margin-bottom: 0.75rem;
+  font-size: var(--font-prose-size);
+  line-height: var(--font-prose-leading);
+}
+
+.post-header .post-subtitle {
+  line-height: 1.2;
+}
+
+:is(.post-meta, .post-tags, .course-meta, .publications .author, .publications .periodical) {
+  font-size: var(--font-meta-size);
+  line-height: 1.25;
+}
+
+.post-list li :is(.post-meta, .post-tags),
+.site-note {
+  font-size: var(--font-meta-size);
+  line-height: 1.25;
+}
+
+/* These plugin-owned components carry their own smaller text defaults. */
+.cv .list-group-item {
+  font-size: var(--font-prose-size);
+  line-height: var(--font-prose-leading);
+}
+
+.cv .card-title {
+  font-size: 1.375rem;
+  line-height: 1.15;
+}
+
+.cv h6 {
+  /* The CV plugin sets institution/summary sizes in inline styles. */
+  font-size: var(--font-meta-size) !important;
+  line-height: 1.25;
+}
+
+.cv h6.title {
+  font-size: var(--font-prose-size) !important;
+  line-height: var(--font-prose-leading);
+}
+
+.cv :is(.location, .badge, .btncv, .list-group-time) {
+  font-size: var(--font-meta-size);
+  line-height: 1.25;
+}
+
+.cv .location {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.publications ol.bibliography li div.abstract {
+  font-size: var(--font-prose-size);
+  text-align: left;
+}
+
+.publications ol.bibliography li div.abstract p {
+  line-height: var(--font-prose-leading);
+}
+
+:is(.post-list h3, .courses .course-title, .projects .card-title) {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+:is(.course-description, .projects .card-text, .publications .title, .table) {
+  font-size: var(--font-prose-size);
+  line-height: var(--font-prose-leading);
+}
+
+.course-info {
+  margin-bottom: 1.25rem;
+}
+
+.course-info p {
+  margin-bottom: 0.35rem;
+}
+
+.courses .course-meta {
+  margin-bottom: 0.5rem;
+}
+
+.courses .course-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+/* News and latest-post links share the approved prose size and leading.
+   Dates stay secondary; retain the existing link colors. */
+.news .table {
+  font-size: var(--font-prose-size);
+  line-height: var(--font-prose-leading);
+}
+
+.news .table :is(th, td) {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: top;
+}
+
+.news .table th[scope="row"] {
+  padding-right: 1rem;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+/* UI text has its own compact rhythm, not prose-size multipliers. */
+.navbar :is(.nav-link, .dropdown-item) {
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.navbar .navbar-brand {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 1100px) {
+  #navbar.navbar-expand-sm .navbar-nav .nav-link {
+    padding-inline: 0.375rem;
+  }
+}
+
+footer.fixed-bottom {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Expand only when the full existing menu and name fit without wrapping.
+   Reuse the theme's existing toggle and .show behavior, including keyboard use. */
+@media (max-width: 1099.98px) {
+  #navbar.navbar-expand-sm > .container {
+    flex-wrap: wrap;
+  }
+
+  #navbar.navbar-expand-sm .navbar-collapse-main {
+    flex-basis: 100%;
+    text-align: left;
+  }
+
+  #navbar.navbar-expand-sm .navbar-collapse-main.show {
+    max-height: calc(100dvh - 4rem);
+    overflow-y: auto;
+  }
+
+  #navbar.navbar-expand-sm .navbar-menu-list {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  #navbar.navbar-expand-sm .dropdown-menu {
+    position: static;
+  }
+
+  #navbar #light-toggle {
+    transform: none;
+  }
+}
+
+/* Important declarations in Tailwind layers outrank unlayered !important.
+   Use its first layer so the custom breakpoint can override expand-sm. */
+@layer theme {
+  @media (max-width: 1099.98px) {
+    #navbar.navbar-expand-sm .navbar-toggler-main {
+      display: block !important;
+      margin-left: auto;
+    }
+
+    #navbar.navbar-expand-sm .navbar-collapse-main {
+      display: none !important;
+    }
+
+    #navbar.navbar-expand-sm .navbar-collapse-main.show {
+      display: block !important;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --font-prose-size: 1.0625rem;
+  }
+
+  .post-header .post-title {
+    font-size: 1.75rem;
+  }
+}
