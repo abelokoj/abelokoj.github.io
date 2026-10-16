@@ -1,3 +1,4 @@
+_private/
 **/*.map
 **/*.min.css
 **/*.min.js

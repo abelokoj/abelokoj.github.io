@@ -220,7 +220,7 @@ Unlike the logistic regression example, `result.success = True` here means that 
 
 An active research direction, which connects back to the PINN post earlier in this series, uses neural networks *inside* the optimization loop for trajectory and control problems, not only as forward PDE solvers. Instead of parameterizing the control $u(t)$ at a fixed set of collocation nodes, as above, a small neural network $u_\theta(t)$ can represent the control as a smooth function of time, with the *network weights* as the optimization variables. A related line of work uses deep networks to approximate solutions of the Hamilton-Jacobi-Bellman equation and hence optimal feedback controls in high dimensions {% cite nakamura2021adaptive %}. These approaches are attractive for high-dimensional state spaces and for settings in which the dynamics are only partially known and must be learned from data along with the control, which is a different regime from the fully known dynamics solved by direct collocation above. The trade-offs mirror those in the PINN post: a more flexible representation and easier handling of high-dimensional state spaces, at the cost of the convergence guarantees that a well-posed classical collocation method provides when the dynamics are fully known. Understanding both approaches, and when each is appropriate, is more useful than treating either as a replacement for the other.
 
-## Summary
+## Summary Notes and Highlights
 
 - **Convexity is a provable, checkable property** (for example, via the Hessian), and determining whether a problem is convex is one of the first steps in choosing a solution method: it separates a guaranteed global optimum from a possibly local one.
 - **Newton's method converges much faster than gradient descent near a solution** (quadratic versus linear convergence) by using curvature information, at the cost of an $O(d^3)$ Hessian solve per iteration, the same cost/benefit trade-off explored with the Sherman-Morrison formula in the first post of this series.
@@ -228,7 +228,7 @@ An active research direction, which connects back to the PINN post earlier in th
 - **Direct collocation** is the standard practical bridge from a continuous-time, infinite-dimensional control problem to a finite, numerically solvable one, turning the dynamics into equality constraints.
 - **A successful non-convex optimization run guarantees only a local optimum**, so on problems that are not provably convex it is worth checking the result against multiple starting points or a known reference solution, as with the drag-free cost of 4.8 above.
 
-The [next post]({{ '/blog/2026/computational-fluid-dynamics_p10/' | relative_url }}) turns to computational fluid dynamics.
+The [next post]({{ '/blog/2026/kelvin-helmholtz-instability_p10/' | relative_url }}) turns to computational fluid dynamics.
 
 ## References
 

@@ -159,7 +159,7 @@ $$
 
 The ratio is undefined when $\min_i \lvert \mathrm{Re}(\lambda_i)\rvert = 0$, for example at points where a Jacobian eigenvalue is purely imaginary, so it is best read as a local indicator. A large stiffness ratio ($S \gg 1$) indicates that fast and slow dynamics coexist, and that an explicit method will remain stability-constrained by the fast mode long after that mode has physically decayed to negligible magnitude. In the Van der Pol system, near the slow branch the fast eigenvalue scales roughly like $\mu$ and the slow one roughly like $1/\mu$, so $S$ grows approximately like $\mu^2$; this accounts for the predictable shift of the crossover in Figure 4 as $\mu$ increases. In production settings, most adaptive solver libraries expose the same information implicitly {% cite shampine1997matlab %}: if the automatic step-size controller of an explicit solver repeatedly reduces the step far below what accuracy alone would demand, that behavior is a strong practical indication of a stiff system, and a reason to change solver families instead of treating the symptom.
 
-## Summary
+## Summary Notes and Highlights
 
 - Stiffness is a **stability** problem, not an accuracy problem: a stiff system forces small steps on an explicit solver even in regions where the solution varies little.
 - The Dahlquist test equation shows why: the stability region of explicit Euler is a bounded disk, whereas that of implicit Euler covers the entire left half-plane (A-stability).

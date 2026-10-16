@@ -218,6 +218,27 @@ kramdown:
 # Includes & excludes
 include: ["_pages"]
 exclude:
+  # Local notes and review reports must never enter the generated website.
+  - _private/
+  - areas_to_improve.md
+  - jp61sol_recommendations.md
+  # Development files must stay at their expected paths, but are not web content.
+  - AGENTS.md
+  - CLAUDE.md
+  - requirements.txt
+  - test/
+  - output/
+  - test-results/
+  - node_modules/
+  - "**/__pycache__/"
+  - "**/*.pyc"
+  - "**/*.pyo"
+  - assets/code/bench_p7_quick.json
+  # Keep RenderCV configuration available to its workflow, not as web downloads.
+  - assets/rendercv/design.yaml
+  - assets/rendercv/locale.yaml
+  - assets/rendercv/settings.yaml
+  - "assets/rendercv/rendercv_output/*.typ"
   # Code, data and archives kept beside the project pages. Without this, Jekyll would publish every README.md / blog_post.md inside them as a stray project page and copy the .zip files to the site.
   - _projects/tdccs_project/
   - _projects/*.zip
@@ -617,14 +638,13 @@ third_party_libraries:
       js: "https://cdn.jsdelivr.net/npm/mermaid@{{version}}/dist/mermaid.min.js"
     version: "10.7.0"
   mathjax:
+    # MathJax 4 SVG bundle with Libertinus Serif + Libertinus Math glyph data.
+    # Pinned custom font build: https://github.com/dgleich/mathjax-fonts
     integrity:
-      js: "sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="
-    local:
-      fonts: "output/chtml/fonts/woff-v2/"
+      js: "sha256-Oo+EkaXO9wvNOBxS1ZjBGX5fMNnBrVVWAVBjJPiDn2k="
     url:
-      fonts: "https://cdn.jsdelivr.net/npm/mathjax@{{version}}/es5/output/chtml/fonts/woff-v2/"
-      js: "https://cdn.jsdelivr.net/npm/mathjax@{{version}}/es5/tex-mml-chtml.js"
-    version: "3.2.2"
+      js: "https://cdn.jsdelivr.net/gh/dgleich/mathjax-fonts@34075ed04fe7db9153772948c2b1e0938fcd63a0/mathjax-libertinus/tex-mml-svg-mathjax-libertinus.js"
+    version: "4.1.0"
   tikzjax:
     integrity:
       css: "sha256-p+CQrhSq3dnLHELDcVBFDf4whOor3w8gzLuc/pwRLyQ="

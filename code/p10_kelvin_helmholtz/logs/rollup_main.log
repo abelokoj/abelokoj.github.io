@@ -1,0 +1,18 @@
+alpha = 0.4428, Lx = 28.379, Ly = 56.758, grid 512 x 1024, dx = 0.0554
+fundamental omega_i = 0.18809, subharmonic omega_i = 0.14721
+  10,000 RK4 steps of dt = 0.02 ...
+    t =    0.00  E = 0.464763  theta = 0.5000  umax = 1.000  (0 s)
+    t =   20.00  E = 0.463838  theta = 0.5135  umax = 1.005  (185 s)
+    t =   40.00  E = 0.462940  theta = 0.7250  umax = 1.298  (383 s)
+    t =   60.00  E = 0.462093  theta = 0.7752  umax = 1.308  (568 s)
+    t =   80.00  E = 0.461299  theta = 1.2557  umax = 1.438  (752 s)
+    t =  100.00  E = 0.460527  theta = 1.7229  umax = 1.573  (937 s)
+    t =  120.00  E = 0.459790  theta = 1.6388  umax = 1.558  (1118 s)
+    t =  140.00  E = 0.459107  theta = 1.7340  umax = 1.521  (1300 s)
+    t =  160.00  E = 0.458457  theta = 1.5848  umax = 1.541  (1484 s)
+    t =  180.00  E = 0.457825  theta = 1.6712  umax = 1.497  (1698 s)
+    t =  200.00  E = 0.457205  theta = 1.6687  umax = 1.515  (1947 s)
+energy budget: max relative residual |dE/dt + 2 nu Z| / (2 nu Z) = 5.19e-07
+    data saved -> /home/abunix/claude_cwk/blog_p10_kh/data/kh_rollup_main.npz
+    data saved -> /home/abunix/claude_cwk/blog_p10_kh/data/kh_frames_main.npz
+done in 1994.9 s

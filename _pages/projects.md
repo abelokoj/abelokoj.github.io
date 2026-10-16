@@ -2,10 +2,10 @@
 layout: page
 title: Projects
 permalink: /projects/
-description: Research and computational projects, with code and reproducible figures.
+description: Research, scientific computing, and open-source software projects.
 nav: true
 nav_order: 3
-display_categories: [research]
+display_categories: [research, software]
 horizontal: false
 ---
 

@@ -412,7 +412,7 @@ The questions below are a reasonable checklist before starting a new project, ro
 
 The urge to start with the most powerful tool available is worth resisting. The most useful empirical observation from this comparison is the one from Part 1: on this dataset, **the simplest model performed best**. That is not an argument against deep learning; it is an argument for beginning with the least costly model that could plausibly succeed, establishing a real baseline, and adopting more flexible tools, which are also more compute-intensive, less interpretable, and more sensitive to hyperparameters, only once the simpler alternatives are confirmed to be underperforming. The same idea runs through the [earlier posts]({{ '/blog/2026/sherman-morrison-ode_p1/' | relative_url }}) in this series: establish what the structure of a problem demands before choosing the tool, whether that tool is a neural network, an implicit ODE solver or a rank-$k$ matrix update.
 
-## Summary
+## Summary Notes and Highlights
 
 - All four libraries solve the same kind of problem, minimizing a loss over a parameterized family of functions, but they sit at different points on the bias-variance and interpretability-flexibility spectra. Choosing correctly matters more than choosing the most prominent option.
 - The uniform `fit`/`predict` interface of scikit-learn makes rigorous, directly comparable model evaluation cheap, and there is rarely a good reason to skip it before committing to a more complex approach.

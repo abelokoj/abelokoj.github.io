@@ -13,7 +13,8 @@ Per-post working archive for the blog. This folder is kept in git but excluded f
 | `p7_hpc_domain_decomposition/` | Domain decomposition and MPI | scripts, `data/` (benchmarks), `figures/` |
 | `p8_bayesian_inference/` | Bayesian inverse problems | |
 | `p9_optimization/` | Optimization (no post yet) | script and figures only |
-| `p10_cavity_flow/` | Computational fluid dynamics | |
+| `p10_kelvin_helmholtz/` | Kelvin–Helmholtz roll-up and vortex pairing (the earlier lid-driven cavity post is archived in `_archive/p10_cavity_flow_2026-07/`) | |
+| `p12_cylinder_shedding/` | Vortex shedding behind a cylinder, lattice Boltzmann (`data/cyl_st_N60_u002.npz` not in git) | |
 | `_archive/tdccs_project_freshman/` | earlier TDCCS project version | archived 2026-09-26 |
 | `_archive/pN/` | superseded drafts | `*_draft_2026-08-01.py` and `old_files/` (earlier .py and .jl versions) |
 

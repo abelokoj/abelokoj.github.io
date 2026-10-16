@@ -1,0 +1,75 @@
+cyl_free_N20: N=20 u0=0.04  cycles=25
+   Cd min/max/mean/amp = 1.1953 1.5443 1.3698 0.3490   (time avg 1.3686)
+   Cl min/max/mean/amp = -0.3347 0.1099 -0.1124 0.4445   (rms 0.2366)
+   St = 0.5522  period spread 2.85e+00  Cd_max spread 8.4e-02  dp min/max 0.7734 0.9949
+   spectral St = 0.1668  Cd avg (whole periods) = 1.3665  Cl rms (low-passed) = 0.2359  Cl amp = 0.3354  Cd amp (low-passed) = 0.0489  Cd noise rms = 0.1057
+cyl_free_N20_u002: N=20 u0=0.02  cycles=140
+   Cd min/max/mean/amp = 1.1413 1.5539 1.3476 0.4126   (time avg 1.3589)
+   Cl min/max/mean/amp = -0.3325 -0.1800 -0.2563 0.1524   (rms 0.2292)
+   St = 1.4924  period spread 1.23e+00  Cd_max spread 1.2e-01  dp min/max 0.7437 0.9902
+   spectral St = 0.1666  Cd avg (whole periods) = 1.3630  Cl rms (low-passed) = 0.2322  Cl amp = 0.3289  Cd amp (low-passed) = 0.0303  Cd noise rms = 0.2033
+cyl_st_N20: N=20 u0=0.04  cycles=14
+   Cd min/max/mean/amp = 3.2111 3.2757 3.2434 0.0646   (time avg 3.2432)
+   Cl min/max/mean/amp = -0.9722 0.9399 -0.0161 1.9121   (rms 0.6759)
+   St = 0.3015  period spread 1.55e-03  Cd_max spread 2.2e-03  dp min/max 2.3397 2.4554
+   spectral St = 0.3015  Cd avg (whole periods) = 3.2431  Cl rms (low-passed) = 0.6750  Cl amp = 0.9633  Cd amp (low-passed) = 0.0350  Cd noise rms = 0.0004
+cyl_st_N20_u002: N=20 u0=0.02  cycles=15
+   Cd min/max/mean/amp = 3.1946 3.2544 3.2245 0.0598   (time avg 3.2249)
+   Cl min/max/mean/amp = -0.9605 0.9289 -0.0158 1.8893   (rms 0.6678)
+   St = 0.3012  period spread 3.91e-06  Cd_max spread 1.5e-05  dp min/max 2.3313 2.4402
+   spectral St = 0.3012  Cd avg (whole periods) = 3.2249  Cl rms (low-passed) = 0.6675  Cl amp = 0.9656  Cd amp (low-passed) = 0.0303  Cd noise rms = 0.0004
+cyl_st_N40: N=40 u0=0.04  cycles=15
+   Cd min/max/mean/amp = 3.2010 3.2721 3.2366 0.0711   (time avg 3.2363)
+   Cl min/max/mean/amp = -1.0442 1.0086 -0.0178 2.0528   (rms 0.7256)
+   St = 0.3018  period spread 1.27e-03  Cd_max spread 1.2e-03  dp min/max 2.4110 2.5216
+   spectral St = 0.3018  Cd avg (whole periods) = 3.2365  Cl rms (low-passed) = 0.7249  Cl amp = 1.0471  Cd amp (low-passed) = 0.0381  Cd noise rms = 0.0009
+cyl_st_N40_u002: N=40 u0=0.02  cycles=14
+   Cd min/max/mean/amp = 3.1825 3.2479 3.2152 0.0655   (time avg 3.2157)
+   Cl min/max/mean/amp = -1.0284 0.9937 -0.0174 2.0221   (rms 0.7146)
+   St = 0.3015  period spread 1.34e-06  Cd_max spread 2.3e-05  dp min/max 2.4013 2.5039
+   spectral St = 0.3015  Cd avg (whole periods) = 3.2157  Cl rms (low-passed) = 0.7149  Cl amp = 1.0164  Cd amp (low-passed) = 0.0331  Cd noise rms = 0.0006
+cyl_st_N60_u002: N=60 u0=0.02  cycles=14
+   Cd min/max/mean/amp = 3.1743 3.2396 3.2070 0.0653   (time avg 3.2075)
+   Cl min/max/mean/amp = -1.0271 0.9924 -0.0174 2.0195   (rms 0.7137)
+   St = 0.3018  period spread 2.22e-06  Cd_max spread 1.4e-05  dp min/max 2.4135 2.5098
+   spectral St = 0.3018  Cd avg (whole periods) = 3.2075  Cl rms (low-passed) = 0.7138  Cl amp = 1.0253  Cd amp (low-passed) = 0.0331  Cd noise rms = 0.0008
+cyl_free_N20 0 0.2419
+cyl_free_N20 10 0.0979
+cyl_free_N20 20 0.0813
+cyl_free_N20 30 0.1599
+cyl_free_N20 40 0.28
+cyl_free_N20 50 0.3518
+cyl_free_N20 60 0.3579
+cyl_free_N20 70 0.3784
+cyl_free_N20 80 0.3942
+cyl_free_N20 90 0.3567
+cyl_free_N20 100 0.3797
+cyl_free_N20 110 0.3822
+cyl_free_N20 120 0.3507
+cyl_free_N20 130 0.3748
+cyl_free_N20 140 0.3894
+cyl_free_N20 150 0.3535
+cyl_free_N20 160 0.3806
+cyl_free_N20 170 0.385
+cyl_free_N20 180 0.3462
+cyl_free_N20 190 0.3792
+cyl_free_N20_u002 0 0.5346
+cyl_free_N20_u002 10 0.165
+cyl_free_N20_u002 20 0.1507
+cyl_free_N20_u002 30 0.157
+cyl_free_N20_u002 40 0.2976
+cyl_free_N20_u002 50 0.3575
+cyl_free_N20_u002 60 0.3628
+cyl_free_N20_u002 70 0.3928
+cyl_free_N20_u002 80 0.4159
+cyl_free_N20_u002 90 0.38
+cyl_free_N20_u002 100 0.3794
+cyl_free_N20_u002 110 0.413
+cyl_free_N20_u002 120 0.387
+cyl_free_N20_u002 130 0.3799
+cyl_free_N20_u002 140 0.3887
+cyl_free_N20_u002 150 0.3816
+cyl_free_N20_u002 160 0.3824
+cyl_free_N20_u002 170 0.3886
+cyl_free_N20_u002 180 0.3689
+cyl_free_N20_u002 190 0.3718

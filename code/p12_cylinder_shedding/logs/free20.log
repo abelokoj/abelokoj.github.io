@@ -1,0 +1,15 @@
+case free: grid 901 x 800, N = 20, u = 0.04, nu = 0.00800, tau+ = 0.5240, Ma = 0.069
+  190 boundary links, 312 solid nodes
+  100,000 steps ...
+    t =   20.000  Cd = 0.9565  Cl = -0.0042  (135 s, 53 MLUPS)
+    t =   40.000  Cd = 1.3755  Cl = +0.1140  (272 s, 53 MLUPS)
+    t =   60.000  Cd = 1.6675  Cl = -0.2541  (403 s, 54 MLUPS)
+    t =   80.000  Cd = 1.1652  Cl = -0.0628  (534 s, 54 MLUPS)
+    t =  100.000  Cd = 1.4133  Cl = +0.3217  (664 s, 54 MLUPS)
+    t =  120.000  Cd = 1.3023  Cl = -0.2704  (794 s, 54 MLUPS)
+    t =  140.000  Cd = 1.4155  Cl = -0.0421  (926 s, 54 MLUPS)
+    t =  160.000  Cd = 1.3179  Cl = +0.3045  (1056 s, 55 MLUPS)
+    t =  180.000  Cd = 1.3616  Cl = -0.2669  (1186 s, 55 MLUPS)
+    t =  200.000  Cd = 1.5268  Cl = -0.0373  (1317 s, 55 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20.npz
+done in 1317.3 s

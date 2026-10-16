@@ -1134,7 +1134,7 @@ Having built a complete pipeline in each library, the guidance of the [previous 
 | Need custom training logic, research-style flexibility                   | PyTorch, or TensorFlow's low-level `GradientTape` API                 | Both expose the backward-pass and optimizer-step mechanics directly, at the cost of writing more boilerplate yourself                                                    |
 | Deploying to production, mobile, or edge devices                         | TensorFlow (TF Lite, TF Serving)                                      | Not demonstrated above, but an ecosystem advantage worth knowing about when a project reaches that stage                                                                 |
 
-## Summary
+## Summary Notes and Highlights
 
 - **The underlying mathematics is shared** far more than the different APIs suggest. Gradient-based optimization, regularization, and early stopping appear, in some form, in every part. A boosted tree ensemble and a bidirectional LSTM address the same *kind* of problem, minimizing a loss without overfitting the training set, with very different function classes.
 - **Start with a baseline.** Every part began with a baseline or a comparison of simple models before adopting a more sophisticated tool. The baseline is not always the winner: in Part 1 the RBF-kernel SVM (0.9812 cross-validated accuracy) beat logistic regression (0.9680), and in Part 2 XGBoost raised $R^2$ from 0.5871 to 0.8509. The value of the baseline is that it measures how much the extra complexity buys.

@@ -1,0 +1,25 @@
+case free: grid 901 x 800, N = 20, u = 0.02, nu = 0.00400, tau+ = 0.5120, Ma = 0.035
+  190 boundary links, 312 solid nodes
+  200,000 steps ...
+    t =   20.000  Cd = 1.0065  Cl = +0.0173  (239 s, 60 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =   40.000  Cd = 1.1350  Cl = +0.1373  (470 s, 61 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =   60.000  Cd = 1.5925  Cl = -0.1967  (708 s, 61 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =   80.000  Cd = 2.2029  Cl = -0.1082  (938 s, 61 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =  100.000  Cd = 1.0204  Cl = +0.3262  (1170 s, 62 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =  120.000  Cd = 1.5985  Cl = -0.2141  (1402 s, 62 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =  140.000  Cd = 1.0345  Cl = -0.1416  (1647 s, 61 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =  160.000  Cd = 1.0529  Cl = +0.3074  (1875 s, 61 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =  180.000  Cd = 0.9432  Cl = -0.1885  (2102 s, 62 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    t =  200.000  Cd = 0.8961  Cl = -0.1283  (2334 s, 62 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002_partial.npz
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_free_N20_u002.npz
+done in 2334.8 s

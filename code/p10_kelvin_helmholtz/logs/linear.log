@@ -1,0 +1,19 @@
+Rayleigh (inviscid): max omega_i = 0.18970 at alpha = 0.4449
+Orr-Sommerfeld Re=1000: max omega_i = 0.18809 at alpha = 0.4428
+   alpha         OS        DNS   rel.diff
+  0.1500   0.113436   0.114197   6.71e-03
+  0.2500   0.157679   0.157768   5.67e-04
+  0.3500   0.181405   0.181412   4.12e-05
+  0.4428   0.188087   0.188087   3.04e-06
+  0.5500   0.179914   0.179915   2.23e-06
+  0.6500   0.158650   0.158656   4.10e-05
+  0.7500   0.125413   0.125483   5.61e-04
+  0.8500   0.080695   0.081236   6.70e-03
+  resolution ny=  256 dt=0.100: omega_i = 0.188121 (OS 0.188087)
+  resolution ny=  256 dt=0.050: omega_i = 0.188121 (OS 0.188087)
+  resolution ny=  512 dt=0.100: omega_i = 0.188087 (OS 0.188087)
+  resolution ny=  512 dt=0.050: omega_i = 0.188087 (OS 0.188087)
+  resolution ny= 1024 dt=0.100: omega_i = 0.188087 (OS 0.188087)
+  resolution ny= 1024 dt=0.050: omega_i = 0.188087 (OS 0.188087)
+    data saved -> /home/abunix/claude_cwk/blog_p10_kh/data/kh_dispersion.npz
+done in 387.7 s

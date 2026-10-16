@@ -42,7 +42,7 @@ Everything in this post rests on one structural fact: **computing $u^{n+1}_{i,j}
 Let the first array index $i$ (the $x$ direction) label the rows of the grid, and suppose the $N_x$ rows are divided into $P$ contiguous blocks, one per processor. This is a **one-dimensional decomposition**; production codes usually decompose in two or three dimensions, for reasons discussed below. Each processor's local array is padded with **one ghost row** on each side.
 
 <p align="center">
-  <img src="/assets/img/posts/domain_decomposition_p7.svg" alt="Domain decomposition schematic showing the wave field split into 4 subdomains" style="width: 100%; max-width: 660px; height: auto; display: block; margin: 0 auto;">
+  <img src="/assets/img/posts/domain_decomposition_p7.svg" alt="Domain decomposition schematic showing the wave field split into 4 subdomains" style="width: 100%; max-width: 550px; height: auto; display: block; margin: 0 auto;">
 </p>
 
 *Figure 1: The wave field from the monolithic solve below, plotted with $x$ on the horizontal axis. The vertical lines mark a partition of the rows ($x$ index) into four subdomains ("ranks"), so each rank's contiguous block of rows appears as a vertical strip spanning the full $y$ range.*
@@ -237,7 +237,7 @@ The Gordon Bell Prize-winning tsunami system mentioned earlier shows these ideas
 
 What makes the system more than a demonstration of scale is its inverse half. Beyond running forward simulations, the team built a framework that rapidly infers the seafloor displacement most consistent with real-time pressure-sensor data {% cite llnl2025gordonbell %}, producing forecasts about ten billion times faster than conventional approaches, in a fraction of a second {% cite newswise2025gordonbell %}. Reasoning from noisy sensor measurements back to the unknown source is the subject of the [next post]({{ '/blog/2026/bayesian-inference-inverse-problems_p8/' | relative_url }}) in this series, and the wave-source problem in Figure 2 is a reduced version of that inference task.
 
-## Summary
+## Summary Notes and Highlights
 
 - **Locality makes parallelism possible.** The finite-difference stencil touches only nearest neighbors, which is what allows domain decomposition to split the problem without changing the answer.
 - **Exchange halos, then compute locally.** This two-phase pattern underlies nearly all distributed PDE solvers, whatever the equation.

@@ -1,0 +1,35 @@
+case st: grid 881 x 164, N = 40, u = 0.02, nu = 0.00800, tau+ = 0.5240, Ma = 0.035
+  382 boundary links, 1252 solid nodes
+  600,000 steps ...
+    t =    2.000  Cd = 3.0611  Cl = +0.1442  (89 s, 64 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =    4.000  Cd = 3.1607  Cl = +0.0615  (169 s, 68 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =    6.000  Cd = 3.2036  Cl = -0.1436  (249 s, 69 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =    8.000  Cd = 3.1786  Cl = -0.3350  (330 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   10.000  Cd = 3.1921  Cl = -0.5150  (409 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   12.000  Cd = 3.1917  Cl = -0.6754  (489 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   14.000  Cd = 3.2043  Cl = -0.8121  (571 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   16.000  Cd = 3.2140  Cl = -0.9179  (651 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   18.000  Cd = 3.2265  Cl = -0.9900  (731 s, 71 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   20.000  Cd = 3.2363  Cl = -1.0250  (811 s, 71 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   22.000  Cd = 3.2435  Cl = -1.0221  (892 s, 71 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   24.000  Cd = 3.2464  Cl = -0.9815  (974 s, 71 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   26.000  Cd = 3.2446  Cl = -0.9049  (1061 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   28.000  Cd = 3.2384  Cl = -0.7955  (1143 s, 70 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    t =   30.000  Cd = 3.2285  Cl = -0.6571  (1240 s, 69 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002_partial.npz
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40_u002.npz
+done in 1242.7 s

@@ -1,0 +1,20 @@
+case st: grid 881 x 164, N = 40, u = 0.04, nu = 0.01600, tau+ = 0.5480, Ma = 0.069
+  382 boundary links, 1252 solid nodes
+  300,000 steps ...
+    t =    2.000  Cd = 2.5685  Cl = +0.1710  (71 s, 40 MLUPS)
+    t =    4.000  Cd = 3.1282  Cl = +1.0003  (139 s, 41 MLUPS)
+    t =    6.000  Cd = 3.4734  Cl = +0.9856  (464 s, 19 MLUPS)
+    t =    8.000  Cd = 3.3352  Cl = +0.7366  (571 s, 20 MLUPS)
+    t =   10.000  Cd = 3.1748  Cl = +0.5534  (884 s, 16 MLUPS)
+    t =   12.000  Cd = 3.2093  Cl = +0.4093  (1169 s, 15 MLUPS)
+    t =   14.000  Cd = 3.2587  Cl = +0.1958  (1246 s, 16 MLUPS)
+    t =   16.000  Cd = 3.2273  Cl = -0.0589  (1312 s, 17 MLUPS)
+    t =   18.000  Cd = 3.1911  Cl = -0.2950  (1371 s, 19 MLUPS)
+    t =   20.000  Cd = 3.1951  Cl = -0.5088  (1428 s, 20 MLUPS)
+    t =   22.000  Cd = 3.2116  Cl = -0.7020  (1496 s, 21 MLUPS)
+    t =   24.000  Cd = 3.2210  Cl = -0.8600  (1620 s, 21 MLUPS)
+    t =   26.000  Cd = 3.2315  Cl = -0.9717  (1693 s, 22 MLUPS)
+    t =   28.000  Cd = 3.2481  Cl = -1.0331  (1749 s, 23 MLUPS)
+    t =   30.000  Cd = 3.2636  Cl = -1.0404  (1846 s, 23 MLUPS)
+    data saved -> /home/abunix/claude_cwk/blog_p12_cylinder/data/cyl_st_N40.npz
+done in 1850.3 s
