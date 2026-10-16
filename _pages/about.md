@@ -2,7 +2,7 @@
 layout: about
 title: About
 permalink: /
-subtitle: <a href='https://www.math.fsu.edu/' target='_blank' rel='noopener'>Department of Mathematics</a>, Florida State University | 303 Love Building, 1017 Academic Way, Tallahassee, FL 32306
+subtitle: <a href='https://www.math.fsu.edu/' target='_blank' rel='noopener'>Department of Mathematics</a>, Florida State University | 303 Love Building, 1017 Academic Way, TLH, FL 32306
 
 profile:
   align: center
@@ -40,8 +40,7 @@ My dissertation, *Global Linear Stability Analysis of Capillary-Driven Interfaci
     
 My interest in numerical methods for partial differential equations began during my undergraduate studies in Mathematics at the Federal University of Petroleum Resources, Nigeria, where my thesis was on Higher order compact finite difference schemes for BVPs. Since then, I have pursued it in two further settings: a summer intern appointment at LLNL, where I applied the Sherman–Morrison formula to accelerate an ODE solver for sustainable-aviation modeling, and several years at FSU as a graduate teaching assistant and instructor of record for Calculus I--III, and Applied Linear Algebra, and other courses. You can find out what some of my past students have to say about me here <https://www.ratemyprofessors.com/professor/2931172>  
     
-My core research interests include (but are not limited to) 
-
+My core research interests include 
 - Computational Fluid Mechanics (Fluid and Gas Dynamics)
 - Multiphase flows and interfacial dynamics
 - Hydrodynamic and global stability analysis
