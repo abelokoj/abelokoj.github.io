@@ -2,7 +2,7 @@
 layout: about
 title: About
 permalink: /
-subtitle: <a href='https://www.math.fsu.edu/' target='_blank' rel='noopener'>Department of Mathematics</a>, Florida State University | 303 Love Building, 1017 Academic Way, TLH, FL 32306
+subtitle: <a href='https://www.math.fsu.edu/' target='_blank' rel='noopener'>Department of Mathematics</a>, Florida State University | 303 Love Bldg., 1017 Academic Way, TLH, FL 32306
 
 profile:
   align: center
@@ -34,7 +34,7 @@ Put your address / P.O. box / other info right below your picture. You can also 
 Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them. -->
  
   
-My name is Abel Okojunu, and I am a PhD candidate in Applied and Computational Mathematics at Florida State University (FSU). I am in the final year of the program and will defend my dissertation in November 2026 under the supervision of Prof. Mark Sussman. My research sits at the intersection of Computational Fluid Dynamics (CFD) and numerical analysis. Particularly, I research the instability that leads to the breakup of liquid jet into droplets, and then develop numerical methods that predict this directly from an existing flow simulation.   
+My name is Abel Okojunu, and I am a PhD candidate in Applied and Computational Mathematics at Florida State University (FSU). I am in the final year of the program and will defend my dissertation in November 2026 under the supervision of Prof. Mark Sussman. My research sits at the intersection of Computational Fluid Dynamics (CFD) and numerical analysis. Particularly, I research the instability that causes the breakup of liquid jet into droplets, and then develop numerical methods that predict this directly from an existing flow simulation.   
       
 My dissertation, *Global Linear Stability Analysis of Capillary-Driven Interfacial Instability: A Jacobian-Free Approach*, extends a matrix-free stability method, namely; the Navier–Stokes-based mean flow perturbation method of Ranjan et al., from single-phase flows to multi-phase flows with a sharp interface. The method uses an existing nonlinear solver, runs the flow with/without a small interface displacement/perturbation and subtracts them. Dynamic mode decomposition then extracts the instability's growth rates and modes from the difference. The solver itself, a coupled level set and continuous moment-of-fluid method (CLS-CMOF), is used without modification. For the capillary instability of a viscous liquid column, the method reproduces the exact growth rate to within half a percent across most of the unstable band.  
     
