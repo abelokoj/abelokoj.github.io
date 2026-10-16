@@ -1,6 +1,6 @@
 /* ==========================================================
    Font sources
-   Serif (headings + body): Libertinus Serif — locally hosted offline webfonts
+   Serif (headings + body): MLModern — locally hosted offline webfonts
    Mono: Maple Mono NF, falling back to Maple Mono and FiraCode Nerd Font
    ========================================================== */
 
@@ -16,59 +16,43 @@
 @import url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css");
 
 @font-face {
-  font-family: "Libertinus Serif";
-  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Regular.woff2") format("woff2");
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Libertinus Serif";
-  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Italic.woff2") format("woff2");
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Libertinus Serif";
-  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Semibold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Libertinus Serif";
-  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-SemiboldItalic.woff2") format("woff2");
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Libertinus Serif";
-  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Bold.woff2") format("woff2");
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Libertinus Serif";
-  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-BoldItalic.woff2") format("woff2");
+  font-family: "MLModern";
+  src: url("../fonts/offline/mlmodern/woff2/MLModern-BoldItalic.woff2") format("woff2");
   font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
 
 :root {
-  --font-serif: "Libertinus Serif", Georgia, "Times New Roman", serif;
+  --font-serif: "MLModern", Georgia, "Times New Roman", serif;
   --font-mono: "Maple Mono NF", "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
 }
 
-/* Libertinus Serif everywhere except the separately styled Resume page. */
+/* MLModern everywhere except the separately styled Resume page. */
 body,
 button,
 input,

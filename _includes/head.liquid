@@ -87,11 +87,11 @@
 {% endif %}
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url | bust_css_cache }}">
 
-<!-- Custom font: locally hosted Libertinus Serif (headings + body) -->
+<!-- Custom font: locally hosted MLModern (headings + body) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {% if page.layout != 'resume' %}
-  <link rel="preload" href="{{ '/assets/fonts/offline/libertinus-serif/woff2/LibertinusSerif-Regular.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ '/assets/fonts/offline/mlmodern/woff2/MLModern-Regular.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
 {% endif %}
 <link rel="stylesheet" href="{{ '/assets/css/custom-fonts.css' | relative_url | bust_file_cache }}">
 <link rel="stylesheet" href="{{ '/assets/css/markdown.css' | relative_url | bust_file_cache }}">

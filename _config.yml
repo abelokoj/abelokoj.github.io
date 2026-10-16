@@ -638,12 +638,12 @@ third_party_libraries:
       js: "https://cdn.jsdelivr.net/npm/mermaid@{{version}}/dist/mermaid.min.js"
     version: "10.7.0"
   mathjax:
-    # MathJax 4 SVG bundle with Libertinus Serif + Libertinus Math glyph data.
-    # Pinned custom font build: https://github.com/dgleich/mathjax-fonts
+    # Site-specific MathJax 4 SVG build using the pinned MLModern OTF sources.
+    # Provenance and licenses: assets/fonts/offline/mlmodern/README.md
     integrity:
-      js: "sha256-Oo+EkaXO9wvNOBxS1ZjBGX5fMNnBrVVWAVBjJPiDn2k="
+      js: "sha256-dQq3hgq+l8K/xV98ncVKqwWX1Nr40naA3TtKbuYbU1w="
     url:
-      js: "https://cdn.jsdelivr.net/gh/dgleich/mathjax-fonts@34075ed04fe7db9153772948c2b1e0938fcd63a0/mathjax-libertinus/tex-mml-svg-mathjax-libertinus.js"
+      js: "/assets/fonts/offline/mlmodern/mathjax/tex-mml-svg-mlmodern.min.js"
     version: "4.1.0"
   tikzjax:
     integrity:
