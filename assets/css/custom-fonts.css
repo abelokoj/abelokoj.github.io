@@ -58,6 +58,23 @@ article .title,
   font-variant-caps: small-caps;
 }
 
+/* The default layout adds 3rem above every page. The About page's name is its
+   visual masthead, so bring it directly below the fixed navigation and restore
+   the prominence lost when lowercase letters are rendered as small caps. */
+.about-page {
+  margin-top: -3rem;
+}
+
+.about-page .post-header .site-name {
+  font-size: 2.3rem;
+}
+
+@media (max-width: 420px) {
+  .about-page .post-header .site-name {
+    font-size: 2.0125rem;
+  }
+}
+
 h1,
 h2,
 h3,
