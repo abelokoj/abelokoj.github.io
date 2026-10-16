@@ -32,30 +32,27 @@ latest_posts:
 Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically.
 
 Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them. -->
+ 
+  
+My name is Abel Okojunu, and I am a PhD candidate in Applied and Computational Mathematics at Florida State University (FSU). I am in the final year of the program and will defend my dissertation in November 2026 under the supervision of Prof. Mark Sussman. My research sits at the intersection of Computational Fluid Dynamics (CFD) and numerical analysis. Particularly, I study when a liquid jet or thread becomes unstable and breaks into droplets, and I develop numerical methods that predict this directly from an existing flow simulation.   
+      
+My dissertation, *Global Linear Stability Analysis of Capillary-Driven Interfacial Instability: A Jacobian-Free Approach*, extends a matrix-free stability method, the Navier–Stokes-based mean flow perturbation method of Ranjan et al., from single-phase flows to two-phase flows with a sharp interface. Rather than deriving and coding the linearized equations, I run the flow solver twice: once with a small interface displacement and once without, then subtract the two. Dynamic mode decomposition then extracts the instability's growth rates and modes from the difference. The solver itself, a coupled level set and continuous moment-of-fluid method, is used without modification. For the capillary instability of a viscous liquid column, the method reproduces the exact growth rate to within half a percent across most of the unstable band.  
+    
+My interest in numerical methods for partial differential equations began during my undergraduate studies in Mathematics at the Federal University of Petroleum Resources, Nigeria, where my thesis was on Higher order compact finite difference schemes for BVPs. Since then, I have pursued it in two further settings: a summer intern appointment at LLNL, where I applied the Sherman–Morrison formula to accelerate an ODE solver for sustainable-aviation modeling, and several years at FSU as a graduate teaching assistant and instructor of record for Calculus I--III, and Applied Linear Algebra, and other courses. You can find out what some of my past students have to say about me here <https://www.ratemyprofessors.com/professor/2931172>  
+    
+My core research interests include (but are not limited to) 
 
+- Computational Fluid Mechanics (Fluid and Gas Dynamics)
+- Multiphase flows and interfacial dynamics
+- Hydrodynamic and global stability analysis
+- Capillary instabilities and liquid breakup
+- Matrix-free and Jacobian-free methods
+- Data-driven modeling and modal analysis of fluid flows
 
-I am a doctoral candidate in Applied and Computational Mathematics at Florida State University, with my PhD defense scheduled for November 2026. My dissertation, *Global Linear Stability Analysis of Capillary-Driven Interfacial Instability: A Jacobian-Free Approach*, uses matrix-free Krylov and Arnoldi methods: numerical linear algebra techniques that allow an instability to be analyzed without explicitly forming the Jacobian of the system governing the flow.
-
-I completed my undergraduate studies in Mathematics at the Federal University of Petroleum Resources, Nigeria, where a thesis on compact finite-difference schemes first directed my attention toward numerical methods for partial differential equations. That interest has since developed outside the classroom in two settings: a summer appointment at Lawrence Livermore National Laboratory, where I applied the Sherman-Morrison formula to accelerate an ordinary differential equation (ODE) solver for sustainable-aviation modeling, and several years as a graduate teaching assistant and instructor of record at Florida State University, where I teach calculus and applied linear algebra.
-
-My present interests include stiff ODE solvers, uncertainty quantification, domain decomposition, Bayesian inverse problems, and the conditions under which physics-informed neural networks justify their computational cost relative to classical solvers. I develop these questions at greater length on the [blog]({{ '/blog/' | relative_url }}), where the emphasis falls on the trade-offs each method entails, not on advocacy for any single approach.
-
-Further material appears on the [projects]({{ '/projects/' | relative_url }}) and [publications]({{ '/publications/' | relative_url }}) pages. I welcome correspondence concerning numerical linear algebra, computational fluid dynamics, high-performance computing, and scientific computing more generally.
+Besides these, I also have keen interest in Data Science/Analytics, SciML & AI, uncertainty quantification, Inverse problems, PINNs, and wherever Mathematical techniques, or computational methods are applied to solving humanity's challenges, pushing the boundaries of Science, and expanding our horizon. During my spare time, I sometimes write about these topics on my [blog]({{ '/blog/' | relative_url }}) and [projects]({{ '/projects/' | relative_url }}) and [publications]({{ '/publications/' | relative_url }}) section which you can find on this page.  
+  
+I am currently building SumatraPDF Enhanced, a lightweight pdf reader with full featured annotation tools comparably at the same level of what is obtainable with popular apps like notability, good notes, Samsung notes etc. It is highly useful tool for researchers, students, and instructors etc. If you work with pdf documents frequently, you will find SumatraPDF Enhanced to be a very useful addition/replacement for most of your current tool stack. You can find it using the link <https://github.com/abelokoj/sumatrapdf-enhanced>
 
 <div role="note" class="site-note" style="margin-top: 2rem; padding: 0.75rem 1rem; border-left: 4px solid var(--global-theme-color); background-color: var(--global-card-bg-color); color: var(--global-text-color);">
-  <strong>Note:</strong> This site is under active development. Some pages are incomplete, and content will continue to be added and revised.
+  <strong>Note:</strong> This site is under active development. Some pages are incomplete, and content will continue to be added and revised (Including this about me page). It will continue for as long as this notification is still here. You will no longer see this notification as soon as the site development is completed.
 </div>
-
-
-
-
-
-
-
-
-
-<!-- I am currently rounding up my PhD program in Applied and Computational Mathematics at Florida State University. My PhD research is focused on the *"Global Linear Stability Analysis of Capillary-Driven Interfacial Instability: A Jacobian-Free Approach"*. The aim is to circumvent the enoumous computationally intensive resources required in performing stability analysis using matrix--forming methods that require explicitly forming the Jacobian Matrix.
-
-
-
-I am a gold medalist (which puts me at the top 1% of mathematicians coming out of Nigeria). -->
