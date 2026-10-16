@@ -1,0 +1,48 @@
+/* Direct OpenType MATH shaping by the browser. No SVG glyph images. */
+@font-face {
+  font-family: "MLModern Math";
+  src: url("../fonts/offline/mlmodern/woff2/MLModernMath-Regular.woff2") format("woff2");
+  /* Retain the font's ascender/descender; remove its extra 20% line gap. */
+  ascent-override: 80.6%;
+  descent-override: 19.4%;
+  line-gap-override: 0%;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MLModern Math";
+  src: url("../fonts/offline/mlmodern/woff2/MLModernMath-Bold.woff2") format("woff2");
+  ascent-override: 80.6%;
+  descent-override: 19.4%;
+  line-gap-override: 0%;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+mjx-container[jax="NativeMML"] math {
+  font-family: "MLModern Math", math;
+  font-size: 1em;
+  color: inherit;
+}
+
+mjx-container[jax="NativeMML"][display="block"] {
+  display: block;
+  margin: 1em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25em;
+}
+
+/* TeX align/array attributes are outside MathML Core; mirror them in CSS. */
+mjx-container[jax="NativeMML"] mtd {
+  padding: 0.2em 0.4em;
+}
+
+mjx-container[jax="NativeMML"] .math-equation-label {
+  padding-inline-start: 1.5em;
+  text-align: right;
+  white-space: nowrap;
+}

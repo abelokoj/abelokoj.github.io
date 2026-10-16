@@ -15,44 +15,12 @@
 /* FiraCode Nerd Font — fallback, and the source of NF icon glyphs */
 @import url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css");
 
-@font-face {
-  font-family: "MLModern";
-  src: url("../fonts/offline/mlmodern/woff2/MLModern-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MLModern";
-  src: url("../fonts/offline/mlmodern/woff2/MLModern-Italic.woff2") format("woff2");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MLModern";
-  src: url("../fonts/offline/mlmodern/woff2/MLModern-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MLModern";
-  src: url("../fonts/offline/mlmodern/woff2/MLModern-BoldItalic.woff2") format("woff2");
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-
 :root {
-  --font-serif: "MLModern", Georgia, "Times New Roman", serif;
+  --font-serif: Georgia, "Times New Roman", serif;
   --font-mono: "Maple Mono NF", "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
 }
 
-/* MLModern everywhere except the separately styled Resume page. */
+/* Shared family assignment; optional font-specific CSS supplies the serif face. */
 body,
 button,
 input,
@@ -66,7 +34,11 @@ select,
 .publications,
 .news,
 .post-meta,
-h1, h2, h3, h4, h6,
+h1,
+h2,
+h3,
+h4,
+h6,
 .title,
 .post-title,
 article .title,
@@ -80,7 +52,17 @@ article .title,
   font-size: 2rem; /* 20% smaller than Bootstrap's 2.5rem h1 default. */
 }
 
-h1, h2, h3, h4, h6,
+/* The personal name only, not page titles or navigation labels. */
+.site-name,
+.navbar-brand.title {
+  font-variant-caps: small-caps;
+}
+
+h1,
+h2,
+h3,
+h4,
+h6,
 .title,
 .post-title,
 article .title,
@@ -178,6 +160,12 @@ html[data-theme="dark"] .contact-icons .fa-github::before {
 
 .contact-icons .ai-cv::before {
   color: var(--global-theme-color) !important;
+}
+
+/* Compact fixed footer; let the copyright text wrap naturally on small screens. */
+footer.fixed-bottom .container {
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 /* Let long CV locations wrap instead of widening the page on phones.
