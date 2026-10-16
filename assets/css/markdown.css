@@ -5,7 +5,7 @@
 :is(.markdown-body, #markdown-content) {
   --md-base-font-size: 13pt;
   --md-line-height: 1.3;
-  --md-font-serif: "Lora", "Palatino Linotype", "NewComputerModern10", Palatino, Georgia, serif;
+  --md-font-serif: var(--font-serif, "Libertinus Serif", Georgia, "Times New Roman", serif);
   --md-font-mono: "Maple Mono NF", "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, "Courier New", monospace;
   --md-color-text: #333333;
   --md-color-heading: #000000;
@@ -325,51 +325,6 @@ html[data-theme="dark"] :is(.markdown-body, #markdown-content) a.absent {
 
 /* Optional ChatGPT Codex-inspired code theme. Enable it per post with
    `code_theme: codex` in the Markdown front matter. */
-.post.code-theme-codex #markdown-content {
-  --code-text: #24292f;
-  --code-comment: #6e7781;
-  --code-keyword: #a40e4c;
-  --code-string: #2f6f44;
-  --code-number: #9a4d00;
-  --code-function: #335cbb;
-  --code-class: #8a5a00;
-  --code-variable: #26734d;
-  --code-decorator: #7047a3;
-  --code-error: #cf222e;
-  --code-error-bg: #ffebe9;
-}
-
-.post.code-theme-codex #markdown-content .highlight,
-.post.code-theme-codex #markdown-content .highlight pre {
-  border-color: #d9d9de;
-  background-color: #f7f7f8;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
-}
-
-.post.code-theme-codex #markdown-content .highlight code {
-  background-color: transparent;
-}
-
-html[data-theme="dark"] .post.code-theme-codex #markdown-content {
-  --code-text: #f4f4f5;
-  --code-comment: #9aa4af;
-  --code-keyword: #ff7ab2;
-  --code-string: #a8cc8c;
-  --code-number: #d19a66;
-  --code-function: #82aaff;
-  --code-class: #ffc777;
-  --code-variable: #c3e88d;
-  --code-decorator: #c792ea;
-  --code-error: #ff6b6b;
-  --code-error-bg: #4b1113;
-}
-
-html[data-theme="dark"] .post.code-theme-codex #markdown-content .highlight,
-html[data-theme="dark"] .post.code-theme-codex #markdown-content .highlight pre {
-  border-color: #343434;
-  background-color: #171717;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
-}
 
 /* About-only icon sizing: 30% smaller than the theme's 4rem/3.2rem defaults. */
 .social .about-contact-icons {

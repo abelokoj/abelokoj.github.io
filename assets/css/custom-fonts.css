@@ -1,6 +1,6 @@
 /* ==========================================================
-   Online font sources
-   Serif (headings + body): Lora — loaded via <link> in _includes/head.liquid
+   Font sources
+   Serif (headings + body): Libertinus Serif — locally hosted offline webfonts
    Mono: Maple Mono NF, falling back to Maple Mono and FiraCode Nerd Font
    ========================================================== */
 
@@ -15,12 +15,60 @@
 /* FiraCode Nerd Font — fallback, and the source of NF icon glyphs */
 @import url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css");
 
+@font-face {
+  font-family: "Libertinus Serif";
+  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libertinus Serif";
+  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libertinus Serif";
+  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libertinus Serif";
+  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-SemiboldItalic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libertinus Serif";
+  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libertinus Serif";
+  src: url("../fonts/offline/libertinus-serif/woff2/LibertinusSerif-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
-  --font-serif: "Lora", Georgia, "Times New Roman", serif;
+  --font-serif: "Libertinus Serif", Georgia, "Times New Roman", serif;
   --font-mono: "Maple Mono NF", "Maple Mono", "FiraCode Nerd Font", "Fira Code", Consolas, monospace;
 }
 
-/* Lora everywhere except the separately styled Resume page. */
+/* Libertinus Serif everywhere except the separately styled Resume page. */
 body,
 button,
 input,
@@ -46,15 +94,6 @@ article .title,
 
 .post-header .post-title {
   font-size: 2rem; /* 20% smaller than Bootstrap's 2.5rem h1 default. */
-}
-
-.post-header .post-subtitle {
-  margin: 0.35rem 0 0.7rem;
-  color: var(--global-text-color);
-  font-family: var(--font-serif);
-  font-size: 1.62rem; /* 20% larger than the previous 1.35rem. */
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 h1, h2, h3, h4, h6,
@@ -157,9 +196,6 @@ html[data-theme="dark"] .contact-icons .fa-github::before {
   color: var(--global-theme-color) !important;
 }
 
-
-
-
 /* Let long CV locations wrap instead of widening the page on phones.
    The CV plugin loads later, so keep this selector more specific than p.location. */
 @media (max-width: 767.98px) {
@@ -168,4 +204,3 @@ html[data-theme="dark"] .contact-icons .fa-github::before {
     overflow-wrap: anywhere;
   }
 }
-
